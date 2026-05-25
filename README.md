@@ -1,23 +1,22 @@
-<img src="https://media.tenor.com/o7b6jzZ5l1sAAAAC/naruto-vs-sasuke.gif" alt="banner">
+<img src="https://media.tenor.com/3bTxZ3D6X0MAAAAC/naruto-sasuke-fight.gif" alt="banner">
 
-<h1 align="center">⚡ API LOURD ⚡</h1>
+<h1 align="center">⚔️ API LOURD ⚔️</h1>
 
 <p align="center">
-🔥 Combat • Puissance • Rapidité 🔥  
-🎌 API Anime créée pour la performance ultime  
+🔥 Naruto vs Sasuke • Combat ultime 🔥  
+⚡ Puissance • Rapidité • Destruction  
 </p>
 
 ---
 
-## ⚔️ Présentation
+## ⚡ Présentation
 
-**API LOURD** est une API puissante conçue pour :
+API LOURD est une API puissante dédiée à l’anime 🎌
 
-- ⚡ Réponses ultra rapides  
-- 🔥 Données anime (Naruto, Sasuke, Gojo…)  
-- 💬 Chat IA  
-- 🎌 Recherche avancée  
-- 🧠 Système intelligent  
+✔ Recherche Naruto, Sasuke, Gojo  
+✔ Réponse rapide  
+✔ Système IA  
+✔ Données dyniques  
 
 ---
 

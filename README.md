@@ -1,26 +1,36 @@
-<img src="https://gifdb.com/images/high/naruto-vs-sasuke-anime-fight-bdu8vb8tw4zp77rz.gif" alt="banner">
-
 <h1 align="center">⚡ API LOURD ⚡</h1>
 
 <p align="center">
-🔥 Anime • Puissance • Rapidité 🔥  
-🎌 API dédiée aux personnages anime  
+🎌 Anime • Puissance • Intelligence  
+👑 Created by Célestin  
 </p>
 
 ---
 
-## ⚔️ Présentation
+## 🖤 Créateur
 
-API LOURD est une API spécialisée dans les données anime :
+<p align="center">
+  <img src="https://i.imgur.com/REMPLACE_PAR_TON_UPLOAD.png" width="250" style="border-radius: 50%;">
+</p>
 
-- 🔍 Recherche personnages (Naruto, Sasuke, Gojo…)
-- 📜 Description réelle via API
-- ⚡ Réponse rapide
-- 🧠 Système intelligent
+<p align="center">
+✨ Célestin — Developer & Creator
+</p>
 
 ---
 
-## 🚀 Exemple
+## 🔥 Présentation
+
+API LOURD est une API spécialisée dans les personnages anime :
+
+- 🔍 Recherche : Naruto, Sasuke, Gojo…
+- 📜 Histoire complète en français
+- ⚡ Réponse rapide
+- 🎯 Données propres et stylées
+
+---
+
+## 🧠 Exemple
 
 ```bash
-curl -X GET "https://ton-api.com/anime?name=Sasuke"
+GET /anime?name=Naruto

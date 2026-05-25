@@ -10,7 +10,7 @@
 ## 🖤 Créateur
 
 <p align="center">
-  <img src="https://i.imgur.com/REMPLACE_PAR_TON_UPLOAD.png" width="250" style="border-radius: 50%;">
+  <img src="https://raw.githubusercontent.com/flackodisk-boop/Api-lourd/main/assets/celestin.png" width="250" style="border-radius: 50%;">
 </p>
 
 <p align="center">
@@ -23,14 +23,11 @@
 
 API LOURD est une API spécialisée dans les personnages anime :
 
-- 🔍 Recherche : Naruto, Sasuke, Gojo…
-- 📜 Histoire complète en français
-- ⚡ Réponse rapide
-- 🎯 Données propres et stylées
+- 🔍 Naruto, Sasuke, Gojo…
+- 📜 Histoire complète
+- ⚡ Rapide
+- 🎯 Données en français
 
 ---
 
-## 🧠 Exemple
-
-```bash
-GET /anime?name=Naruto
+## ⚡ Signature

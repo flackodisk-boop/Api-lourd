@@ -1,1 +1,339 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialDark - Application</title>
+    <style>
+        :root {
+            --bg-principal: #070f1e;       /* Bleu très sombre comme sur ton screen */
+            --bg-secondaire: #0f1b2f;     /* Cartes et menus */
+            --bg-hover: #1b2d4a;
+            --texte-principal: #ffffff;
+            --texte-secondaire: #94a3b8;
+            --or-accent: #d4af37;         /* Couleur dorée inspirée de ton logo */
+            --bleu-action: #1da1f2;
+            --bordure: #1e293b;
+        }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-principal);
+            color: var(--texte-principal);
+        }
+
+        /* --- NAVBAR --- */
+        header {
+            background-color: var(--bg-secondaire);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            border-bottom: 1px solid var(--bordure);
+        }
+
+        .logo-zone {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            font-size: 20px;
+            color: var(--or-accent);
+        }
+
+        .nav-profil {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-statut {
+            font-size: 14px;
+            color: var(--texte-secondaire);
+        }
+
+        /* --- LAYOUT --- */
+        .conteneur-principal {
+            margin-top: 70px;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            gap: 20px;
+        }
+
+        .colonne-gauche {
+            flex: 1;
+            max-width: 280px;
+        }
+
+        .zone-centrale {
+            flex: 2;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        /* --- COMPOSANTS --- */
+        .carte {
+            background-color: var(--bg-secondaire);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--bordure);
+        }
+
+        .menu-item {
+            display: block;
+            padding: 12px;
+            color: var(--texte-principal);
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .menu-item:hover, .menu-item.actif {
+            background-color: var(--bg-hover);
+            color: var(--or-accent);
+        }
+
+        /* Inputs et Boutons */
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            background-color: var(--bg-principal);
+            border: 1px solid var(--bordure);
+            border-radius: 8px;
+            color: white;
+        }
+
+        button {
+            width: 100%;
+            background-color: var(--or-accent);
+            color: #000;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .btn-secondaire {
+            background-color: transparent;
+            color: var(--texte-secondaire);
+            border: 1px solid var(--bordure);
+            margin-top: 10px;
+        }
+
+        .btn-secondaire:hover {
+            background-color: var(--bg-hover);
+            color: white;
+        }
+
+        /* Gestion des Onglets / Vues */
+        .section-vue {
+            display: none;
+        }
+
+        .section-vue.visible {
+            display: block;
+        }
+
+        /* Post Look */
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background-color: var(--or-accent);
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-zone">
+            <span>📐</span> G-Social
+        </div>
+        <div class="nav-profil">
+            <span id="txt-statut" class="user-statut">Visiteur anonyme</span>
+        </div>
+    </header>
+
+    <div class="conteneur-principal">
+        
+        <aside class="colonne-gauche">
+            <div class="carte">
+                <div class="menu-item actif" onclick="changerOnglet('flux', this)">🏠 Fil d'actualité</div>
+                <div class="menu-item" onclick="changerOnglet('parametres', this)">⚙️ Paramètres</div>
+                <div id="item-connexion-menu" class="menu-item" onclick="changerOnglet('connexion', this)">🔑 Connexion / Profil</div>
+            </div>
+        </aside>
+
+        <main class="zone-centrale">
+
+            <section id="vue-flux" class="section-vue visible">
+                <div class="carte">
+                    <h3 style="margin-bottom: 15px;">Créer une publication</h3>
+                    <input type="text" id="input-post" placeholder="Partagez quelque chose avec la communauté...">
+                    <button onclick="ajouterPost()" style="background-color: var(--bleu-action); color: white;">Publier</button>
+                </div>
+
+                <div id="liste-posts">
+                    <div class="carte">
+                        <div class="post-header">
+                            <div class="avatar"></div>
+                            <div>
+                                <strong>Modérateur G</strong>
+                                <div style="font-size: 12px; color: var(--texte-secondaire);">En ligne sur Vercel</div>
+                            </div>
+                        </div>
+                        <p>Félicitations ! Ton application "G-Social" est maintenant configurée pour le déploiement.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="vue-parametres" class="section-vue">
+                <div class="carte">
+                    <h2>⚙️ Paramètres du Compte</h2>
+                    <br>
+                    <p style="color: var(--texte-secondaire); margin-bottom: 15px;">Modifie les options de ton application ici.</p>
+                    
+                    <label>Nom d'affichage</label>
+                    <input type="text" id="param-pseudo" value="UtilisateurG">
+                    
+                    <label>Thème de l'application</label>
+                    <input type="text" value="Bleu Sombre (Par défaut)" disabled style="opacity: 0.5;">
+                    
+                    <button onclick="sauvegarderParametres()">Enregistrer les modifications</button>
+                </div>
+            </section>
+
+            <section id="vue-connexion" class="section-vue">
+                <div id="boite-connexion" class="carte">
+                    <h2>🔑 Connexion</h2>
+                    <br>
+                    <form onsubmit="gererConnexion(event)">
+                        <input type="text" id="login-username" placeholder="Nom d'utilisateur (ex: Flacko)" required>
+                        <input type="password" placeholder="Mot de passe (factice)" required>
+                        <button type="submit">Se connecter de manière sécurisée</button>
+                    </form>
+                </div>
+
+                <div id="boite-profil" class="carte" style="display: none;">
+                    <h2>👤 Ton Profil</h2>
+                    <br>
+                    <p>Statut : <span style="color: #4cd137;">Connecté</span></p>
+                    <p id="profil-nom" style="margin-top: 10px; font-size: 18px; font-weight: bold;"></p>
+                    <button onclick="gererDeconnexion()" class="btn-secondaire">Se déconnecter</button>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        // Système d'onglets
+        function changerOnglet(idVue, elementMenu) {
+            // Masquer toutes les vues
+            document.querySelectorAll('.section-vue').forEach(vue => vue.classList.remove('visible'));
+            // Désactiver tous les styles du menu
+            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('actif'));
+            
+            // Afficher la vue demandée
+            document.getElementById('vue-' + idVue).classList.add('visible');
+            // Mettre en valeur le menu cliqué
+            elementMenu.classList.add('actif');
+        }
+
+        // Système de Connexion Dynamique
+        let utilisateurConnecte = null;
+
+        function gererConnexion(event) {
+            event.preventDefault();
+            const pseudo = document.getElementById('login-username').value;
+            utilisateurConnecte = pseudo;
+
+            // Mettre à jour l'interface utilisateur
+            document.getElementById('txt-statut').innerText = "Connecté en tant que : " + pseudo;
+            document.getElementById('profil-nom').innerText = "Bienvenue, " + pseudo;
+            document.getElementById('param-pseudo').value = pseudo;
+
+            // Basculer les formulaires
+            document.getElementById('boite-connexion').style.display = 'none';
+            document.getElementById('boite-profil').style.display = 'block';
+            document.getElementById('item-connexion-menu').innerText = "👤 Profil (" + pseudo + ")";
+        }
+
+        function gererDeconnexion() {
+            utilisateurConnecte = null;
+            document.getElementById('txt-statut').innerText = "Visiteur anonyme";
+            document.getElementById('boite-connexion').style.display = 'block';
+            document.getElementById('boite-profil').style.display = 'none';
+            document.getElementById('item-connexion-menu').innerText = "🔑 Connexion / Profil";
+        }
+
+        // Sauvegarde rapide des paramètres
+        function sauvegarderParametres() {
+            const nouveauNom = document.getElementById('param-pseudo').value;
+            if(utilisateurConnecte) {
+                utilisateurConnecte = nouveauNom;
+                document.getElementById('txt-statut').innerText = "Connecté en tant que : " + nouveauNom;
+                document.getElementById('profil-nom').innerText = "Bienvenue, " + nouveauNom;
+            }
+            alert("Paramètres mis à jour avec succès !");
+        }
+
+        // Ajouter un post à la volée
+        function ajouterPost() {
+            const contenu = document.getElementById('input-post').value;
+            if(!contenu.trim()) return alert("Le message ne peut pas être vide !");
+
+            const auteur = utilisateurConnecte ? utilisateurConnecte : "Visiteur Anonyme";
+            const liste = document.getElementById('liste-posts');
+
+            const nouveauPostHtml = `
+                <div class="carte">
+                    <div class="post-header">
+                        <div class="avatar" style="background-color: var(--bleu-action);"></div>
+                        <div>
+                            <strong>${auteur}</strong>
+                            <div style="font-size: 12px; color: var(--texte-secondaire);">À l'instant</div>
+                        </div>
+                    </div>
+                    <p>${contenu}</p>
+                </div>
+            `;
+
+            // Insérer le post au début de la liste
+            liste.insertAdjacentHTML('afterbegin', nouveauPostHtml);
+            document.getElementById('input-post').value = ""; // Vider le champ
+        }
+    </script>
+</body>
+</html>

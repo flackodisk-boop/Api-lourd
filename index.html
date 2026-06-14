@@ -3,17 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SocialDark - Application</title>
+    <title>G-Social X WhatsApp - Dev Edition</title>
     <style>
         :root {
-            --bg-principal: #070f1e;       /* Bleu très sombre comme sur ton screen */
-            --bg-secondaire: #0f1b2f;     /* Cartes et menus */
+            --bg-principal: #070f1e;       
+            --bg-secondaire: #0f1b2f;     
             --bg-hover: #1b2d4a;
             --texte-principal: #ffffff;
             --texte-secondaire: #94a3b8;
-            --or-accent: #d4af37;         /* Couleur dorée inspirée de ton logo */
+            --or-accent: #d4af37;         
             --bleu-action: #1da1f2;
             --bordure: #1e293b;
+            --vert-whatsapp: #128c7e;
+            --vert-light: #25d366;
+            --bulle-moi: #056162;
+            --bulle-autre: #26354d;
+            --rouge-danger: #ef4444;
         }
 
         * {
@@ -26,12 +31,14 @@
         body {
             background-color: var(--bg-principal);
             color: var(--texte-principal);
+            overflow-x: hidden;
+            height: 100vh;
         }
 
         /* --- NAVBAR --- */
         header {
             background-color: var(--bg-secondaire);
-            padding: 10px 20px;
+            padding: 0 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -40,6 +47,7 @@
             width: 100%;
             z-index: 100;
             border-bottom: 1px solid var(--bordure);
+            height: 60px;
         }
 
         .logo-zone {
@@ -51,67 +59,93 @@
             color: var(--or-accent);
         }
 
-        .nav-profil {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .user-statut {
-            font-size: 14px;
-            color: var(--texte-secondaire);
-        }
-
-        /* --- LAYOUT --- */
+        /* --- LAYOUT GLOBAL --- */
         .conteneur-principal {
-            margin-top: 70px;
+            margin-top: 60px;
             display: flex;
-            justify-content: center;
-            padding: 20px;
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
-            gap: 20px;
+            height: calc(100vh - 60px);
+            width: 100vw;
         }
 
+        /* Colonne Gauche : Profil & Menu (Facebook Siderbar) */
         .colonne-gauche {
-            flex: 1;
-            max-width: 280px;
+            width: 300px;
+            background-color: var(--bg-secondaire);
+            border-right: 1px solid var(--bordure);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
         }
 
+        /* Zone Centrale : Flux & Pages (Défilant) */
         .zone-centrale {
-            flex: 2;
-            max-width: 600px;
-            width: 100%;
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        /* --- COMPOSANTS --- */
+        .feed-container {
+            width: 100%;
+            max-width: 650px;
+        }
+
+        /* Colonne Droite : Liste WhatsApp & Chats */
+        .colonne-droite-messenger {
+            width: 380px;
+            background-color: var(--bg-secondaire);
+            border-left: 1px solid var(--bordure);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- COMPOSANTS INTERFACES --- */
         .carte {
             background-color: var(--bg-secondaire);
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 20px;
             border: 1px solid var(--bordure);
+            width: 100%;
+        }
+
+        .avatar {
+            width: 42px;
+            height: 42px;
+            background-color: var(--or-accent);
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--bordure);
+        }
+
+        .avatar-grand {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 10px auto;
+            display: block;
         }
 
         .menu-item {
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 12px;
             padding: 12px;
-            color: var(--texte-principal);
-            text-decoration: none;
             border-radius: 8px;
-            margin-bottom: 5px;
             cursor: pointer;
             transition: 0.2s;
+            margin-bottom: 5px;
         }
-
         .menu-item:hover, .menu-item.actif {
             background-color: var(--bg-hover);
             color: var(--or-accent);
         }
 
-        /* Inputs et Boutons */
-        input {
+        /* Formulaires */
+        input, textarea, select {
             width: 100%;
             padding: 12px;
             margin-bottom: 15px;
@@ -119,6 +153,8 @@
             border: 1px solid var(--bordure);
             border-radius: 8px;
             color: white;
+            outline: none;
+            resize: none;
         }
 
         button {
@@ -130,209 +166,458 @@
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 15px;
+            transition: 0.2s;
         }
+        button:hover { opacity: 0.9; }
 
-        button:hover {
-            opacity: 0.9;
-        }
-
-        .btn-secondaire {
+        .btn-secondary {
             background-color: transparent;
             color: var(--texte-secondaire);
             border: 1px solid var(--bordure);
-            margin-top: 10px;
         }
+        .btn-secondary:hover { background-color: var(--bg-hover); color: white; }
 
-        .btn-secondaire:hover {
-            background-color: var(--bg-hover);
-            color: white;
-        }
+        .btn-danger { background-color: var(--rouge-danger); color: white; }
 
-        /* Gestion des Onglets / Vues */
-        .section-vue {
-            display: none;
-        }
+        .btn-mini { width: auto; padding: 6px 12px; font-size: 12px; }
 
-        .section-vue.visible {
-            display: block;
-        }
-
-        /* Post Look */
-        .post-header {
+        /* Listes d'utilisateurs (Facebook / Invitations) */
+        .user-card-row {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .user-card-row:last-child { border-bottom: none; }
+
+        .user-details { flex: 1; }
+        .user-name { font-weight: bold; font-size: 14px; }
+        .user-subtitle { font-size: 12px; color: var(--texte-secondaire); }
+
+        .actions-gap { display: flex; gap: 8px; }
+
+        /* Commentaires sous les posts */
+        .comment-section {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .comment-item {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            font-size: 13px;
+            background-color: var(--bg-principal);
+            padding: 8px;
+            border-radius: 6px;
         }
 
-        .avatar {
-            width: 40px;
-            height: 40px;
-            background-color: var(--or-accent);
-            border-radius: 50%;
+        /* --- SECTION MESSAGERIE WHATSAPP --- */
+        .whatsapp-header {
+            background-color: var(--bg-hover);
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--bordure);
+            height: 60px;
         }
+
+        .chat-pill {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            transition: 0.2s;
+        }
+        .chat-pill:hover, .chat-pill.active { background-color: var(--bg-hover); }
+
+        .whatsapp-chat-box {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+        .whatsapp-chat-box.active { display: flex; }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background-color: #040914;
+        }
+
+        .msg { max-width: 75%; padding: 8px 12px; border-radius: 8px; font-size: 14px; line-height: 1.4; }
+        .msg.me { background-color: var(--bulle-moi); align-self: flex-end; }
+        .msg.other { background-color: var(--bulle-autre); align-self: flex-start; }
+        .msg-time { font-size: 10px; color: rgba(255,255,255,0.5); text-align: right; margin-top: 3px; }
+
+        .chat-input-area { padding: 12px; background-color: var(--bg-hover); display: flex; gap: 10px; }
+        .chat-input-area input { margin-bottom: 0; }
+        .chat-input-area button { width: auto; background-color: var(--vert-whatsapp); color: white; padding: 0 20px; }
+
+        /* Vues */
+        .section-vue { display: none; width: 100%; }
+        .section-vue.visible { display: block; }
     </style>
 </head>
 <body>
 
     <header>
         <div class="logo-zone">
-            <span>📐</span> G-Social
+            <span>📐</span> G-Social Platform
         </div>
-        <div class="nav-profil">
-            <span id="txt-statut" class="user-statut">Visiteur anonyme</span>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="width: 10px; height: 10px; background-color: var(--vert-light); border-radius: 50%;"></span>
+            <span style="font-size: 13px; color: var(--texte-secondaire);">Mode: Développeur Actif</span>
         </div>
     </header>
 
     <div class="conteneur-principal">
         
         <aside class="colonne-gauche">
-            <div class="carte">
-                <div class="menu-item actif" onclick="changerOnglet('flux', this)">🏠 Fil d'actualité</div>
-                <div class="menu-item" onclick="changerOnglet('parametres', this)">⚙️ Paramètres</div>
-                <div id="item-connexion-menu" class="menu-item" onclick="changerOnglet('connexion', this)">🔑 Connexion / Profil</div>
+            <div class="carte" style="text-align: center; padding: 15px;">
+                <img id="my-profile-pic" class="avatar avatar-grand" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" alt="Avatar">
+                <h3 id="my-profile-name">Célestin Olua</h3>
+                <p id="my-profile-bio" style="font-size: 12px; color: var(--texte-secondaire); margin-top: 5px;">Développeur Fullstack NodeJS & React</p>
+                <div id="my-profile-stack" style="font-size: 11px; color: var(--or-accent); margin-top: 8px; font-weight: bold;">JavaScript / HTML / CSS</div>
             </div>
+            
+            <nav style="flex: 1;">
+                <div class="menu-item actif" onclick="basculerOnglet('feed', this)">🏠 Fil d'actualité</div>
+                <div class="menu-item" onclick="basculerOnglet('communaute', this)">🔍 Découvrir & Inviter</div>
+                <div class="menu-item" onclick="basculerOnglet('invitations', this)">✉️ Invitations (<span id="count-invit">1</span>)</div>
+                <div class="menu-item" onclick="basculerOnglet('parametres', this)">⚙️ Paramètres du Profil</div>
+            </nav>
         </aside>
 
         <main class="zone-centrale">
-
-            <section id="vue-flux" class="section-vue visible">
-                <div class="carte">
-                    <h3 style="margin-bottom: 15px;">Créer une publication</h3>
-                    <input type="text" id="input-post" placeholder="Partagez quelque chose avec la communauté...">
-                    <button onclick="ajouterPost()" style="background-color: var(--bleu-action); color: white;">Publier</button>
-                </div>
-
-                <div id="liste-posts">
+            <div class="feed-container">
+                
+                <section id="vue-feed" class="section-vue visible">
                     <div class="carte">
-                        <div class="post-header">
-                            <div class="avatar"></div>
-                            <div>
-                                <strong>Modérateur G</strong>
-                                <div style="font-size: 12px; color: var(--texte-secondaire);">En ligne sur Vercel</div>
+                        <h4 style="margin-bottom: 12px;">Créer une publication de code</h4>
+                        <textarea id="post-content-input" rows="3" placeholder="Partagez un snippet, une idée ou un succès système..."></textarea>
+                        <button onclick="creerPublication()" style="background-color: var(--bleu-action); color: white;">Publier sur le réseau</button>
+                    </div>
+
+                    <div id="feed-wall">
+                        <div class="carte">
+                            <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+                                <img class="avatar" src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80">
+                                <div>
+                                    <strong>Modérateur G</strong>
+                                    <div style="font-size: 11px; color: var(--texte-secondaire);">Il y a 10 minutes</div>
+                                </div>
+                            </div>
+                            <p>Le système hybride Facebook x WhatsApp est entièrement opérationnel. Modifiez vos profils, envoyez vos invitations et lancez vos discussions.</p>
+                            
+                            <div class="comment-section">
+                                <div style="display: flex; gap: 8px;">
+                                    <input type="text" placeholder="Écrire un commentaire..." style="margin-bottom:0; padding:8px; font-size:13px;" onkeypress="ajouterCommentaireSimule(event, this)">
+                                </div>
+                                <div class="comment-item">
+                                    <strong>Alice Dev :</strong> Superbe boulot sur le design fluide !
+                                </div>
                             </div>
                         </div>
-                        <p>Félicitations ! Ton application "G-Social" est maintenant configurée pour le déploiement.</p>
+                    </div>
+                </section>
+
+                <section id="vue-communaute" class="section-vue">
+                    <div class="carte">
+                        <h2>🔍 Développeurs sur la plateforme</h2>
+                        <p style="font-size: 13px; color: var(--texte-secondaire); margin-bottom: 15px;">Envoyez une demande d'ami pour débloquer leur canal WhatsApp.</p>
+                        
+                        <div class="user-card-row">
+                            <img class="avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80">
+                            <div class="user-details">
+                                <div class="user-name">Marc Tech</div>
+                                <div class="user-subtitle">Architecte Cloud / DevOps</div>
+                            </div>
+                            <button class="btn-mini" onclick="envoyerInvitation(this, 'Marc Tech')">Inviter</button>
+                        </div>
+
+                        <div class="user-card-row">
+                            <img class="avatar" src="https://images.unsplash.com/photo-1628157582853-a796fa650a6a?auto=format&fit=crop&w=150&q=80">
+                            <div class="user-details">
+                                <div class="user-name">Lucas Python</div>
+                                <div class="user-subtitle">Ingénieur Data / AI</div>
+                            </div>
+                            <button class="btn-mini" onclick="envoyerInvitation(this, 'Lucas Python')">Inviter</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="vue-invitations" class="section-vue">
+                    <div class="carte">
+                        <h2>✉️ Invitations Reçues</h2>
+                        <br>
+                        <div id="box-invitations-recues">
+                            <div class="user-card-row" id="invit-row-1">
+                                <img class="avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80">
+                                <div class="user-details">
+                                    <div class="user-name">Alice Codeuse</div>
+                                    <div class="user-subtitle">Développeuse Frontend React</div>
+                                </div>
+                                <div class="actions-gap">
+                                    <button class="btn-mini" style="background-color: var(--vert-light); color: black;" onclick="accepterInvitation('invit-row-1', 'Alice Codeuse', 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80')">Accepter</button>
+                                    <button class="btn-mini btn-danger" onclick="refuserInvitation('invit-row-1')">Refuser</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="carte">
+                        <h2>✉️ Invitations Envoyées</h2>
+                        <br>
+                        <div id="box-invitations-envoyees" style="font-size: 13px; color: var(--texte-secondaire);">
+                            Aucune invitation en attente d'approbation.
+                        </div>
+                    </div>
+                </section>
+
+                <section id="vue-parametres" class="section-vue">
+                    <div class="carte">
+                        <h2>⚙️ Paramètres du Profil Développeur</h2>
+                        <br>
+                        <label>Nom Complet</label>
+                        <input type="text" id="setting-name" value="Célestin Olua">
+
+                        <label>Image de Profil (Lien URL)</label>
+                        <input type="text" id="setting-pic" value="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80">
+
+                        <label>Biographie Professionnelle</label>
+                        <textarea id="setting-bio" rows="2">Développeur Fullstack NodeJS & React</textarea>
+
+                        <label>Langage Principal / Spécialité</label>
+                        <select id="setting-stack">
+                            <option value="JavaScript / HTML / CSS">JavaScript / Fullstack</option>
+                            <option value="Python / Django / AI">Python / AI Data</option>
+                            <option value="PHP / Symfony / DevOps">PHP / Core Backend</option>
+                        </select>
+
+                        <button onclick="sauvegarderProfilConfiguration()">Enregistrer et Appliquer</button>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+
+        <aside class="colonne-droite-messenger">
+            
+            <div id="whatsapp-master-list" style="display: flex; flex-direction: column; height: 100%;">
+                <div class="whatsapp-header">
+                    <strong>Discussions Privées (WhatsApp)</strong>
+                </div>
+                <div style="flex: 1; overflow-y: auto;" id="whatsapp-contacts-box">
+                    
+                    <div class="chat-pill" onclick="ouvrirFenetreChat('Modérateur G', 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80')">
+                        <img class="avatar" src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80">
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <strong style="font-size: 14px;">Modérateur G</strong>
+                                <span style="font-size: 11px; color: var(--texte-secondaire);">14:48</span>
+                            </div>
+                            <p style="font-size: 12px; color: var(--texte-secondaire); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">Serveur Vercel opérationnel...</p>
+                        </div>
+                    </div>
+
+                    <div id="contacts-dynamiques-whatsapp"></div>
+
+                </div>
+            </div>
+
+            <div id="whatsapp-active-window" class="whatsapp-chat-box">
+                <div class="whatsapp-header" style="background-color: var(--vert-whatsapp); justify-content: flex-start;">
+                    <button onclick="fermerFenetreChat()" style="width: auto; background: none; color: white; font-size: 18px; margin-right: 10px; padding: 0 5px;">←</button>
+                    <img id="active-chat-avatar" class="avatar" src="" style="width: 36px; height: 36px;">
+                    <div>
+                        <strong id="active-chat-name" style="font-size: 15px;">Nom</strong>
+                        <div style="font-size: 11px; color: rgba(255,255,255,0.8);">en ligne</div>
                     </div>
                 </div>
-            </section>
 
-            <section id="vue-parametres" class="section-vue">
-                <div class="carte">
-                    <h2>⚙️ Paramètres du Compte</h2>
-                    <br>
-                    <p style="color: var(--texte-secondaire); margin-bottom: 15px;">Modifie les options de ton application ici.</p>
-                    
-                    <label>Nom d'affichage</label>
-                    <input type="text" id="param-pseudo" value="UtilisateurG">
-                    
-                    <label>Thème de l'application</label>
-                    <input type="text" value="Bleu Sombre (Par défaut)" disabled style="opacity: 0.5;">
-                    
-                    <button onclick="sauvegarderParametres()">Enregistrer les modifications</button>
+                <div class="chat-messages" id="chat-messages-scroll">
+                    </div>
+
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input-field" placeholder="Écrire un message sécurisé..." onkeypress="gestionEntreeChat(event)">
+                    <button onclick="envoyerMessageChat()">Envoyer</button>
                 </div>
-            </section>
+            </div>
 
-            <section id="vue-connexion" class="section-vue">
-                <div id="boite-connexion" class="carte">
-                    <h2>🔑 Connexion</h2>
-                    <br>
-                    <form onsubmit="gererConnexion(event)">
-                        <input type="text" id="login-username" placeholder="Nom d'utilisateur (ex: Flacko)" required>
-                        <input type="password" placeholder="Mot de passe (factice)" required>
-                        <button type="submit">Se connecter de manière sécurisée</button>
-                    </form>
-                </div>
+        </aside>
 
-                <div id="boite-profil" class="carte" style="display: none;">
-                    <h2>👤 Ton Profil</h2>
-                    <br>
-                    <p>Statut : <span style="color: #4cd137;">Connecté</span></p>
-                    <p id="profil-nom" style="margin-top: 10px; font-size: 18px; font-weight: bold;"></p>
-                    <button onclick="gererDeconnexion()" class="btn-secondaire">Se déconnecter</button>
-                </div>
-            </section>
-
-        </main>
     </div>
 
     <script>
-        // Système d'onglets
-        function changerOnglet(idVue, elementMenu) {
-            // Masquer toutes les vues
-            document.querySelectorAll('.section-vue').forEach(vue => vue.classList.remove('visible'));
-            // Désactiver tous les styles du menu
-            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('actif'));
+        // Système de navigation par onglets (Style Dashboard Facebook)
+        function basculerOnglet(idCible, elementMenu) {
+            document.querySelectorAll('.section-vue').forEach(v => v.classList.remove('visible'));
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('actif'));
             
-            // Afficher la vue demandée
-            document.getElementById('vue-' + idVue).classList.add('visible');
-            // Mettre en valeur le menu cliqué
+            document.getElementById('vue-' + idCible).classList.add('visible');
             elementMenu.classList.add('actif');
         }
 
-        // Système de Connexion Dynamique
-        let utilisateurConnecte = null;
+        // Publication de contenu sur le fil d'actualité
+        function creerPublication() {
+            const input = document.getElementById('post-content-input');
+            const texte = input.value.trim();
+            if(!texte) return;
 
-        function gererConnexion(event) {
-            event.preventDefault();
-            const pseudo = document.getElementById('login-username').value;
-            utilisateurConnecte = pseudo;
+            const monNom = document.getElementById('my-profile-name').innerText;
+            const maPhoto = document.getElementById('my-profile-pic').src;
+            const murCalcul = document.getElementById('feed-wall');
 
-            // Mettre à jour l'interface utilisateur
-            document.getElementById('txt-statut').innerText = "Connecté en tant que : " + pseudo;
-            document.getElementById('profil-nom').innerText = "Bienvenue, " + pseudo;
-            document.getElementById('param-pseudo').value = pseudo;
-
-            // Basculer les formulaires
-            document.getElementById('boite-connexion').style.display = 'none';
-            document.getElementById('boite-profil').style.display = 'block';
-            document.getElementById('item-connexion-menu').innerText = "👤 Profil (" + pseudo + ")";
-        }
-
-        function gererDeconnexion() {
-            utilisateurConnecte = null;
-            document.getElementById('txt-statut').innerText = "Visiteur anonyme";
-            document.getElementById('boite-connexion').style.display = 'block';
-            document.getElementById('boite-profil').style.display = 'none';
-            document.getElementById('item-connexion-menu').innerText = "🔑 Connexion / Profil";
-        }
-
-        // Sauvegarde rapide des paramètres
-        function sauvegarderParametres() {
-            const nouveauNom = document.getElementById('param-pseudo').value;
-            if(utilisateurConnecte) {
-                utilisateurConnecte = nouveauNom;
-                document.getElementById('txt-statut').innerText = "Connecté en tant que : " + nouveauNom;
-                document.getElementById('profil-nom').innerText = "Bienvenue, " + nouveauNom;
-            }
-            alert("Paramètres mis à jour avec succès !");
-        }
-
-        // Ajouter un post à la volée
-        function ajouterPost() {
-            const contenu = document.getElementById('input-post').value;
-            if(!contenu.trim()) return alert("Le message ne peut pas être vide !");
-
-            const auteur = utilisateurConnecte ? utilisateurConnecte : "Visiteur Anonyme";
-            const liste = document.getElementById('liste-posts');
-
-            const nouveauPostHtml = `
+            const postStructureHtml = `
                 <div class="carte">
-                    <div class="post-header">
-                        <div class="avatar" style="background-color: var(--bleu-action);"></div>
+                    <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+                        <img class="avatar" src="${maPhoto}">
                         <div>
-                            <strong>${auteur}</strong>
-                            <div style="font-size: 12px; color: var(--texte-secondaire);">À l'instant</div>
+                            <strong>${monNom}</strong>
+                            <div style="font-size: 11px; color: var(--texte-secondaire);">À l'instant</div>
                         </div>
                     </div>
-                    <p>${contenu}</p>
+                    <p>${texte}</p>
+                    <div class="comment-section">
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" placeholder="Écrire un commentaire..." style="margin-bottom:0; padding:8px; font-size:13px;" onkeypress="ajouterCommentaireSimule(event, this)">
+                        </div>
+                    </div>
                 </div>
             `;
+            murCalcul.insertAdjacentHTML('afterbegin', postStructureHtml);
+            input.value = "";
+        }
 
-            // Insérer le post au début de la liste
-            liste.insertAdjacentHTML('afterbegin', nouveauPostHtml);
-            document.getElementById('input-post').value = ""; // Vider le champ
+        // Ajouter un commentaire sous un post
+        function ajouterCommentaireSimule(event, inputElement) {
+            if (event.key === 'Enter' && inputElement.value.trim() !== "") {
+                const monNom = document.getElementById('my-profile-name').innerText;
+                const commentHtml = `
+                    <div class="comment-item">
+                        <strong>${monNom} :</strong> ${inputElement.value.trim()}
+                    </div>
+                `;
+                inputElement.parentElement.insertAdjacentHTML('afterend', commentHtml);
+                inputElement.value = "";
+            }
+        }
+
+        // Sauvegarder les paramètres de profil
+        function sauvegarderProfilConfiguration() {
+            const nom = document.getElementById('setting-name').value.trim();
+            const pic = document.getElementById('setting-pic').value.trim();
+            const bio = document.getElementById('setting-bio').value.trim();
+            const stack = document.getElementById('setting-stack').value;
+
+            if(!nom) return alert("Le nom est obligatoire.");
+
+            document.getElementById('my-profile-name').innerText = nom;
+            document.getElementById('my-profile-pic').src = pic;
+            document.getElementById('my-profile-bio').innerText = bio;
+            document.getElementById('my-profile-stack').innerText = stack;
+
+            alert("Profil mis à jour avec succès sur l'API !");
+        }
+
+        // Envoyer une invitation (Gérer les listes)
+        function envoyerInvitation(bouton, nomDev) {
+            bouton.innerText = "Envoyé ✔";
+            bouton.disabled = true;
+            bouton.style.opacity = "0.6";
+
+            const conteneurEnvoyes = document.getElementById('box-invitations-envoyees');
+            if(conteneurEnvoyes.innerText.includes("Aucune invitation")) {
+                conteneurEnvoyes.innerHTML = "";
+            }
+
+            conteneurEnvoyes.insertAdjacentHTML('beforeend', `
+                <div style="padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.02);">
+                    Demande d'ami en attente de réponse avec <strong>${nomDev}</strong>
+                </div>
+            `);
+        }
+
+        // Refuser invitation
+        function refuserInvitation(idLigne) {
+            document.getElementById(idLigne).remove();
+            document.getElementById('count-invit').innerText = "0";
+        }
+
+        // Accepter l'invitation d'un développeur -> Injection directe dans WhatsApp à droite
+        function accepterInvitation(idLigne, nomAmi, photoAmi) {
+            document.getElementById(idLigne).remove();
+            document.getElementById('count-invit').innerText = "0";
+
+            const conteneurWhatsApp = document.getElementById('contacts-dynamiques-whatsapp');
+            const nouvellePillChatHtml = `
+                <div class="chat-pill" onclick="ouvrirFenetreChat('${nomAmi}', '${photoAmi}')">
+                    <img class="avatar" src="${photoAmi}">
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <strong style="font-size: 14px;">${nomAmi}</strong>
+                            <span style="font-size: 11px; color: var(--texte-secondaire);">Maintenant</span>
+                        </div>
+                        <p style="font-size: 12px; color: var(--texte-secondaire); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">Nouvel ami connecté via invitation</p>
+                    </div>
+                </div>
+            `;
+            conteneurWhatsApp.insertAdjacentHTML('beforeend', nouvellePillChatHtml);
+            alert(`${nomAmi} est maintenant dans vos contacts de messagerie instantanée !`);
+        }
+
+        // --- MOTEUR WHATSAPP ---
+        function ouvrirFenetreChat(nom, avatarUrl) {
+            document.getElementById('whatsapp-master-list').style.display = 'none';
+            const zoneFenetreActive = document.getElementById('whatsapp-active-window');
+            zoneFenetreActive.classList.add('active');
+
+            document.getElementById('active-chat-name').innerText = nom;
+            document.getElementById('active-chat-avatar').src = avatarUrl;
+            
+            const boiteScroll = document.getElementById('chat-messages-scroll');
+            boiteScroll.innerHTML = `
+                <div class="msg other">
+                    Salut ! Tu as accepté ma demande d'ami. Qu'as-tu prévu de coder aujourd'hui ?
+                    <div class="msg-time">Maintenant</div>
+                </div>
+            `;
+        }
+
+        function fermerFenetreChat() {
+            document.getElementById('whatsapp-active-window').classList.remove('active');
+            document.getElementById('whatsapp-master-list').style.display = 'flex';
+        }
+
+        function envoyerMessageChat() {
+            const input = document.getElementById('chat-input-field');
+            const message = input.value.trim();
+            if(!message) return;
+
+            const boiteScroll = document.getElementById('chat-messages-scroll');
+            const heure = new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+
+            const messageHtml = `
+                <div class="msg me">
+                    ${message}
+                    <div class="msg-time">${heure}</div>
+                </div>
+            `;
+            boiteScroll.insertAdjacentHTML('beforeend', messageHtml);
+            input.value = "";
+            boiteScroll.scrollTop = boiteScroll.scrollHeight;
+        }
+
+        function gestionEntreeChat(e) {
+            if(e.key === 'Enter') envoyerMessageChat();
         }
     </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>G-Social X WhatsApp - Dev Edition</title>
+    <title>G-Social X WhatsApp - Muller Edition</title>
     <style>
         :root {
             --bg-principal: #070f1e;       
@@ -19,6 +19,7 @@
             --bulle-moi: #056162;
             --bulle-autre: #26354d;
             --rouge-danger: #ef4444;
+            --code-bg: #01060f;
         }
 
         * {
@@ -35,7 +36,6 @@
             height: 100vh;
         }
 
-        /* --- NAVBAR --- */
         header {
             background-color: var(--bg-secondaire);
             padding: 0 20px;
@@ -59,7 +59,6 @@
             color: var(--or-accent);
         }
 
-        /* --- LAYOUT GLOBAL --- */
         .conteneur-principal {
             margin-top: 60px;
             display: flex;
@@ -67,7 +66,6 @@
             width: 100vw;
         }
 
-        /* Colonne Gauche : Profil & Menu (Facebook Siderbar) */
         .colonne-gauche {
             width: 300px;
             background-color: var(--bg-secondaire);
@@ -79,7 +77,6 @@
             overflow-y: auto;
         }
 
-        /* Zone Centrale : Flux & Pages (Défilant) */
         .zone-centrale {
             flex: 1;
             padding: 20px;
@@ -94,7 +91,6 @@
             max-width: 650px;
         }
 
-        /* Colonne Droite : Liste WhatsApp & Chats */
         .colonne-droite-messenger {
             width: 380px;
             background-color: var(--bg-secondaire);
@@ -103,7 +99,6 @@
             flex-direction: column;
         }
 
-        /* --- COMPOSANTS INTERFACES --- */
         .carte {
             background-color: var(--bg-secondaire);
             border-radius: 12px;
@@ -144,7 +139,6 @@
             color: var(--or-accent);
         }
 
-        /* Formulaires */
         input, textarea, select {
             width: 100%;
             padding: 12px;
@@ -170,18 +164,9 @@
         }
         button:hover { opacity: 0.9; }
 
-        .btn-secondary {
-            background-color: transparent;
-            color: var(--texte-secondaire);
-            border: 1px solid var(--bordure);
-        }
-        .btn-secondary:hover { background-color: var(--bg-hover); color: white; }
-
+        .btn-mini { width: auto; padding: 6px 12px; font-size: 12px; }
         .btn-danger { background-color: var(--rouge-danger); color: white; }
 
-        .btn-mini { width: auto; padding: 6px 12px; font-size: 12px; }
-
-        /* Listes d'utilisateurs (Facebook / Invitations) */
         .user-card-row {
             display: flex;
             align-items: center;
@@ -189,7 +174,6 @@
             padding: 12px 0;
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        .user-card-row:last-child { border-bottom: none; }
 
         .user-details { flex: 1; }
         .user-name { font-weight: bold; font-size: 14px; }
@@ -197,7 +181,6 @@
 
         .actions-gap { display: flex; gap: 8px; }
 
-        /* Commentaires sous les posts */
         .comment-section {
             margin-top: 15px;
             padding-top: 10px;
@@ -213,7 +196,6 @@
             border-radius: 6px;
         }
 
-        /* --- SECTION MESSAGERIE WHATSAPP --- */
         .whatsapp-header {
             background-color: var(--bg-hover);
             padding: 12px 15px;
@@ -257,11 +239,23 @@
         .msg.other { background-color: var(--bulle-autre); align-self: flex-start; }
         .msg-time { font-size: 10px; color: rgba(255,255,255,0.5); text-align: right; margin-top: 3px; }
 
+        /* Bloc de code personnalisé pour développeurs */
+        pre {
+            background-color: var(--code-bg);
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid var(--bordure);
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            color: var(--vert-light);
+            margin-top: 5px;
+        }
+
         .chat-input-area { padding: 12px; background-color: var(--bg-hover); display: flex; gap: 10px; }
         .chat-input-area input { margin-bottom: 0; }
         .chat-input-area button { width: auto; background-color: var(--vert-whatsapp); color: white; padding: 0 20px; }
 
-        /* Vues */
         .section-vue { display: none; width: 100%; }
         .section-vue.visible { display: block; }
     </style>
@@ -270,7 +264,7 @@
 
     <header>
         <div class="logo-zone">
-            <span>📐</span> G-Social Platform
+            <span>📐</span> G-Social Platform <small style="font-size: 11px; color: var(--texte-secondaire); font-weight: normal;">(Müller Edition)</small>
         </div>
         <div style="display: flex; align-items: center; gap: 10px;">
             <span style="width: 10px; height: 10px; background-color: var(--vert-light); border-radius: 50%;"></span>
@@ -302,20 +296,20 @@
                 <section id="vue-feed" class="section-vue visible">
                     <div class="carte">
                         <h4 style="margin-bottom: 12px;">Créer une publication de code</h4>
-                        <textarea id="post-content-input" rows="3" placeholder="Partagez un snippet, une idée ou un succès système..."></textarea>
+                        <textarea id="post-content-input" rows="3" placeholder="Partagez un snippet (utilise ``` pour du code)..."></textarea>
                         <button onclick="creerPublication()" style="background-color: var(--bleu-action); color: white;">Publier sur le réseau</button>
                     </div>
 
                     <div id="feed-wall">
                         <div class="carte">
                             <div style="display: flex; gap: 12px; margin-bottom: 12px;">
-                                <img class="avatar" src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80">
+                                <img class="avatar" src="[https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80](https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80)">
                                 <div>
                                     <strong>Modérateur G</strong>
                                     <div style="font-size: 11px; color: var(--texte-secondaire);">Il y a 10 minutes</div>
                                 </div>
                             </div>
-                            <p>Le système hybride Facebook x WhatsApp est entièrement opérationnel. Modifiez vos profils, envoyez vos invitations et lancez vos discussions.</p>
+                            <p>Le système hybride Facebook x WhatsApp est entièrement opérationnel. Essayez d'envoyer du code avec des backticks comme ceci : <br> ```console.log("Hello World");```</p>
                             
                             <div class="comment-section">
                                 <div style="display: flex; gap: 8px;">
@@ -335,7 +329,7 @@
                         <p style="font-size: 13px; color: var(--texte-secondaire); margin-bottom: 15px;">Envoyez une demande d'ami pour débloquer leur canal WhatsApp.</p>
                         
                         <div class="user-card-row">
-                            <img class="avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80">
+                            <img class="avatar" src="[https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80](https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80)">
                             <div class="user-details">
                                 <div class="user-name">Marc Tech</div>
                                 <div class="user-subtitle">Architecte Cloud / DevOps</div>
@@ -344,7 +338,7 @@
                         </div>
 
                         <div class="user-card-row">
-                            <img class="avatar" src="https://images.unsplash.com/photo-1628157582853-a796fa650a6a?auto=format&fit=crop&w=150&q=80">
+                            <img class="avatar" src="[https://images.unsplash.com/photo-1628157582853-a796fa650a6a?auto=format&fit=crop&w=150&q=80](https://images.unsplash.com/photo-1628157582853-a796fa650a6a?auto=format&fit=crop&w=150&q=80)">
                             <div class="user-details">
                                 <div class="user-name">Lucas Python</div>
                                 <div class="user-subtitle">Ingénieur Data / AI</div>
@@ -360,13 +354,13 @@
                         <br>
                         <div id="box-invitations-recues">
                             <div class="user-card-row" id="invit-row-1">
-                                <img class="avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80">
+                                <img class="avatar" src="[https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80](https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80)">
                                 <div class="user-details">
                                     <div class="user-name">Alice Codeuse</div>
                                     <div class="user-subtitle">Développeuse Frontend React</div>
                                 </div>
                                 <div class="actions-gap">
-                                    <button class="btn-mini" style="background-color: var(--vert-light); color: black;" onclick="accepterInvitation('invit-row-1', 'Alice Codeuse', 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80')">Accepter</button>
+                                    <button class="btn-mini" style="background-color: var(--vert-light); color: black;" onclick="accepterInvitation('invit-row-1', 'Alice Codeuse', '[https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80](https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80)')">Accepter</button>
                                     <button class="btn-mini btn-danger" onclick="refuserInvitation('invit-row-1')">Refuser</button>
                                 </div>
                             </div>
@@ -390,7 +384,7 @@
                         <input type="text" id="setting-name" value="Célestin Olua">
 
                         <label>Image de Profil (Lien URL)</label>
-                        <input type="text" id="setting-pic" value="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80">
+                        <input type="text" id="setting-pic" value="[https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80](https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80)">
 
                         <label>Biographie Professionnelle</label>
                         <textarea id="setting-bio" rows="2">Développeur Fullstack NodeJS & React</textarea>
@@ -410,26 +404,24 @@
         </main>
 
         <aside class="colonne-droite-messenger">
-            
             <div id="whatsapp-master-list" style="display: flex; flex-direction: column; height: 100%;">
                 <div class="whatsapp-header">
                     <strong>Discussions Privées (WhatsApp)</strong>
                 </div>
                 <div style="flex: 1; overflow-y: auto;" id="whatsapp-contacts-box">
                     
-                    <div class="chat-pill" onclick="ouvrirFenetreChat('Modérateur G', 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80')">
-                        <img class="avatar" src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80">
+                    <div class="chat-pill" onclick="ouvrirFenetreChat('Modérateur G', '[https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80](https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80)')">
+                        <img class="avatar" src="[https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80](https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80)">
                         <div style="flex: 1; min-width: 0;">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <strong style="font-size: 14px;">Modérateur G</strong>
-                                <span style="font-size: 11px; color: var(--texte-secondaire);">14:48</span>
+                                <span style="font-size: 11px; color: var(--texte-secondaire);">En ligne</span>
                             </div>
-                            <p style="font-size: 12px; color: var(--texte-secondaire); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">Serveur Vercel opérationnel...</p>
+                            <p style="font-size: 12px; color: var(--texte-secondaire); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">Cliquez pour ouvrir le terminal de chat...</p>
                         </div>
                     </div>
 
                     <div id="contacts-dynamiques-whatsapp"></div>
-
                 </div>
             </div>
 
@@ -443,182 +435,25 @@
                     </div>
                 </div>
 
-                <div class="chat-messages" id="chat-messages-scroll">
-                    </div>
+                <div class="chat-messages" id="chat-messages-scroll"></div>
 
                 <div class="chat-input-area">
-                    <input type="text" id="chat-input-field" placeholder="Écrire un message sécurisé..." onkeypress="gestionEntreeChat(event)">
+                    <input type="text" id="chat-input-field" placeholder="Discuter ou poster du code avec ```..." onkeypress="gestionEntreeChat(event)">
                     <button onclick="envoyerMessageChat()">Envoyer</button>
                 </div>
             </div>
-
         </aside>
 
     </div>
 
     <script>
-        // Système de navigation par onglets (Style Dashboard Facebook)
-        function basculerOnglet(idCible, elementMenu) {
-            document.querySelectorAll('.section-vue').forEach(v => v.classList.remove('visible'));
-            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('actif'));
-            
-            document.getElementById('vue-' + idCible).classList.add('visible');
-            elementMenu.classList.add('actif');
-        }
+        // --- BASE DE DONNÉES LOCALES DES DISCUSSIONS (Nouveauté) ---
+        const historiqueDiscussions = {
+            "Modérateur G": [
+                { expediteur: "other", texte: "Bienvenue sur l'édition Muller ! Tu peux tester le formatage de code en écrivant par exemple : 
+http://googleusercontent.com/immersive_entry_chip/0
 
-        // Publication de contenu sur le fil d'actualité
-        function creerPublication() {
-            const input = document.getElementById('post-content-input');
-            const texte = input.value.trim();
-            if(!texte) return;
-
-            const monNom = document.getElementById('my-profile-name').innerText;
-            const maPhoto = document.getElementById('my-profile-pic').src;
-            const murCalcul = document.getElementById('feed-wall');
-
-            const postStructureHtml = `
-                <div class="carte">
-                    <div style="display: flex; gap: 12px; margin-bottom: 12px;">
-                        <img class="avatar" src="${maPhoto}">
-                        <div>
-                            <strong>${monNom}</strong>
-                            <div style="font-size: 11px; color: var(--texte-secondaire);">À l'instant</div>
-                        </div>
-                    </div>
-                    <p>${texte}</p>
-                    <div class="comment-section">
-                        <div style="display: flex; gap: 8px;">
-                            <input type="text" placeholder="Écrire un commentaire..." style="margin-bottom:0; padding:8px; font-size:13px;" onkeypress="ajouterCommentaireSimule(event, this)">
-                        </div>
-                    </div>
-                </div>
-            `;
-            murCalcul.insertAdjacentHTML('afterbegin', postStructureHtml);
-            input.value = "";
-        }
-
-        // Ajouter un commentaire sous un post
-        function ajouterCommentaireSimule(event, inputElement) {
-            if (event.key === 'Enter' && inputElement.value.trim() !== "") {
-                const monNom = document.getElementById('my-profile-name').innerText;
-                const commentHtml = `
-                    <div class="comment-item">
-                        <strong>${monNom} :</strong> ${inputElement.value.trim()}
-                    </div>
-                `;
-                inputElement.parentElement.insertAdjacentHTML('afterend', commentHtml);
-                inputElement.value = "";
-            }
-        }
-
-        // Sauvegarder les paramètres de profil
-        function sauvegarderProfilConfiguration() {
-            const nom = document.getElementById('setting-name').value.trim();
-            const pic = document.getElementById('setting-pic').value.trim();
-            const bio = document.getElementById('setting-bio').value.trim();
-            const stack = document.getElementById('setting-stack').value;
-
-            if(!nom) return alert("Le nom est obligatoire.");
-
-            document.getElementById('my-profile-name').innerText = nom;
-            document.getElementById('my-profile-pic').src = pic;
-            document.getElementById('my-profile-bio').innerText = bio;
-            document.getElementById('my-profile-stack').innerText = stack;
-
-            alert("Profil mis à jour avec succès sur l'API !");
-        }
-
-        // Envoyer une invitation (Gérer les listes)
-        function envoyerInvitation(bouton, nomDev) {
-            bouton.innerText = "Envoyé ✔";
-            bouton.disabled = true;
-            bouton.style.opacity = "0.6";
-
-            const conteneurEnvoyes = document.getElementById('box-invitations-envoyees');
-            if(conteneurEnvoyes.innerText.includes("Aucune invitation")) {
-                conteneurEnvoyes.innerHTML = "";
-            }
-
-            conteneurEnvoyes.insertAdjacentHTML('beforeend', `
-                <div style="padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.02);">
-                    Demande d'ami en attente de réponse avec <strong>${nomDev}</strong>
-                </div>
-            `);
-        }
-
-        // Refuser invitation
-        function refuserInvitation(idLigne) {
-            document.getElementById(idLigne).remove();
-            document.getElementById('count-invit').innerText = "0";
-        }
-
-        // Accepter l'invitation d'un développeur -> Injection directe dans WhatsApp à droite
-        function accepterInvitation(idLigne, nomAmi, photoAmi) {
-            document.getElementById(idLigne).remove();
-            document.getElementById('count-invit').innerText = "0";
-
-            const conteneurWhatsApp = document.getElementById('contacts-dynamiques-whatsapp');
-            const nouvellePillChatHtml = `
-                <div class="chat-pill" onclick="ouvrirFenetreChat('${nomAmi}', '${photoAmi}')">
-                    <img class="avatar" src="${photoAmi}">
-                    <div style="flex: 1; min-width: 0;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <strong style="font-size: 14px;">${nomAmi}</strong>
-                            <span style="font-size: 11px; color: var(--texte-secondaire);">Maintenant</span>
-                        </div>
-                        <p style="font-size: 12px; color: var(--texte-secondaire); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">Nouvel ami connecté via invitation</p>
-                    </div>
-                </div>
-            `;
-            conteneurWhatsApp.insertAdjacentHTML('beforeend', nouvellePillChatHtml);
-            alert(`${nomAmi} est maintenant dans vos contacts de messagerie instantanée !`);
-        }
-
-        // --- MOTEUR WHATSAPP ---
-        function ouvrirFenetreChat(nom, avatarUrl) {
-            document.getElementById('whatsapp-master-list').style.display = 'none';
-            const zoneFenetreActive = document.getElementById('whatsapp-active-window');
-            zoneFenetreActive.classList.add('active');
-
-            document.getElementById('active-chat-name').innerText = nom;
-            document.getElementById('active-chat-avatar').src = avatarUrl;
-            
-            const boiteScroll = document.getElementById('chat-messages-scroll');
-            boiteScroll.innerHTML = `
-                <div class="msg other">
-                    Salut ! Tu as accepté ma demande d'ami. Qu'as-tu prévu de coder aujourd'hui ?
-                    <div class="msg-time">Maintenant</div>
-                </div>
-            `;
-        }
-
-        function fermerFenetreChat() {
-            document.getElementById('whatsapp-active-window').classList.remove('active');
-            document.getElementById('whatsapp-master-list').style.display = 'flex';
-        }
-
-        function envoyerMessageChat() {
-            const input = document.getElementById('chat-input-field');
-            const message = input.value.trim();
-            if(!message) return;
-
-            const boiteScroll = document.getElementById('chat-messages-scroll');
-            const heure = new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
-
-            const messageHtml = `
-                <div class="msg me">
-                    ${message}
-                    <div class="msg-time">${heure}</div>
-                </div>
-            `;
-            boiteScroll.insertAdjacentHTML('beforeend', messageHtml);
-            input.value = "";
-            boiteScroll.scrollTop = boiteScroll.scrollHeight;
-        }
-
-        function gestionEntreeChat(e) {
-            if(e.key === 'Enter') envoyerMessageChat();
-        }
-    </script>
-</body>
-</html>
+### Qu'est-ce qui change avec cette mise à jour ?
+1. **Tu as un interpréteur de code intégré :** Si tu écris un message entouré de triple accents graves (\`\`\` ton code \`\`\`), il s'affiche dans un terminal noir et vert très stylé de développeur.
+2. **Chaque personne a sa propre mémoire :** Si tu tchatches avec le Modérateur G, puis que tu acceptes l'invitation d'Alice, les deux conversations n'écrasent plus les données de l'autre grâce à la variable globale `historiqueDiscussions`.
+3. **Le bot te répond :** Chaque message envoyé déclenche une réponse aléatoire amusante sur le thème du code pour tester le fonctionnement des bulles de messages reçus (`.msg.other`).

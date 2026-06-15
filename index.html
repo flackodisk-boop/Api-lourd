@@ -3,129 +3,407 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>G-Social X WhatsApp - Müller Edition</title>
+    <title>Néo - Assistant IA</title>
     <style>
         :root {
-            --bg-principal: #0b1426;       
-            --bg-secondaire: #13223c;     
-            --bg-hover: #1e3257;
-            --texte-principal: #f8fafc;
+            --bg-principal: #0f172a;
+            --bg-chat: #1e293b;
+            --bg-input: #0f172a;
+            --accent: #10b981;
+            --accent-hover: #059669;
+            --texte: #ffffff;
             --texte-secondaire: #94a3b8;
-            --or-accent: #f59e0b;         
-            --bleu-action: #38bdf8;
-            --bordure: #1e293b;
-            --vert-light: #4ade80;
+            --bulle-ai: #334155;
+            --bleu-action: #3b82f6;
+            --bleu-hover: #2563eb;
+            --bordure: #334155;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg-principal); color: var(--texte-principal); overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
-        
-        header { 
-            background-color: var(--bg-secondaire); 
-            padding: 0 24px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 1px solid var(--bordure); 
-            height: 56px; 
-            flex-shrink: 0; 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
         }
-        .logo-zone { font-weight: 600; font-size: 18px; color: var(--or-accent); }
-        
-        .conteneur-principal { display: flex; flex: 1; height: calc(100vh - 56px); overflow: hidden; }
-        
-        .colonne-gauche { 
-            width: 260px; 
-            background-color: var(--bg-secondaire); 
-            border-right: 1px solid var(--bordure); 
-            padding: 20px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 20px; 
-        }
-        
-        .menu-item { 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            padding: 12px 14px; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            transition: all 0.2s; 
-            margin-bottom: 6px; 
-            font-size: 14px; 
-            color: var(--texte-secondaire); 
-        }
-        .menu-item:hover, .menu-item.actif { background-color: var(--bg-hover); color: var(--texte-principal); }
-        .menu-item.actif { border-left: 3px solid var(--or-accent); }
 
-        .zone-centrale { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
-        .app-container { width: 100%; max-width: 800px; }
-        
-        .loader { color: var(--texte-secondaire); font-size: 14px; text-align: center; padding: 40px; }
+        body {
+            background: var(--bg-principal);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .chat {
+            width: 100%;
+            max-width: 440px;
+            height: 90vh;
+            max-height: 750px;
+            background: var(--bg-chat);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
+            border: 1px solid var(--bordure);
+        }
+
+        .header {
+            background: var(--accent);
+            color: var(--texte);
+            padding: 16px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .msg-container {
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+        }
+
+        .msg-container.user { margin-left: auto; align-items: flex-end; }
+        .msg-container.ai { margin-right: auto; align-items: flex-start; }
+
+        .bubble {
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .user .bubble {
+            background: var(--accent);
+            color: var(--texte);
+            border-bottom-right-radius: 4px;
+        }
+
+        .ai .bubble {
+            background: var(--bulle-ai);
+            color: var(--texte);
+            border-bottom-left-radius: 4px;
+        }
+
+        .media-preview {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-top: 8px;
+            border: 1px solid var(--bordure);
+            display: block;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            width: 100%;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-download { background: var(--accent); }
+        .btn-download:hover { background: var(--accent-hover); }
+        .btn-view { background: var(--bleu-action); }
+        .btn-view:hover { background: var(--bleu-hover); }
+
+        .input-box {
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            background: var(--bg-input);
+            align-items: center;
+            flex-shrink: 0;
+            border-top: 1px solid var(--bordure);
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--bordure);
+            outline: none;
+            border-radius: 10px;
+            font-size: 14px;
+            background: var(--bg-chat);
+            color: white;
+        }
+        input:focus { border-color: var(--accent); }
+
+        .icon-btn {
+            width: 44px;
+            height: 44px;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+        .btn-send { background: var(--accent); }
+        .btn-send:hover { background: var(--accent-hover); }
+        .btn-image { background: var(--bleu-action); }
+        .btn-image:hover { background: var(--bleu-hover); }
+
+        .loading-dots {
+            display: flex;
+            gap: 4px;
+            padding: 4px 0;
+        }
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--texte-secondaire);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1.0); }
+        }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo-zone">📐 G-Social Platform <small style="font-size: 11px; color: var(--texte-secondaire);">Müller Edition</small></div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="width: 8px; height: 8px; background-color: var(--vert-light); border-radius: 50%;"></span>
-            <span id="app-status" style="font-size: 12px; color: var(--texte-secondaire);">Version 2.1.0</span>
+    <div class="chat">
+        <div class="header">
+            <span>🤖</span> Néo - Assistant IA
         </div>
-    </header>
 
-    <div class="conteneur-principal">
-        
-        <aside class="colonne-gauche">
-            <nav style="flex: 1;">
-                <div class="menu-item actif" onclick="chargerComposant('./social.html', this)">🏠 Fil Social</div>
-                <div class="menu-item" onclick="chargerComposant('./chat.html', this)">💬 Messagerie Chat</div>
-            </nav>
-        </aside>
-
-        <main class="zone-centrale">
-            <div class="app-container" id="zone-injection">
-                <div class="loader">Chargement...</div>
+        <div id="messages" class="messages">
+            <div class="msg-container ai">
+                <div class="bubble">
+                    Bonjour 👋 Je suis Néo.<br><br>
+                    📸 Envoyez une image ou écrivez un prompt pour générer ou modifier des visuels !<br>
+                    💡 Ex: <em>"génère un paysage futuriste"</em> ou importez une photo.
+                </div>
             </div>
-        </main>
+        </div>
 
+        <div class="input-box">
+            <button class="icon-btn btn-image" onclick="triggerUpload()">📷</button>
+            <input type="text" id="input" placeholder="Discutez ou décrivez une image...">
+            <button class="icon-btn btn-send" id="sendBtn" onclick="send()">➤</button>
+        </div>
+
+        <input type="file" id="imageInput" accept="image/*" style="display: none">
     </div>
 
-    <script src="./config.js" defer></script>
-
     <script>
-        // Fonction de routage dynamique qui parcourt les fichiers du dépôt racine
-        async function chargerComposant(cheminFichier, elementMenu) {
-            if (elementMenu) {
-                document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('actif'));
-                elementMenu.classList.add('actif');
+        const API_KEY = "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";
+        const GEM_API = "https://christus-gem-api.onrender.com";
+        
+        const messages = document.getElementById("messages");
+        const input = document.getElementById("input");
+        const fileInput = document.getElementById("imageInput");
+        
+        let pendingFile = null;
+
+        function triggerUpload() {
+            fileInput.click();
+        }
+
+        fileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                pendingFile = file;
+                const previewUrl = URL.createObjectURL(file);
+                addMessage("📷 Image importée, prête pour modification. Que dois-je faire ?", "user", previewUrl);
             }
+        };
 
-            const conteneur = document.getElementById('zone-injection');
-            conteneur.innerHTML = '<div class="loader">Connexion aux fichiers de la structure...</div>';
+        function viewImage(url) {
+            window.open(url, '_blank');
+        }
 
+        async function downloadImage(url) {
             try {
-                // Va chercher le fichier dans l'arborescence
-                const reponse = await fetch(cheminFichier);
-                if (!reponse.ok) throw new Error("Fichier introuvable dans la structure");
-                
-                const html = await reponse.text();
-                conteneur.innerHTML = html;
-            } catch (error) {
-                conteneur.innerHTML = `
-                    <div style="background: #1e293b; padding: 20px; border-radius: 8px; border: 1px solid #ef4444;">
-                        <h4 style="color: #ef4444;">Erreur de liaison</h4>
-                        <p style="font-size: 13px; color: var(--texte-secondaire); margin-top: 8px;">
-                            Impossible d'accéder à <strong>${cheminFichier}</strong>. Vérifie que le fichier est bien présent dans la branche de ton dépôt et que tu utilises un serveur web local ou GitHub Pages pour tester.
-                        </p>
-                    </div>`;
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = blobUrl;
+                a.download = `neo_${Date.now()}.jpg`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(blobUrl);
+            } catch (err) {
+                console.error("Erreur de téléchargement", err);
             }
         }
 
-        // Chargement initial du fichier social.html au démarrage
-        window.addEventListener('DOMContentLoaded', () => {
-            chargerComposant('./social.html', document.querySelector('.menu-item.actif'));
+        function addMessage(text, sender, imageUrl = null) {
+            const container = document.createElement("div");
+            container.className = `msg-container ${sender}`;
+
+            let htmlContent = `<div class="bubble">${text.replace(/\n/g, '<br>')}</div>`;
+            
+            if (imageUrl) {
+                htmlContent += `<img src="${imageUrl}" class="media-preview" alt="Media">`;
+                if (sender === "ai") {
+                    htmlContent += `
+                        <div class="button-group">
+                            <button class="btn-action btn-download" onclick="downloadImage('${imageUrl}')">⬇️ Télécharger</button>
+                            <button class="btn-action btn-view" onclick="viewImage('${imageUrl}')">👁️ Voir</button>
+                        </div>
+                    `;
+                }
+            }
+
+            container.innerHTML = htmlContent;
+            messages.appendChild(container);
+            messages.scrollTop = messages.scrollHeight;
+            return container;
+        }
+
+        function addLoading() {
+            const container = document.createElement("div");
+            container.className = "msg-container ai";
+            container.innerHTML = `
+                <div class="bubble">
+                    <div class="loading-dots">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                </div>`;
+            messages.appendChild(container);
+            messages.scrollTop = messages.scrollHeight;
+            return container;
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        function isImagePrompt(text) {
+            const keys = ['génère', 'genere', 'crée', 'cree', 'dessine', 'imagine', 'photo', 'image', 'generate', 'create'];
+            return keys.some(k => text.toLowerCase().includes(k));
+        }
+
+        function cleanPrompt(text) {
+            return text.replace(/^(génère|genere|crée|cree|dessine|imagine|veux|affiche)\s+(une image de|une photo de|un|une)?/i, '').trim();
+        }
+
+        async function send() {
+            const text = input.value.trim();
+            if (!text && !pendingFile) return;
+
+            if (text && !pendingFile) {
+                addMessage(text, "user");
+            }
+
+            input.value = "";
+            const loader = addLoading();
+
+            try {
+                let imageUrl;
+
+                // Mode 1: Modification d'image existante
+                if (pendingFile) {
+                    const base64 = await fileToBase64(pendingFile);
+                    const promptText = text || "modify image";
+                    
+                    const response = await fetch(`${GEM_API}/edit`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ image: base64, prompt: promptText, format: "jpg" })
+                    });
+                    
+                    if (!response.ok) throw new Error("Échec de modification");
+                    const blob = await response.blob();
+                    imageUrl = URL.createObjectURL(blob);
+                    
+                    loader.remove();
+                    addMessage(`✅ Image modifiée avec succès !`, "ai", imageUrl);
+                    pendingFile = null;
+                }
+                // Mode 2: Génération pure d'image IA
+                else if (isImagePrompt(text)) {
+                    const finalPrompt = cleanPrompt(text);
+                    const response = await fetch(`${GEM_API}/generate`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ prompt: finalPrompt, ratio: "1:1", format: "jpg" })
+                    });
+                    
+                    if (!response.ok) throw new Error("Échec de génération");
+                    const blob = await response.blob();
+                    imageUrl = URL.createObjectURL(blob);
+                    
+                    loader.remove();
+                    addMessage(`🎨 Voici votre création pour : "${finalPrompt}"`, "ai", imageUrl);
+                }
+                // Mode 3: Discussion textuelle standard (Llama 3)
+                else {
+                    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${API_KEY}`
+                        },
+                        body: JSON.stringify({
+                            model: "meta-llama/llama-3.1-8b-instruct",
+                            messages: [
+                                { role: "system", content: "Tu es Néo, un assistant intelligent, utile et poli en français." },
+                                { role: "user", content: text }
+                            ]
+                        })
+                    });
+
+                    const data = await response.json();
+                    const reply = data.choices?.[0]?.message?.content || "Désolé, je rencontre une petite erreur de connexion.";
+                    loader.remove();
+                    addMessage(reply, "ai");
+                }
+            } catch (err) {
+                loader.remove();
+                addMessage(`❌ Une erreur est survenue : ${err.message}`, "ai");
+            }
+        }
+
+        input.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") send();
         });
     </script>
 </body>

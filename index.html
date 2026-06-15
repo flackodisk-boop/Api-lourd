@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>G-Social X WhatsApp - Muller Edition</title>
+    <title>G-Social X WhatsApp - Müller Edition</title>
     <style>
         :root {
             --bg-principal: #0b1426;       
@@ -71,7 +71,7 @@
         <div class="logo-zone">📐 G-Social Platform <small style="font-size: 11px; color: var(--texte-secondaire);">Müller Edition</small></div>
         <div style="display: flex; align-items: center; gap: 8px;">
             <span style="width: 8px; height: 8px; background-color: var(--vert-light); border-radius: 50%;"></span>
-            <span id="app-status" style="font-size: 12px; color: var(--texte-secondaire);">Initialisation...</span>
+            <span id="app-status" style="font-size: 12px; color: var(--texte-secondaire);">Version 2.1.0</span>
         </div>
     </header>
 
@@ -79,58 +79,53 @@
         
         <aside class="colonne-gauche">
             <nav style="flex: 1;">
-                <div class="menu-item actif" onclick="chargerComposant('social.html', this)">🏠 Fil Social</div>
-                <div class="menu-item" onclick="chargerComposant('chat.html', this)">💬 Messagerie Chat</div>
+                <div class="menu-item actif" onclick="chargerComposant('./social.html', this)">🏠 Fil Social</div>
+                <div class="menu-item" onclick="chargerComposant('./chat.html', this)">💬 Messagerie Chat</div>
             </nav>
         </aside>
 
         <main class="zone-centrale">
             <div class="app-container" id="zone-injection">
-                <div class="loader">Chargement du composant...</div>
+                <div class="loader">Chargement...</div>
             </div>
         </main>
 
     </div>
 
-    <script src="./config.js"></script>
-    <script>
-        // Affichage du statut depuis le fichier de config
-        if (typeof CONFIG !== 'undefined') {
-            document.getElementById('app-status').innerText = `Version ${CONFIG.version} - ${CONFIG.env}`;
-        }
+    <script src="./config.js" defer></script>
 
-        // Routeur pour aller chercher les fichiers HTML du fork
-        async function chargerComposant(nomFichier, elementMenu) {
+    <script>
+        // Fonction de routage dynamique qui parcourt les fichiers du dépôt racine
+        async function chargerComposant(cheminFichier, elementMenu) {
             if (elementMenu) {
                 document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('actif'));
                 elementMenu.classList.add('actif');
             }
 
             const conteneur = document.getElementById('zone-injection');
-            conteneur.innerHTML = '<div class="loader">Connexion au fork...</div>';
+            conteneur.innerHTML = '<div class="loader">Connexion aux fichiers de la structure...</div>';
 
             try {
-                const reponse = await fetch(`./${nomFichier}`);
-                if (!reponse.ok) throw new Error("Fichier introuvable");
-                const html = await reponse.text();
+                // Va chercher le fichier dans l'arborescence
+                const reponse = await fetch(cheminFichier);
+                if (!reponse.ok) throw new Error("Fichier introuvable dans la structure");
                 
-                // Injecte le fichier HTML cible
+                const html = await reponse.text();
                 conteneur.innerHTML = html;
             } catch (error) {
                 conteneur.innerHTML = `
                     <div style="background: #1e293b; padding: 20px; border-radius: 8px; border: 1px solid #ef4444;">
-                        <h4 style="color: #ef4444;">Erreur de chargement</h4>
+                        <h4 style="color: #ef4444;">Erreur de liaison</h4>
                         <p style="font-size: 13px; color: var(--texte-secondaire); margin-top: 8px;">
-                            Le fichier <strong>${nomFichier}</strong> est introuvable ou le navigateur bloque l'accès local. 
-                            Utilise un serveur local (Live Server) pour exécuter l'application.
+                            Impossible d'accéder à <strong>${cheminFichier}</strong>. Vérifie que le fichier est bien présent dans la branche de ton dépôt et que tu utilises un serveur web local ou GitHub Pages pour tester.
                         </p>
                     </div>`;
             }
         }
 
-        // Charger le premier fichier par défaut
+        // Chargement initial du fichier social.html au démarrage
         window.addEventListener('DOMContentLoaded', () => {
-            chargerComposant('social.html', document.querySelector('.menu-item.actif'));
+            chargerComposant('./social.html', document.querySelector('.menu-item.actif'));
         });
     </script>
 </body>

@@ -36,7 +36,7 @@
             overflow: hidden;
         }
 
-        /* Écran de démarrage (Splash Screen) */
+        /* Splash Screen */
         #splash-screen {
             position: fixed;
             top: 0;
@@ -87,10 +87,10 @@
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 163, 127, 0); }
         }
 
-        /* Interface Principale (Taille réduite pour un effet moins gros) */
+        /* Interface Principale */
         .chat-container {
             width: 100%;
-            max-width: 600px; /* Réduit de 800px à 600px */
+            max-width: 600px;
             height: 100vh;
             background: var(--bg-chat);
             display: flex;
@@ -104,13 +104,25 @@
 
         .header {
             padding: 14px 20px;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             text-align: center;
             border-bottom: 1px solid var(--bordure);
             color: var(--texte-secondaire);
             background: var(--bg-chat);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             flex-shrink: 0;
+        }
+
+        .user-badge {
+            font-size: 12px;
+            background: var(--bulle-user);
+            padding: 4px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 1px solid var(--bordure);
         }
 
         .messages {
@@ -123,9 +135,9 @@
 
         .row {
             width: 100%;
-            padding: 14px 24px;
+            padding: 10px 20px;
             display: flex;
-            gap: 16px;
+            gap: 14px;
             align-items: flex-start;
         }
 
@@ -153,7 +165,7 @@
         .bubble {
             max-width: 85%;
             font-size: 15px;
-            line-height: 1.6;
+            line-height: 1.5;
             word-wrap: break-word;
             white-space: pre-wrap;
         }
@@ -171,9 +183,9 @@
 
         .media-preview {
             max-width: 100%;
-            max-height: 400px;
+            max-height: 250px;
             border-radius: 12px;
-            margin-top: 12px;
+            margin-top: 8px;
             border: 1px solid var(--bordure);
             display: block;
         }
@@ -205,16 +217,53 @@
         .btn-view { background: var(--bleu-action); }
         .btn-view:hover { background: var(--bleu-hover); }
 
+        /* Zone d'envoi et barre d'outils */
         .input-area {
-            padding: 0 24px 24px 24px;
+            padding: 0 20px 20px 20px;
             background: var(--bg-chat);
             flex-shrink: 0;
+        }
+
+        /* Aperçu de la photo sélectionnée avant envoi */
+        .upload-preview-container {
+            display: none;
+            width: 100%;
+            max-width: 560px;
+            margin: 0 auto 8px auto;
+            position: relative;
+            background: var(--bg-input);
+            padding: 8px;
+            border-radius: 12px;
+            border: 1px solid var(--bordure);
+        }
+
+        .upload-preview-container img {
+            height: 60px;
+            border-radius: 6px;
+            display: block;
+        }
+
+        .btn-remove-image {
+            position: absolute;
+            top: 4px;
+            left: 70px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .input-wrapper {
             position: relative;
             width: 100%;
-            max-width: 760px;
+            max-width: 560px;
             margin: 0 auto;
             background: var(--bg-input);
             border-radius: 24px;
@@ -230,7 +279,7 @@
             border: none;
             outline: none;
             color: var(--texte);
-            padding: 10px 12px;
+            padding: 10px 8px;
             font-size: 15px;
         }
 
@@ -238,9 +287,26 @@
             color: var(--texte-secondaire);
         }
 
+        .btn-attach {
+            background: transparent;
+            border: none;
+            color: var(--texte-secondaire);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: color 0.2s;
+        }
+
+        .btn-attach:hover {
+            color: var(--texte);
+        }
+
         .btn-send {
-            width: 32px;
-            height: 32px;
+            width: 34px;
+            height: 34px;
             background: var(--texte);
             color: var(--bg-chat);
             border: none;
@@ -249,7 +315,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 14px;
+            font-size: 16px;
+            font-weight: bold;
             transition: background 0.2s, transform 0.1s;
         }
 
@@ -278,7 +345,7 @@
             40% { transform: scale(1.0); }
         }
 
-        .messages::-webkit-scrollbar { width: 8px; }
+        .messages::-webkit-scrollbar { width: 6px; }
         .messages::-webkit-scrollbar-track { background: transparent; }
         .messages::-webkit-scrollbar-thumb { background: #424242; border-radius: 4px; }
     </style>
@@ -286,21 +353,36 @@
 <body>
 
     <div id="splash-screen">
-        <div class="logo-animation">N</div> <div class="splash-title">Néo v1</div> <div class="splash-subtitle">Par Célestin Olua</div>
+        <div class="logo-animation">N</div>
+        <div class="splash-title">Néo v1</div>
+        <div class="splash-subtitle">Par Célestin Olua</div>
     </div>
 
     <div class="chat-container" id="app-container">
         <div class="header">
-            Néo v1 — Par Célestin Olua </div>
+            <span>Néo v1 — Par Célestin</span>
+            <div class="user-badge" id="userBadge" onclick="askUsername()">👤 Profil</div>
+        </div>
 
         <div id="messages" class="messages">
             <div class="row ai-row">
-                <div class="avatar">N</div> <div class="bubble">Bonjour ! Je suis Néo. Posez-moi une question ou demandez-moi une image (ex: "génère une image de voiture futuriste").</div> </div>
+                <div class="avatar">N</div>
+                <div class="bubble" id="welcomeMessage">Bonjour ! Je suis Néo. Posez-moi une question ou importez une photo pour commencer.</div>
+            </div>
         </div>
 
         <div class="input-area">
+            <div class="upload-preview-container" id="previewContainer">
+                <img id="imagePreview" src="" alt="Aperçu">
+                <button class="btn-remove-image" onclick="clearSelectedImage()">✕</button>
+            </div>
+
             <div class="input-wrapper">
-                <input type="text" id="input" placeholder="Message Néo ou prompt d'image..."> <button class="btn-send" id="sendBtn" onclick="send()">↑</button>
+                <button class="btn-attach" onclick="triggerFileInput()">📎</button>
+                <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
+                
+                <input type="text" id="input" placeholder="Message Néo ou prompt d'image...">
+                <button class="btn-send" id="sendBtn" onclick="send()">↑</button>
             </div>
         </div>
     </div>
@@ -311,9 +393,19 @@
         
         const messagesContainer = document.getElementById("messages");
         const inputField = document.getElementById("input");
+        const fileInput = document.getElementById("fileInput");
+        const previewContainer = document.getElementById("previewContainer");
+        const imagePreview = document.getElementById("imagePreview");
+        const userBadge = document.getElementById("userBadge");
+        const welcomeMessage = document.getElementById("welcomeMessage");
 
-        // Gestion du Logo d'ouverture (Splash Screen)
+        let userName = localStorage.getItem("neo_user_name") || "";
+        let selectedImageBase64 = null;
+
+        // Configuration initiale du nom de l'utilisateur
         window.addEventListener('DOMContentLoaded', () => {
+            updateUserUI();
+            
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
                 const app = document.getElementById('app-container');
@@ -324,9 +416,55 @@
                 
                 setTimeout(() => {
                     splash.style.display = 'none';
+                    if (!userName) {
+                        askUsername();
+                    }
                 }, 500);
             }, 2500);
         });
+
+        function askUsername() {
+            const name = prompt("Comment t'appelles-tu ? (Pour que Néo se souvienne de toi)", userName);
+            if (name && name.trim() !== "") {
+                userName = name.trim();
+                localStorage.setItem("neo_user_name", userName);
+                updateUserUI();
+            }
+        }
+
+        function updateUserUI() {
+            if (userName) {
+                userBadge.innerText = `👤 ${userName}`;
+                welcomeMessage.innerText = `Bonjour ${userName} ! Je suis Néo. Posez-moi une question ou importez une photo.`;
+            } else {
+                userBadge.innerText = "👤 Configurer";
+            }
+        }
+
+        // Fonctions de gestion de l'image
+        function triggerFileInput() {
+            fileInput.click();
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                selectedImageBase64 = e.target.result;
+                imagePreview.src = selectedImageBase64;
+                previewContainer.style.display = "block";
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearSelectedImage() {
+            selectedImageBase64 = null;
+            fileInput.value = "";
+            previewContainer.style.display = "none";
+            imagePreview.src = "";
+        }
 
         function viewImage(url) {
             window.open(url, '_blank');
@@ -355,7 +493,8 @@
 
             if (sender === "ai") {
                 let htmlContent = `
-                    <div class="avatar">N</div> <div class="bubble">
+                    <div class="avatar">N</div>
+                    <div class="bubble">
                         <div>${text}</div>`;
                 
                 if (imageUrl) {
@@ -370,7 +509,13 @@
                 htmlContent += `</div>`;
                 row.innerHTML = htmlContent;
             } else {
-                row.innerHTML = `<div class="bubble">${text}</div>`;
+                // Message de l'utilisateur avec photo optionnelle attachée
+                let htmlContent = `<div class="bubble"><div>${text}</div>`;
+                if (imageUrl) {
+                    htmlContent += `<img src="${imageUrl}" class="media-preview" alt="Photo envoyée">`;
+                }
+                htmlContent += `</div>`;
+                row.innerHTML = htmlContent;
             }
 
             messagesContainer.appendChild(row);
@@ -381,7 +526,8 @@
             const row = document.createElement("div");
             row.className = "row ai-row";
             row.innerHTML = `
-                <div class="avatar">N</div> <div class="bubble">
+                <div class="avatar">N</div>
+                <div class="bubble">
                     <div class="loading-dots">
                         <div class="dot"></div>
                         <div class="dot"></div>
@@ -395,7 +541,7 @@
 
         function isImageRequest(text) {
             const keys = ['génère', 'genere', 'crée', 'cree', 'dessine', 'imagine', 'photo', 'image', 'generate', 'create'];
-            return keys.some(k => text.toLowerCase().includes(k));
+            return keys.some(k => text.toLowerCase().includes(k)) && !selectedImageBase64;
         }
 
         function cleanPrompt(text) {
@@ -404,10 +550,14 @@
 
         async function send() {
             const text = inputField.value.trim();
-            if (!text) return;
+            if (!text && !selectedImageBase64) return;
 
-            addMessage(text, "user");
+            // Sauvegarde de l'image locale pour l'affichage de la bulle utilisateur
+            const currentImg = selectedImageBase64;
+
+            addMessage(text || "Photo envoyée", "user", currentImg);
             inputField.value = "";
+            clearSelectedImage();
 
             const loader = addLoading();
 
@@ -430,13 +580,20 @@
                     addMessage(`🎨 Voici la génération pour : "${finalPrompt}"`, "ai", imageUrl);
                 } 
                 else {
+                    // Envoi des infos vers l'API textuelle
                     const response = await fetch(API_COPILOT, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ prompt: text })
+                        body: JSON.stringify({ 
+                            prompt: text,
+                            username: userName, // Transmission du nom
+                            image: currentImg   // Transmission de l'image en base64 si présente
+                        })
                     });
 
-                    if (!response.ok) throw new Error("Erreur réponse Néo"); const data = await response.json();
+                    if (!response.ok) throw new Error("Erreur réponse Néo");
+
+                    const data = await response.json();
                     loader.remove();
 
                     const reply = data.reply || data.response || data.choices?.[0]?.message?.content || "Analyse effectuée.";
@@ -450,8 +607,4 @@
         }
 
         inputField.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") send();
-        });
-    </script>
-</body>
-</html>
+   

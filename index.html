@@ -36,7 +36,7 @@
             overflow: hidden;
         }
 
-        /* Écran de démarrage (Splash Screen) */
+        /* Splash Screen (Écran de démarrage) */
         #splash-screen {
             position: fixed;
             top: 0;
@@ -52,43 +52,43 @@
             transition: opacity 0.4s ease, transform 0.4s ease;
         }
 
-        /* Logo N Arrangé avec Dégradé Vert */
+        /* Style fidèle à ta capture : Logo N Vert */
         .logo-animation {
-            width: 85px;
-            height: 85px;
+            width: 90px;
+            height: 90px;
             background: linear-gradient(135deg, #10a37f, #0d7e62);
-            border-radius: 22px;
+            border-radius: 24px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 42px;
+            font-size: 46px;
             font-weight: 800;
             color: white;
-            box-shadow: 0 0 25px rgba(16, 163, 127, 0.5);
+            box-shadow: 0 0 25px rgba(16, 163, 127, 0.4);
             animation: pulse 2s infinite ease-in-out;
         }
 
         .splash-title {
-            margin-top: 20px;
-            font-size: 22px;
+            margin-top: 24px;
+            font-size: 24px;
             font-weight: 700;
             color: var(--texte);
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
 
         .splash-subtitle {
             margin-top: 8px;
-            font-size: 13px;
+            font-size: 14px;
             color: var(--texte-secondaire);
         }
 
         @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 163, 127, 0.6); }
-            70% { transform: scale(1); box-shadow: 0 0 0 18px rgba(16, 163, 127, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 163, 127, 0); }
+            0% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(16, 163, 127, 0.5); }
+            70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(16, 163, 127, 0); }
+            100% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(16, 163, 127, 0); }
         }
 
-        /* Interface Principale */
+        /* Interface Principale (Optimisée à 600px max) */
         .chat-container {
             width: 100%;
             max-width: 600px;
@@ -107,7 +107,6 @@
             padding: 14px 20px;
             font-size: 14px;
             font-weight: 600;
-            text-align: center;
             border-bottom: 1px solid var(--bordure);
             color: var(--texte-secondaire);
             background: var(--bg-chat);
@@ -126,9 +125,7 @@
             border: 1px solid var(--bordure);
             transition: background 0.2s;
         }
-        .user-badge:hover {
-            background: var(--bordure);
-        }
+        .user-badge:hover { background: var(--bordure); }
 
         .messages {
             flex: 1;
@@ -146,9 +143,7 @@
             align-items: flex-start;
         }
 
-        .row.user-row {
-            justify-content: flex-end;
-        }
+        .row.user-row { justify-content: flex-end; }
 
         .avatar {
             width: 30px;
@@ -161,11 +156,7 @@
             font-weight: bold;
             flex-shrink: 0;
         }
-
-        .ai-row .avatar {
-            background: var(--accent);
-            color: white;
-        }
+        .ai-row .avatar { background: var(--accent); color: white; }
 
         .bubble {
             max-width: 85%;
@@ -174,17 +165,8 @@
             word-wrap: break-word;
             white-space: pre-wrap;
         }
-
-        .user-row .bubble {
-            background: var(--bulle-user);
-            padding: 10px 16px;
-            border-radius: 20px;
-        }
-
-        .ai-row .bubble {
-            padding-top: 4px;
-            color: var(--texte);
-        }
+        .user-row .bubble { background: var(--bulle-user); padding: 10px 16px; border-radius: 20px; }
+        .ai-row .bubble { padding-top: 4px; color: var(--texte); }
 
         .media-preview {
             max-width: 100%;
@@ -239,12 +221,7 @@
             border-radius: 12px;
             border: 1px solid var(--bordure);
         }
-
-        .upload-preview-container img {
-            height: 60px;
-            border-radius: 6px;
-            display: block;
-        }
+        .upload-preview-container img { height: 60px; border-radius: 6px; display: block; }
 
         .btn-remove-image {
             position: absolute;
@@ -285,10 +262,7 @@
             padding: 10px 8px;
             font-size: 15px;
         }
-
-        input::placeholder {
-            color: var(--texte-secondaire);
-        }
+        input::placeholder { color: var(--texte-secondaire); }
 
         .btn-attach {
             background: transparent;
@@ -300,12 +274,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: color 0.2s;
         }
-
-        .btn-attach:hover {
-            color: var(--texte);
-        }
+        .btn-attach:hover { color: var(--texte); }
 
         .btn-send {
             width: 34px;
@@ -322,16 +292,9 @@
             font-weight: bold;
             transition: background 0.2s, transform 0.1s;
         }
-
         .btn-send:hover { background: var(--texte-secondaire); }
-        .btn-send:active { transform: scale(0.95); }
 
-        .loading-dots {
-            display: flex;
-            gap: 4px;
-            padding: 8px 0;
-        }
-
+        .loading-dots { display: flex; gap: 4px; padding: 8px 0; }
         .dot {
             width: 6px;
             height: 6px;
@@ -339,7 +302,6 @@
             border-radius: 50%;
             animation: bounce 1.4s infinite ease-in-out both;
         }
-
         .dot:nth-child(1) { animation-delay: -0.32s; }
         .dot:nth-child(2) { animation-delay: -0.16s; }
 
@@ -405,15 +367,16 @@
         let userName = localStorage.getItem("neo_user_name") || "";
         let selectedImageBase64 = null;
 
-        // Gestion propre de l'ouverture sans aucun élément bloquant
+        // OUVERTURE SÉCURISÉE : S'exécute quoi qu'il arrive après 2 secondes
         window.addEventListener('DOMContentLoaded', () => {
+            // On met d'abord à jour l'interface utilisateur de manière sécurisée
             updateUserUI();
             
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
                 const app = document.getElementById('app-container');
                 
-                if(splash && app) {
+                if (splash && app) {
                     splash.style.opacity = '0';
                     splash.style.transform = 'scale(1.05)';
                     app.style.opacity = '1';
@@ -422,14 +385,14 @@
                         splash.style.display = 'none';
                     }, 400);
                 }
-            }, 2000); // Réduit à 2 secondes pour plus de rapidité
+            }, 2000);
         });
 
         function askUsername() {
             const name = prompt("Comment t'appelles-tu ?", userName);
             if (name !== null) {
                 userName = name.trim();
-                if(userName) {
+                if (userName) {
                     localStorage.setItem("neo_user_name", userName);
                 } else {
                     localStorage.removeItem("neo_user_name");
@@ -439,6 +402,8 @@
         }
 
         function updateUserUI() {
+            if (!userBadge || !welcomeMessage) return; // Sécurité anti-crash
+            
             if (userName) {
                 userBadge.innerText = `👤 ${userName}`;
                 welcomeMessage.innerText = `Bonjour ${userName} ! Je suis Néo. Posez-moi une question ou importez une photo.`;
@@ -448,9 +413,7 @@
             }
         }
 
-        function triggerFileInput() {
-            fileInput.click();
-        }
+        function triggerFileInput() { fileInput.click(); }
 
         function handleFileSelect(event) {
             const file = event.target.files[0];
@@ -472,9 +435,7 @@
             imagePreview.src = "";
         }
 
-        function viewImage(url) {
-            window.open(url, '_blank');
-        }
+        function viewImage(url) { window.open(url, '_blank'); }
 
         async function downloadImage(url) {
             try {
@@ -511,7 +472,6 @@
                             <button class="btn-action btn-view" onclick="viewImage('${imageUrl}')">👁️ Voir</button>
                         </div>`;
                 }
-                
                 htmlContent += `</div>`;
                 row.innerHTML = htmlContent;
             } else {
@@ -609,4 +569,10 @@
             }
         }
 
-        inputField.addEven
+        inputField.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") send();
+        });
+    </script>
+</body>
+    </html>
+    

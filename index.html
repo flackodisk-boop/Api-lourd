@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Copilot - Assistant IA</title>
+    <title>Néo - Assistant IA</title>
     <style>
         :root {
             --bg-principal: #212121;
@@ -87,10 +87,10 @@
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 163, 127, 0); }
         }
 
-        /* Interface Principale */
+        /* Interface Principale (Taille réduite pour un effet moins gros) */
         .chat-container {
             width: 100%;
-            max-width: 800px;
+            max-width: 600px; /* Réduit de 800px à 600px */
             height: 100vh;
             background: var(--bg-chat);
             display: flex;
@@ -286,27 +286,21 @@
 <body>
 
     <div id="splash-screen">
-        <div class="logo-animation">C</div>
-        <div class="splash-title">Copilot v1</div>
-        <div class="splash-subtitle">Par Célestin Olua</div>
+        <div class="logo-animation">N</div> <div class="splash-title">Néo v1</div> <div class="splash-subtitle">Par Célestin Olua</div>
     </div>
 
     <div class="chat-container" id="app-container">
         <div class="header">
-            Copilot v1 — Par Célestin Olua
-        </div>
+            Néo v1 — Par Célestin Olua </div>
 
         <div id="messages" class="messages">
             <div class="row ai-row">
-                <div class="avatar">C</div>
-                <div class="bubble">Bonjour ! Je suis Copilot. Posez-moi une question ou demandez-moi une image (ex: "génère une image de voiture futuriste").</div>
-            </div>
+                <div class="avatar">N</div> <div class="bubble">Bonjour ! Je suis Néo. Posez-moi une question ou demandez-moi une image (ex: "génère une image de voiture futuriste").</div> </div>
         </div>
 
         <div class="input-area">
             <div class="input-wrapper">
-                <input type="text" id="input" placeholder="Message Copilot ou prompt d'image...">
-                <button class="btn-send" id="sendBtn" onclick="send()">↑</button>
+                <input type="text" id="input" placeholder="Message Néo ou prompt d'image..."> <button class="btn-send" id="sendBtn" onclick="send()">↑</button>
             </div>
         </div>
     </div>
@@ -331,7 +325,7 @@
                 setTimeout(() => {
                     splash.style.display = 'none';
                 }, 500);
-            }, 2500); // Reste visible 2.5 secondes au lancement
+            }, 2500);
         });
 
         function viewImage(url) {
@@ -361,8 +355,7 @@
 
             if (sender === "ai") {
                 let htmlContent = `
-                    <div class="avatar">C</div>
-                    <div class="bubble">
+                    <div class="avatar">N</div> <div class="bubble">
                         <div>${text}</div>`;
                 
                 if (imageUrl) {
@@ -388,8 +381,7 @@
             const row = document.createElement("div");
             row.className = "row ai-row";
             row.innerHTML = `
-                <div class="avatar">C</div>
-                <div class="bubble">
+                <div class="avatar">N</div> <div class="bubble">
                     <div class="loading-dots">
                         <div class="dot"></div>
                         <div class="dot"></div>
@@ -444,9 +436,7 @@
                         body: JSON.stringify({ prompt: text })
                     });
 
-                    if (!response.ok) throw new Error("Erreur réponse Copilot");
-
-                    const data = await response.json();
+                    if (!response.ok) throw new Error("Erreur réponse Néo"); const data = await response.json();
                     loader.remove();
 
                     const reply = data.reply || data.response || data.choices?.[0]?.message?.content || "Analyse effectuée.";

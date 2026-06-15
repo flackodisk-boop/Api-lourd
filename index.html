@@ -14,324 +14,124 @@
             --or-accent: #f59e0b;         
             --bleu-action: #38bdf8;
             --bordure: #1e293b;
-            --vert-whatsapp: #075e54;
             --vert-light: #4ade80;
-            --bulle-moi: #056162;
-            --bulle-autre: #1e293b;
-            --rouge-danger: #f43f5e;
-            --code-bg: #030712;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-principal); color: var(--texte-principal); overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        
+        header { 
+            background-color: var(--bg-secondaire); 
+            padding: 0 24px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid var(--bordure); 
+            height: 56px; 
+            flex-shrink: 0; 
         }
-
-        body {
-            background-color: var(--bg-principal);
-            color: var(--texte-principal);
-            overflow: hidden;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
+        .logo-zone { font-weight: 600; font-size: 18px; color: var(--or-accent); }
+        
+        .conteneur-principal { display: flex; flex: 1; height: calc(100vh - 56px); overflow: hidden; }
+        
+        .colonne-gauche { 
+            width: 260px; 
+            background-color: var(--bg-secondaire); 
+            border-right: 1px solid var(--bordure); 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 20px; 
         }
-
-        header {
-            background-color: var(--bg-secondaire);
-            padding: 0 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--bordure);
-            height: 56px;
-            flex-shrink: 0;
+        
+        .menu-item { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            padding: 12px 14px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            margin-bottom: 6px; 
+            font-size: 14px; 
+            color: var(--texte-secondaire); 
         }
-
-        .logo-zone {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 600;
-            font-size: 18px;
-            color: var(--or-accent);
-        }
-
-        .conteneur-principal {
-            display: flex;
-            flex: 1;
-            height: calc(100vh - 56px);
-            overflow: hidden;
-        }
-
-        .colonne-gauche {
-            width: 260px;
-            background-color: var(--bg-secondaire);
-            border-right: 1px solid var(--bordure);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            overflow-y: auto;
-        }
-
-        .zone-centrale {
-            flex: 1;
-            padding: 24px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: var(--bg-principal);
-        }
-
-        .feed-container {
-            width: 100%;
-            max-width: 600px;
-        }
-
-        .colonne-droite-messenger {
-            width: 320px;
-            background-color: var(--bg-secondaire);
-            border-left: 1px solid var(--bordure);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .carte {
-            background-color: var(--bg-secondaire);
-            border-radius: 10px;
-            padding: 18px;
-            margin-bottom: 18px;
-            border: 1px solid var(--bordure);
-        }
-
-        .avatar {
-            width: 38px;
-            height: 38px;
-            background-color: var(--or-accent);
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .avatar-grand {
-            width: 76px;
-            height: 76px;
-            margin: 0 auto 12px auto;
-            display: block;
-            border: 2px solid var(--or-accent);
-        }
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin-bottom: 6px;
-            font-size: 14px;
-            color: var(--texte-secondaire);
-        }
-        .menu-item:hover, .menu-item.actif {
-            background-color: var(--bg-hover);
-            color: var(--texte-principal);
-        }
+        .menu-item:hover, .menu-item.actif { background-color: var(--bg-hover); color: var(--texte-principal); }
         .menu-item.actif { border-left: 3px solid var(--or-accent); }
 
-        input, textarea, select {
-            width: 100%;
-            padding: 10px 14px;
-            margin-bottom: 12px;
-            background-color: var(--bg-principal);
-            border: 1px solid var(--bordure);
-            border-radius: 6px;
-            color: white;
-            outline: none;
-            font-size: 14px;
-        }
-        input:focus, textarea:focus { border-color: var(--bleu-action); }
-
-        button {
-            width: 100%;
-            background-color: var(--or-accent);
-            color: #0b1426;
-            border: none;
-            padding: 10px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background 0.2s;
-            font-size: 14px;
-        }
-        button:hover { opacity: 0.9; }
-
-        .btn-mini { width: auto; padding: 6px 12px; font-size: 12px; }
-        .btn-danger { background-color: var(--rouge-danger); color: white; }
-
-        .user-card-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--bordure);
-        }
-
-        .whatsapp-header {
-            background-color: var(--bg-hover);
-            padding: 0 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-bottom: 1px solid var(--bordure);
-            height: 56px;
-            flex-shrink: 0;
-        }
-
-        .chat-pill {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            cursor: pointer;
-            border-bottom: 1px solid var(--bordure);
-            transition: background 0.2s;
-        }
-        .chat-pill:hover, .chat-pill.active { background-color: var(--bg-hover); }
-
-        .whatsapp-chat-box {
-            display: none;
-            flex-direction: column;
-            height: 100%;
-        }
-        .whatsapp-chat-box.active { display: flex; }
-
-        .chat-messages {
-            flex: 1;
-            padding: 16px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            background-color: #080f1d;
-        }
-
-        .msg { max-width: 80%; padding: 8px 12px; border-radius: 8px; font-size: 14px; line-height: 1.4; }
-        .msg.me { background-color: var(--bulle-moi); align-self: flex-end; }
-        .msg.other { background-color: var(--bulle-autre); align-self: flex-start; }
-
-        .chat-input-area { padding: 12px; background-color: var(--bg-hover); display: flex; gap: 8px; flex-shrink: 0; }
-        .chat-input-area input { margin-bottom: 0; }
-        .chat-input-area button { width: auto; background-color: var(--vert-whatsapp); color: white; }
-
-        .section-vue { display: none; width: 100%; }
-        .section-vue.visible { display: block; }
+        .zone-centrale { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
+        .app-container { width: 100%; max-width: 800px; }
+        
+        .loader { color: var(--texte-secondaire); font-size: 14px; text-align: center; padding: 40px; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo-zone">
-            <span>📐</span> G-Social Platform <small style="font-size: 11px; color: var(--texte-secondaire);">Müller Edition</small>
-        </div>
+        <div class="logo-zone">📐 G-Social Platform <small style="font-size: 11px; color: var(--texte-secondaire);">Müller Edition</small></div>
         <div style="display: flex; align-items: center; gap: 8px;">
             <span style="width: 8px; height: 8px; background-color: var(--vert-light); border-radius: 50%;"></span>
-            <span style="font-size: 12px; color: var(--texte-secondaire);">Mode: Développeur Actif</span>
+            <span id="app-status" style="font-size: 12px; color: var(--texte-secondaire);">Initialisation...</span>
         </div>
     </header>
 
     <div class="conteneur-principal">
         
         <aside class="colonne-gauche">
-            <div class="carte" style="text-align: center; padding: 12px;">
-                <img id="my-profile-pic" class="avatar avatar-grand" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" alt="Avatar">
-                <h4 id="my-profile-name">Célestin Olua</h4>
-                <p id="my-profile-bio" style="font-size: 12px; color: var(--texte-secondaire); margin-top: 4px;">Développeur Fullstack</p>
-            </div>
-            
             <nav style="flex: 1;">
-                <div class="menu-item actif" onclick="basculerOnglet('feed', this)">🏠 Fil d'actualité</div>
-                <div class="menu-item" onclick="basculerOnglet('communaute', this)">🔍 Découvrir</div>
-                <div class="menu-item" onclick="basculerOnglet('invitations', this)">✉️ Invitations (<span id="count-invit">1</span>)</div>
-                <div class="menu-item" onclick="basculerOnglet('parametres', this)">⚙️ Paramètres</div>
+                <div class="menu-item actif" onclick="chargerComposant('social.html', this)">🏠 Fil Social</div>
+                <div class="menu-item" onclick="chargerComposant('chat.html', this)">💬 Messagerie Chat</div>
             </nav>
         </aside>
 
         <main class="zone-centrale">
-            <div class="feed-container">
-                
-                <section id="vue-feed" class="section-vue visible">
-                    <div class="carte">
-                        <h4 style="margin-bottom: 10px; font-weight: 500;">Créer une publication</h4>
-                        <textarea id="post-content-input" rows="3" placeholder="Partagez un snippet (utilise ``` pour du code)..."></textarea>
-                        <button onclick="creerPublication()" style="background-color: var(--bleu-action); color: #0b1426;">Publier sur le réseau</button>
-                    </div>
-
-                    <div id="feed-wall">
-                        </div>
-                </section>
-
-                </div>
-        </main>
-
-        <aside class="colonne-droite-messenger">
-            <div id="whatsapp-master-list" style="display: flex; flex-direction: column; height: 100%;">
-                <div class="whatsapp-header">
-                    <strong>Discussions Privées</strong>
-                </div>
-                <div style="flex: 1; overflow-y: auto;" id="whatsapp-contacts-box">
-                    <div class="chat-pill" onclick="ouvrirFenetreChat('Modérateur G')">
-                        <div style="flex: 1;">
-                            <strong style="font-size: 14px;">Modérateur G</strong>
-                            <p style="font-size: 12px; color: var(--texte-secondaire);">Terminal de discussion actif...</p>
-                        </div>
-                    </div>
-                </div>
+            <div class="app-container" id="zone-injection">
+                <div class="loader">Chargement du composant...</div>
             </div>
-        </aside>
+        </main>
 
     </div>
 
-    <script type="module">
-        /* Si ton fork contient d'autres fichiers JS (ex: app.js, api.js), 
-          tu peux les importer directement ici pour distribuer les données.
-          Exemple : 
-          import { initialiserChat, envoyerMessage } from './app.js';
-        */
+    <script src="./config.js"></script>
+    <script>
+        // Affichage du statut depuis le fichier de config
+        if (typeof CONFIG !== 'undefined') {
+            document.getElementById('app-status').innerText = `Version ${CONFIG.version} - ${CONFIG.env}`;
+        }
 
-        // Exemple de liaison pour charger dynamiquement des données depuis un autre fichier du projet
-        async function chargerDonneesDuFork() {
+        // Routeur pour aller chercher les fichiers HTML du fork
+        async function chargerComposant(nomFichier, elementMenu) {
+            if (elementMenu) {
+                document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('actif'));
+                elementMenu.classList.add('actif');
+            }
+
+            const conteneur = document.getElementById('zone-injection');
+            conteneur.innerHTML = '<div class="loader">Connexion au fork...</div>';
+
             try {
-                // Si tu as un fichier de configuration ou JSON à la racine de ton fork :
-                // const reponse = await fetch('./data.json');
-                // const data = await reponse.json();
-                console.log("Système prêt à interagir avec le reste du dépôt.");
+                const reponse = await fetch(`./${nomFichier}`);
+                if (!reponse.ok) throw new Error("Fichier introuvable");
+                const html = await reponse.text();
+                
+                // Injecte le fichier HTML cible
+                conteneur.innerHTML = html;
             } catch (error) {
-                console.error("Erreur lors de la liaison avec les fichiers du fork:", error);
+                conteneur.innerHTML = `
+                    <div style="background: #1e293b; padding: 20px; border-radius: 8px; border: 1px solid #ef4444;">
+                        <h4 style="color: #ef4444;">Erreur de chargement</h4>
+                        <p style="font-size: 13px; color: var(--texte-secondaire); margin-top: 8px;">
+                            Le fichier <strong>${nomFichier}</strong> est introuvable ou le navigateur bloque l'accès local. 
+                            Utilise un serveur local (Live Server) pour exécuter l'application.
+                        </p>
+                    </div>`;
             }
         }
-        
-        window.addEventListener('DOMContentLoaded', chargerDonneesDuFork);
-    </script>
 
-    <script>
-        // Logique UI globale (Changement d'onglets)
-        function basculerOnglet(cible, element) {
-            document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('actif'));
-            document.querySelectorAll('.section-vue').forEach(el => el.classList.remove('visible'));
-            
-            element.classList.add('actif');
-            const section = document.getElementById(`vue-${cible}`);
-            if(section) section.classList.add('visible');
-        }
-
-        function ouvrirFenetreChat(nom) {
-            console.log("Ouverture du chat avec : " + nom);
-            // Insérer ici ta logique d'ouverture connectée à tes modules externes
-        }
+        // Charger le premier fichier par défaut
+        window.addEventListener('DOMContentLoaded', () => {
+            chargerComposant('social.html', document.querySelector('.menu-item.actif'));
+        });
     </script>
 </body>
 </html>

@@ -226,7 +226,7 @@
             border-radius: 24px;
             border: 1px solid var(--bordure);
             display: flex;
-            align-items: flex-end;
+            align-items: center; /* Aligné au centre pour une meilleure hauteur d'écriture stable */
             padding: 6px 16px;
         }
 
@@ -236,12 +236,13 @@
             border: none;
             outline: none;
             color: var(--texte);
-            padding: 10px 4px;
+            padding: 12px 4px; /* Augmenté pour donner de l'espace */
             font-size: 15px;
             resize: none;
-            height: 24px;
-            max-height: 120px;
+            height: 44px; /* Hauteur de départ fixe pour avoir une vraie zone visible */
+            max-height: 140px;
             box-sizing: border-box;
+            display: block;
         }
         textarea::placeholder { color: var(--texte-secondaire); }
 
@@ -255,13 +256,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 8px;
+            flex-shrink: 0;
         }
         .btn-attach:hover { color: var(--texte); }
 
         .btn-send {
-            width: 34px;
-            height: 34px;
+            width: 36px;
+            height: 36px;
             background: var(--texte);
             color: var(--bg-chat);
             border: none;
@@ -275,7 +276,6 @@
             transition: background 0.2s, transform 0.1s;
             margin-left: 8px;
             flex-shrink: 0;
-            margin-bottom: 3px;
         }
         .btn-send:hover { background: var(--texte-secondaire); }
 
@@ -503,7 +503,7 @@
 
             addMessage(text || "Photo envoyée", "user", currentImg);
             inputField.value = "";
-            inputField.style.height = "24px"; 
+            inputField.style.height = "44px"; 
             clearSelectedImage();
 
             const loader = addLoading();
@@ -560,10 +560,11 @@
         });
 
         inputField.addEventListener("input", function() {
-            this.style.height = "24px";
-            const newHeight = Math.min(this.scrollHeight, 120);
+            this.style.height = "44px";
+            const newHeight = Math.min(this.scrollHeight, 140);
             this.style.height = newHeight + "px";
         });
     </script>
 </body>
-</html>
+    </html>
+    

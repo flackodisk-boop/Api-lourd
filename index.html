@@ -36,7 +36,7 @@
             overflow: hidden;
         }
 
-        /* Splash Screen (Écran de démarrage sans logo) */
+        /* Splash Screen */
         #splash-screen {
             position: fixed;
             top: 0;
@@ -65,7 +65,7 @@
             color: var(--texte-secondaire);
         }
 
-        /* Interface Principale (Optimisée à 600px max) */
+        /* Interface Principale */
         .chat-container {
             width: 100%;
             max-width: 600px;
@@ -226,20 +226,24 @@
             border-radius: 24px;
             border: 1px solid var(--bordure);
             display: flex;
-            align-items: center;
-            padding: 6px 12px;
+            align-items: flex-end;
+            padding: 6px 16px;
         }
 
-        input {
+        textarea {
             flex: 1;
             background: transparent;
             border: none;
             outline: none;
             color: var(--texte);
-            padding: 10px 8px;
+            padding: 10px 4px;
             font-size: 15px;
+            resize: none;
+            height: 24px;
+            max-height: 120px;
+            box-sizing: border-box;
         }
-        input::placeholder { color: var(--texte-secondaire); }
+        textarea::placeholder { color: var(--texte-secondaire); }
 
         .btn-attach {
             background: transparent;
@@ -247,10 +251,11 @@
             color: var(--texte-secondaire);
             font-size: 20px;
             cursor: pointer;
-            padding: 0 8px;
+            padding-right: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
+            margin-bottom: 8px;
         }
         .btn-attach:hover { color: var(--texte); }
 
@@ -268,6 +273,9 @@
             font-size: 16px;
             font-weight: bold;
             transition: background 0.2s, transform 0.1s;
+            margin-left: 8px;
+            flex-shrink: 0;
+            margin-bottom: 3px;
         }
         .btn-send:hover { background: var(--texte-secondaire); }
 
@@ -299,6 +307,8 @@
         <div class="splash-subtitle">Par Célestin Olua</div>
     </div>
 
+    <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
+
     <div class="chat-container" id="app-container">
         <div class="header">
             <span>Néo v1 — Par Célestin</span>
@@ -320,9 +330,7 @@
 
             <div class="input-wrapper">
                 <button class="btn-attach" onclick="triggerFileInput()">📎</button>
-                <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
-                
-                <input type="text" id="input" placeholder="Message Néo ou prompt d'image...">
+                <textarea id="input" placeholder="Message Néo ou prompt d'image..."></textarea>
                 <button class="btn-send" id="sendBtn" onclick="send()">↑</button>
             </div>
         </div>
@@ -495,6 +503,7 @@
 
             addMessage(text || "Photo envoyée", "user", currentImg);
             inputField.value = "";
+            inputField.style.height = "24px"; 
             clearSelectedImage();
 
             const loader = addLoading();
@@ -543,8 +552,17 @@
             }
         }
 
-        inputField.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") send();
+        inputField.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                send();
+            }
+        });
+
+        inputField.addEventListener("input", function() {
+            this.style.height = "24px";
+            const newHeight = Math.min(this.scrollHeight, 120);
+            this.style.height = newHeight + "px";
         });
     </script>
 </body>

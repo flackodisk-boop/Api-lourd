@@ -6,17 +6,17 @@
     <title>Néo - Assistant IA</title>
     <style>
         :root {
-            --bg-principal: #212121;
-            --bg-chat: #171717;
-            --bg-input: #2f2f2f;
+            --bg-principal: #0d0d0d;
+            --bg-chat: #000000;
+            --bg-input: #1a1a1a;
             --texte: #ececec;
             --texte-secondaire: #b4b4b4;
-            --accent: #10a37f; 
-            --accent-hover: #1a7f64;
-            --bulle-user: #2f2f2f;
-            --bordure: #424242;
+            --accent: #2563eb; 
+            --accent-hover: #1d4ed8;
+            --bulle-user: #1a1a1a;
+            --bordure: #262626;
             --bleu-action: #3b82f6;
-            --bleu-hover: #2563eb;
+            --bleu-hover: #1d4ed8;
         }
 
         * {
@@ -36,7 +36,7 @@
             overflow: hidden;
         }
 
-        /* Splash Screen (Écran de démarrage) */
+        /* Splash Screen (Écran de démarrage sans logo) */
         #splash-screen {
             position: fixed;
             top: 0;
@@ -52,25 +52,8 @@
             transition: opacity 0.4s ease, transform 0.4s ease;
         }
 
-        /* Style fidèle à ta capture : Logo N Vert */
-        .logo-animation {
-            width: 90px;
-            height: 90px;
-            background: linear-gradient(135deg, #10a37f, #0d7e62);
-            border-radius: 24px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 46px;
-            font-weight: 800;
-            color: white;
-            box-shadow: 0 0 25px rgba(16, 163, 127, 0.4);
-            animation: pulse 2s infinite ease-in-out;
-        }
-
         .splash-title {
-            margin-top: 24px;
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 700;
             color: var(--texte);
             letter-spacing: 0.5px;
@@ -80,12 +63,6 @@
             margin-top: 8px;
             font-size: 14px;
             color: var(--texte-secondaire);
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(16, 163, 127, 0.5); }
-            70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(16, 163, 127, 0); }
-            100% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(16, 163, 127, 0); }
         }
 
         /* Interface Principale (Optimisée à 600px max) */
@@ -312,13 +289,12 @@
 
         .messages::-webkit-scrollbar { width: 6px; }
         .messages::-webkit-scrollbar-track { background: transparent; }
-        .messages::-webkit-scrollbar-thumb { background: #424242; border-radius: 4px; }
+        .messages::-webkit-scrollbar-thumb { background: #262626; border-radius: 4px; }
     </style>
 </head>
 <body>
 
     <div id="splash-screen">
-        <div class="logo-animation">N</div>
         <div class="splash-title">Néo v1</div>
         <div class="splash-subtitle">Par Célestin Olua</div>
     </div>
@@ -367,9 +343,7 @@
         let userName = localStorage.getItem("neo_user_name") || "";
         let selectedImageBase64 = null;
 
-        // OUVERTURE SÉCURISÉE : S'exécute quoi qu'il arrive après 2 secondes
         window.addEventListener('DOMContentLoaded', () => {
-            // On met d'abord à jour l'interface utilisateur de manière sécurisée
             updateUserUI();
             
             setTimeout(() => {
@@ -402,7 +376,7 @@
         }
 
         function updateUserUI() {
-            if (!userBadge || !welcomeMessage) return; // Sécurité anti-crash
+            if (!userBadge || !welcomeMessage) return;
             
             if (userName) {
                 userBadge.innerText = `👤 ${userName}`;
@@ -574,5 +548,4 @@
         });
     </script>
 </body>
-    </html>
-    
+</html>

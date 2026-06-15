@@ -6,68 +6,67 @@
     <title>G-Social X WhatsApp - Muller Edition</title>
     <style>
         :root {
-            --bg-principal: #070f1e;       
-            --bg-secondaire: #0f1b2f;     
-            --bg-hover: #1b2d4a;
-            --texte-principal: #ffffff;
+            --bg-principal: #0b1426;       
+            --bg-secondaire: #13223c;     
+            --bg-hover: #1e3257;
+            --texte-principal: #f8fafc;
             --texte-secondaire: #94a3b8;
-            --or-accent: #d4af37;         
-            --bleu-action: #1da1f2;
+            --or-accent: #f59e0b;         
+            --bleu-action: #38bdf8;
             --bordure: #1e293b;
-            --vert-whatsapp: #128c7e;
-            --vert-light: #25d366;
+            --vert-whatsapp: #075e54;
+            --vert-light: #4ade80;
             --bulle-moi: #056162;
-            --bulle-autre: #26354d;
-            --rouge-danger: #ef4444;
-            --code-bg: #01060f;
+            --bulle-autre: #1e293b;
+            --rouge-danger: #f43f5e;
+            --code-bg: #030712;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
         }
 
         body {
             background-color: var(--bg-principal);
             color: var(--texte-principal);
-            overflow-x: hidden;
+            overflow: hidden;
             height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         header {
             background-color: var(--bg-secondaire);
-            padding: 0 20px;
+            padding: 0 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 100;
             border-bottom: 1px solid var(--bordure);
-            height: 60px;
+            height: 56px;
+            flex-shrink: 0;
         }
 
         .logo-zone {
             display: flex;
             align-items: center;
             gap: 10px;
-            font-weight: bold;
-            font-size: 20px;
+            font-weight: 600;
+            font-size: 18px;
             color: var(--or-accent);
         }
 
         .conteneur-principal {
-            margin-top: 60px;
             display: flex;
-            height: calc(100vh - 60px);
-            width: 100vw;
+            flex: 1;
+            height: calc(100vh - 56px);
+            overflow: hidden;
         }
 
         .colonne-gauche {
-            width: 300px;
+            width: 260px;
             background-color: var(--bg-secondaire);
             border-right: 1px solid var(--bordure);
             padding: 20px;
@@ -79,88 +78,94 @@
 
         .zone-centrale {
             flex: 1;
-            padding: 20px;
+            padding: 24px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             align-items: center;
+            background-color: var(--bg-principal);
         }
 
         .feed-container {
             width: 100%;
-            max-width: 650px;
+            max-width: 600px;
         }
 
         .colonne-droite-messenger {
-            width: 380px;
+            width: 320px;
             background-color: var(--bg-secondaire);
             border-left: 1px solid var(--bordure);
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
         .carte {
             background-color: var(--bg-secondaire);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 18px;
             border: 1px solid var(--bordure);
-            width: 100%;
         }
 
         .avatar {
-            width: 42px;
-            height: 42px;
+            width: 38px;
+            height: 38px;
             background-color: var(--or-accent);
             border-radius: 50%;
             object-fit: cover;
-            border: 1px solid var(--bordure);
         }
 
         .avatar-grand {
-            width: 90px;
-            height: 90px;
-            margin: 0 auto 10px auto;
+            width: 76px;
+            height: 76px;
+            margin: 0 auto 12px auto;
             display: block;
+            border: 2px solid var(--or-accent);
         }
 
         .menu-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 12px;
+            padding: 10px 14px;
             border-radius: 8px;
             cursor: pointer;
-            transition: 0.2s;
-            margin-bottom: 5px;
+            transition: all 0.2s ease;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: var(--texte-secondaire);
         }
         .menu-item:hover, .menu-item.actif {
             background-color: var(--bg-hover);
-            color: var(--or-accent);
+            color: var(--texte-principal);
         }
+        .menu-item.actif { border-left: 3px solid var(--or-accent); }
 
         input, textarea, select {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
+            padding: 10px 14px;
+            margin-bottom: 12px;
             background-color: var(--bg-principal);
             border: 1px solid var(--bordure);
-            border-radius: 8px;
+            border-radius: 6px;
             color: white;
             outline: none;
-            resize: none;
+            font-size: 14px;
         }
+        input:focus, textarea:focus { border-color: var(--bleu-action); }
 
         button {
             width: 100%;
             background-color: var(--or-accent);
-            color: #000;
+            color: #0b1426;
             border: none;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 10px 14px;
+            border-radius: 6px;
             cursor: pointer;
-            font-weight: bold;
-            transition: 0.2s;
+            font-weight: 600;
+            transition: background 0.2s;
+            font-size: 14px;
         }
         button:hover { opacity: 0.9; }
 
@@ -172,48 +177,28 @@
             align-items: center;
             gap: 12px;
             padding: 12px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .user-details { flex: 1; }
-        .user-name { font-weight: bold; font-size: 14px; }
-        .user-subtitle { font-size: 12px; color: var(--texte-secondaire); }
-
-        .actions-gap { display: flex; gap: 8px; }
-
-        .comment-section {
-            margin-top: 15px;
-            padding-top: 10px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-        }
-        .comment-item {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-            font-size: 13px;
-            background-color: var(--bg-principal);
-            padding: 8px;
-            border-radius: 6px;
+            border-bottom: 1px solid var(--bordure);
         }
 
         .whatsapp-header {
             background-color: var(--bg-hover);
-            padding: 12px 15px;
+            padding: 0 16px;
             display: flex;
             align-items: center;
             gap: 12px;
             border-bottom: 1px solid var(--bordure);
-            height: 60px;
+            height: 56px;
+            flex-shrink: 0;
         }
 
         .chat-pill {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 15px;
+            padding: 12px 16px;
             cursor: pointer;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-            transition: 0.2s;
+            border-bottom: 1px solid var(--bordure);
+            transition: background 0.2s;
         }
         .chat-pill:hover, .chat-pill.active { background-color: var(--bg-hover); }
 
@@ -226,35 +211,21 @@
 
         .chat-messages {
             flex: 1;
-            padding: 15px;
+            padding: 16px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 10px;
-            background-color: #040914;
+            background-color: #080f1d;
         }
 
-        .msg { max-width: 75%; padding: 8px 12px; border-radius: 8px; font-size: 14px; line-height: 1.4; }
+        .msg { max-width: 80%; padding: 8px 12px; border-radius: 8px; font-size: 14px; line-height: 1.4; }
         .msg.me { background-color: var(--bulle-moi); align-self: flex-end; }
         .msg.other { background-color: var(--bulle-autre); align-self: flex-start; }
-        .msg-time { font-size: 10px; color: rgba(255,255,255,0.5); text-align: right; margin-top: 3px; }
 
-        /* Bloc de code personnalisé pour développeurs */
-        pre {
-            background-color: var(--code-bg);
-            padding: 8px;
-            border-radius: 6px;
-            border: 1px solid var(--bordure);
-            overflow-x: auto;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 12px;
-            color: var(--vert-light);
-            margin-top: 5px;
-        }
-
-        .chat-input-area { padding: 12px; background-color: var(--bg-hover); display: flex; gap: 10px; }
+        .chat-input-area { padding: 12px; background-color: var(--bg-hover); display: flex; gap: 8px; flex-shrink: 0; }
         .chat-input-area input { margin-bottom: 0; }
-        .chat-input-area button { width: auto; background-color: var(--vert-whatsapp); color: white; padding: 0 20px; }
+        .chat-input-area button { width: auto; background-color: var(--vert-whatsapp); color: white; }
 
         .section-vue { display: none; width: 100%; }
         .section-vue.visible { display: block; }
@@ -264,29 +235,28 @@
 
     <header>
         <div class="logo-zone">
-            <span>📐</span> G-Social Platform <small style="font-size: 11px; color: var(--texte-secondaire); font-weight: normal;">(Müller Edition)</small>
+            <span>📐</span> G-Social Platform <small style="font-size: 11px; color: var(--texte-secondaire);">Müller Edition</small>
         </div>
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="width: 10px; height: 10px; background-color: var(--vert-light); border-radius: 50%;"></span>
-            <span style="font-size: 13px; color: var(--texte-secondaire);">Mode: Développeur Actif</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="width: 8px; height: 8px; background-color: var(--vert-light); border-radius: 50%;"></span>
+            <span style="font-size: 12px; color: var(--texte-secondaire);">Mode: Développeur Actif</span>
         </div>
     </header>
 
     <div class="conteneur-principal">
         
         <aside class="colonne-gauche">
-            <div class="carte" style="text-align: center; padding: 15px;">
+            <div class="carte" style="text-align: center; padding: 12px;">
                 <img id="my-profile-pic" class="avatar avatar-grand" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" alt="Avatar">
-                <h3 id="my-profile-name">Célestin Olua</h3>
-                <p id="my-profile-bio" style="font-size: 12px; color: var(--texte-secondaire); margin-top: 5px;">Développeur Fullstack NodeJS & React</p>
-                <div id="my-profile-stack" style="font-size: 11px; color: var(--or-accent); margin-top: 8px; font-weight: bold;">JavaScript / HTML / CSS</div>
+                <h4 id="my-profile-name">Célestin Olua</h4>
+                <p id="my-profile-bio" style="font-size: 12px; color: var(--texte-secondaire); margin-top: 4px;">Développeur Fullstack</p>
             </div>
             
             <nav style="flex: 1;">
                 <div class="menu-item actif" onclick="basculerOnglet('feed', this)">🏠 Fil d'actualité</div>
-                <div class="menu-item" onclick="basculerOnglet('communaute', this)">🔍 Découvrir & Inviter</div>
+                <div class="menu-item" onclick="basculerOnglet('communaute', this)">🔍 Découvrir</div>
                 <div class="menu-item" onclick="basculerOnglet('invitations', this)">✉️ Invitations (<span id="count-invit">1</span>)</div>
-                <div class="menu-item" onclick="basculerOnglet('parametres', this)">⚙️ Paramètres du Profil</div>
+                <div class="menu-item" onclick="basculerOnglet('parametres', this)">⚙️ Paramètres</div>
             </nav>
         </aside>
 
@@ -295,160 +265,73 @@
                 
                 <section id="vue-feed" class="section-vue visible">
                     <div class="carte">
-                        <h4 style="margin-bottom: 12px;">Créer une publication de code</h4>
+                        <h4 style="margin-bottom: 10px; font-weight: 500;">Créer une publication</h4>
                         <textarea id="post-content-input" rows="3" placeholder="Partagez un snippet (utilise ``` pour du code)..."></textarea>
-                        <button onclick="creerPublication()" style="background-color: var(--bleu-action); color: white;">Publier sur le réseau</button>
+                        <button onclick="creerPublication()" style="background-color: var(--bleu-action); color: #0b1426;">Publier sur le réseau</button>
                     </div>
 
                     <div id="feed-wall">
-                        <div class="carte">
-                            <div style="display: flex; gap: 12px; margin-bottom: 12px;">
-                                <img class="avatar" src="[https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80](https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80)">
-                                <div>
-                                    <strong>Modérateur G</strong>
-                                    <div style="font-size: 11px; color: var(--texte-secondaire);">Il y a 10 minutes</div>
-                                </div>
-                            </div>
-                            <p>Le système hybride Facebook x WhatsApp est entièrement opérationnel. Essayez d'envoyer du code avec des backticks comme ceci : <br> ```console.log("Hello World");```</p>
-                            
-                            <div class="comment-section">
-                                <div style="display: flex; gap: 8px;">
-                                    <input type="text" placeholder="Écrire un commentaire..." style="margin-bottom:0; padding:8px; font-size:13px;" onkeypress="ajouterCommentaireSimule(event, this)">
-                                </div>
-                                <div class="comment-item">
-                                    <strong>Alice Dev :</strong> Superbe boulot sur le design fluide !
-                                </div>
-                            </div>
                         </div>
-                    </div>
                 </section>
 
-                <section id="vue-communaute" class="section-vue">
-                    <div class="carte">
-                        <h2>🔍 Développeurs sur la plateforme</h2>
-                        <p style="font-size: 13px; color: var(--texte-secondaire); margin-bottom: 15px;">Envoyez une demande d'ami pour débloquer leur canal WhatsApp.</p>
-                        
-                        <div class="user-card-row">
-                            <img class="avatar" src="[https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80](https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80)">
-                            <div class="user-details">
-                                <div class="user-name">Marc Tech</div>
-                                <div class="user-subtitle">Architecte Cloud / DevOps</div>
-                            </div>
-                            <button class="btn-mini" onclick="envoyerInvitation(this, 'Marc Tech')">Inviter</button>
-                        </div>
-
-                        <div class="user-card-row">
-                            <img class="avatar" src="[https://images.unsplash.com/photo-1628157582853-a796fa650a6a?auto=format&fit=crop&w=150&q=80](https://images.unsplash.com/photo-1628157582853-a796fa650a6a?auto=format&fit=crop&w=150&q=80)">
-                            <div class="user-details">
-                                <div class="user-name">Lucas Python</div>
-                                <div class="user-subtitle">Ingénieur Data / AI</div>
-                            </div>
-                            <button class="btn-mini" onclick="envoyerInvitation(this, 'Lucas Python')">Inviter</button>
-                        </div>
-                    </div>
-                </section>
-
-                <section id="vue-invitations" class="section-vue">
-                    <div class="carte">
-                        <h2>✉️ Invitations Reçues</h2>
-                        <br>
-                        <div id="box-invitations-recues">
-                            <div class="user-card-row" id="invit-row-1">
-                                <img class="avatar" src="[https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80](https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80)">
-                                <div class="user-details">
-                                    <div class="user-name">Alice Codeuse</div>
-                                    <div class="user-subtitle">Développeuse Frontend React</div>
-                                </div>
-                                <div class="actions-gap">
-                                    <button class="btn-mini" style="background-color: var(--vert-light); color: black;" onclick="accepterInvitation('invit-row-1', 'Alice Codeuse', '[https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80](https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80)')">Accepter</button>
-                                    <button class="btn-mini btn-danger" onclick="refuserInvitation('invit-row-1')">Refuser</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="carte">
-                        <h2>✉️ Invitations Envoyées</h2>
-                        <br>
-                        <div id="box-invitations-envoyees" style="font-size: 13px; color: var(--texte-secondaire);">
-                            Aucune invitation en attente d'approbation.
-                        </div>
-                    </div>
-                </section>
-
-                <section id="vue-parametres" class="section-vue">
-                    <div class="carte">
-                        <h2>⚙️ Paramètres du Profil Développeur</h2>
-                        <br>
-                        <label>Nom Complet</label>
-                        <input type="text" id="setting-name" value="Célestin Olua">
-
-                        <label>Image de Profil (Lien URL)</label>
-                        <input type="text" id="setting-pic" value="[https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80](https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80)">
-
-                        <label>Biographie Professionnelle</label>
-                        <textarea id="setting-bio" rows="2">Développeur Fullstack NodeJS & React</textarea>
-
-                        <label>Langage Principal / Spécialité</label>
-                        <select id="setting-stack">
-                            <option value="JavaScript / HTML / CSS">JavaScript / Fullstack</option>
-                            <option value="Python / Django / AI">Python / AI Data</option>
-                            <option value="PHP / Symfony / DevOps">PHP / Core Backend</option>
-                        </select>
-
-                        <button onclick="sauvegarderProfilConfiguration()">Enregistrer et Appliquer</button>
-                    </div>
-                </section>
-
-            </div>
+                </div>
         </main>
 
         <aside class="colonne-droite-messenger">
             <div id="whatsapp-master-list" style="display: flex; flex-direction: column; height: 100%;">
                 <div class="whatsapp-header">
-                    <strong>Discussions Privées (WhatsApp)</strong>
+                    <strong>Discussions Privées</strong>
                 </div>
                 <div style="flex: 1; overflow-y: auto;" id="whatsapp-contacts-box">
-                    
-                    <div class="chat-pill" onclick="ouvrirFenetreChat('Modérateur G', '[https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80](https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80)')">
-                        <img class="avatar" src="[https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80](https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80)">
-                        <div style="flex: 1; min-width: 0;">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <strong style="font-size: 14px;">Modérateur G</strong>
-                                <span style="font-size: 11px; color: var(--texte-secondaire);">En ligne</span>
-                            </div>
-                            <p style="font-size: 12px; color: var(--texte-secondaire); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">Cliquez pour ouvrir le terminal de chat...</p>
+                    <div class="chat-pill" onclick="ouvrirFenetreChat('Modérateur G')">
+                        <div style="flex: 1;">
+                            <strong style="font-size: 14px;">Modérateur G</strong>
+                            <p style="font-size: 12px; color: var(--texte-secondaire);">Terminal de discussion actif...</p>
                         </div>
                     </div>
-
-                    <div id="contacts-dynamiques-whatsapp"></div>
-                </div>
-            </div>
-
-            <div id="whatsapp-active-window" class="whatsapp-chat-box">
-                <div class="whatsapp-header" style="background-color: var(--vert-whatsapp); justify-content: flex-start;">
-                    <button onclick="fermerFenetreChat()" style="width: auto; background: none; color: white; font-size: 18px; margin-right: 10px; padding: 0 5px;">←</button>
-                    <img id="active-chat-avatar" class="avatar" src="" style="width: 36px; height: 36px;">
-                    <div>
-                        <strong id="active-chat-name" style="font-size: 15px;">Nom</strong>
-                        <div style="font-size: 11px; color: rgba(255,255,255,0.8);">en ligne</div>
-                    </div>
-                </div>
-
-                <div class="chat-messages" id="chat-messages-scroll"></div>
-
-                <div class="chat-input-area">
-                    <input type="text" id="chat-input-field" placeholder="Discuter ou poster du code avec ```..." onkeypress="gestionEntreeChat(event)">
-                    <button onclick="envoyerMessageChat()">Envoyer</button>
                 </div>
             </div>
         </aside>
 
     </div>
 
+    <script type="module">
+        /* Si ton fork contient d'autres fichiers JS (ex: app.js, api.js), 
+          tu peux les importer directement ici pour distribuer les données.
+          Exemple : 
+          import { initialiserChat, envoyerMessage } from './app.js';
+        */
+
+        // Exemple de liaison pour charger dynamiquement des données depuis un autre fichier du projet
+        async function chargerDonneesDuFork() {
+            try {
+                // Si tu as un fichier de configuration ou JSON à la racine de ton fork :
+                // const reponse = await fetch('./data.json');
+                // const data = await reponse.json();
+                console.log("Système prêt à interagir avec le reste du dépôt.");
+            } catch (error) {
+                console.error("Erreur lors de la liaison avec les fichiers du fork:", error);
+            }
+        }
+        
+        window.addEventListener('DOMContentLoaded', chargerDonneesDuFork);
+    </script>
+
     <script>
-        // --- BASE DE DONNÉES LOCALES DES DISCUSSIONS (Nouveauté) ---
-        const historiqueDiscussions = {
-            "Modérateur G": [
-    * Si tu écris un message ee
-            e
+        // Logique UI globale (Changement d'onglets)
+        function basculerOnglet(cible, element) {
+            document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('actif'));
+            document.querySelectorAll('.section-vue').forEach(el => el.classList.remove('visible'));
+            
+            element.classList.add('actif');
+            const section = document.getElementById(`vue-${cible}`);
+            if(section) section.classList.add('visible');
+        }
+
+        function ouvrirFenetreChat(nom) {
+            console.log("Ouverture du chat avec : " + nom);
+            // Insérer ici ta logique d'ouverture connectée à tes modules externes
+        }
+    </script>
+</body>
+</html>

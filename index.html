@@ -36,7 +36,7 @@
             overflow: hidden;
         }
 
-        /* Splash Screen */
+        /* Écran de démarrage (Splash Screen) */
         #splash-screen {
             position: fixed;
             top: 0;
@@ -52,25 +52,26 @@
             transition: opacity 0.5s ease, transform 0.5s ease;
         }
 
+        /* Style Logo N arrangé avec un beau dégradé Vert */
         .logo-animation {
-            width: 80px;
-            height: 80px;
-            background: var(--accent);
-            border-radius: 50%;
+            width: 85px;
+            height: 85px;
+            background: linear-gradient(135deg, #10a37f, #0d7e62);
+            border-radius: 22px; /* Style arrondi moderne */
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 36px;
-            font-weight: bold;
+            font-size: 42px;
+            font-weight: 800;
             color: white;
-            box-shadow: 0 0 20px rgba(16, 163, 127, 0.4);
+            box-shadow: 0 0 25px rgba(16, 163, 127, 0.5);
             animation: pulse 2s infinite ease-in-out;
         }
 
         .splash-title {
             margin-top: 20px;
-            font-size: 20px;
-            font-weight: 600;
+            font-size: 22px;
+            font-weight: 700;
             color: var(--texte);
             letter-spacing: 1px;
         }
@@ -82,8 +83,8 @@
         }
 
         @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 163, 127, 0.5); }
-            70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(16, 163, 127, 0); }
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 163, 127, 0.6); }
+            70% { transform: scale(1); box-shadow: 0 0 0 18px rgba(16, 163, 127, 0); }
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 163, 127, 0); }
         }
 
@@ -119,10 +120,14 @@
         .user-badge {
             font-size: 12px;
             background: var(--bulle-user);
-            padding: 4px 10px;
-            border-radius: 12px;
+            padding: 5px 12px;
+            border-radius: 14px;
             cursor: pointer;
             border: 1px solid var(--bordure);
+            transition: background 0.2s;
+        }
+        .user-badge:hover {
+            background: var(--bordure);
         }
 
         .messages {
@@ -217,14 +222,12 @@
         .btn-view { background: var(--bleu-action); }
         .btn-view:hover { background: var(--bleu-hover); }
 
-        /* Zone d'envoi et barre d'outils */
         .input-area {
             padding: 0 20px 20px 20px;
             background: var(--bg-chat);
             flex-shrink: 0;
         }
 
-        /* Aperçu de la photo sélectionnée avant envoi */
         .upload-preview-container {
             display: none;
             width: 100%;
@@ -402,7 +405,7 @@
         let userName = localStorage.getItem("neo_user_name") || "";
         let selectedImageBase64 = null;
 
-        // Configuration initiale du nom de l'utilisateur
+        // Événement de lancement corrigé : pas de prompt bloquant au démarrage
         window.addEventListener('DOMContentLoaded', () => {
             updateUserUI();
             
@@ -416,8 +419,9 @@
                 
                 setTimeout(() => {
                     splash.style.display = 'none';
+                    // Demande le nom uniquement après disparition totale du splash screen
                     if (!userName) {
-                        askUsername();
+                        setTimeout(() => { askUsername(); }, 200);
                     }
                 }, 500);
             }, 2500);
@@ -441,7 +445,6 @@
             }
         }
 
-        // Fonctions de gestion de l'image
         function triggerFileInput() {
             fileInput.click();
         }
@@ -509,7 +512,6 @@
                 htmlContent += `</div>`;
                 row.innerHTML = htmlContent;
             } else {
-                // Message de l'utilisateur avec photo optionnelle attachée
                 let htmlContent = `<div class="bubble"><div>${text}</div>`;
                 if (imageUrl) {
                     htmlContent += `<img src="${imageUrl}" class="media-preview" alt="Photo envoyée">`;
@@ -552,7 +554,6 @@
             const text = inputField.value.trim();
             if (!text && !selectedImageBase64) return;
 
-            // Sauvegarde de l'image locale pour l'affichage de la bulle utilisateur
             const currentImg = selectedImageBase64;
 
             addMessage(text || "Photo envoyée", "user", currentImg);
@@ -580,14 +581,13 @@
                     addMessage(`🎨 Voici la génération pour : "${finalPrompt}"`, "ai", imageUrl);
                 } 
                 else {
-                    // Envoi des infos vers l'API textuelle
                     const response = await fetch(API_COPILOT, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ 
                             prompt: text,
-                            username: userName, // Transmission du nom
-                            image: currentImg   // Transmission de l'image en base64 si présente
+                            username: userName,
+                            image: currentImg 
                         })
                     });
 
@@ -607,4 +607,5 @@
         }
 
         inputField.addEventListener("keypress", (e) => {
-   
+            if (e.key === "Enter") send();
+  

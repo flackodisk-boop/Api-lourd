@@ -1,21 +1,23 @@
 function handleLogin(e) {
   e.preventDefault();
-  
+
+  if (typeof initDB === "function") initDB();
+
+  // Nettoyage de la saisie (retire les espaces et ignore les majuscules)
   const userInput = document.getElementById('username').value.trim().toLowerCase();
   const passInput = document.getElementById('password').value.trim();
 
   const db = getDB();
   
-  // Flexible username check (case insensitive)
-  const userFound = db.users.find(
+  const foundUser = db.users.find(
     u => u.user.toLowerCase() === userInput && u.pass === passInput
   );
 
-  if (userFound) {
-    localStorage.setItem('jpp_session', JSON.stringify(userFound));
+  if (foundUser) {
+    localStorage.setItem('jpp_session', JSON.stringify(foundUser));
     window.location.href = 'dashboard.html';
   } else {
-    alert("❌ Invalid credentials\n\nUsername: admin\nPassword: 1234");
+    alert("❌ Identifiants incorrects\n\nNom d'utilisateur : admin\nMot de passe : 1234");
   }
 }
 
@@ -28,6 +30,5 @@ function requireAuth() {
 
 function logout() {
   localStorage.removeItem('jpp_session');
-  window.location.href = 'login.html'
-    ;
+  window.location.href = 'login.html';
 }

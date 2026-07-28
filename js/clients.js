@@ -1,47 +1,63 @@
-requireAuth();
+<!DOCTYPE html>
+<html lang="fr" class="h-full bg-slate-50">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clients - JPP Plomberie</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="h-full flex flex-col md:flex-row">
 
-function renderClients() {
-  const db = getDB();
-  const tbody = document.getElementById('table-clients');
-  if(!tbody) return;
-  
-  tbody.innerHTML = '';
-  db.clients.forEach(c => {
-    tbody.innerHTML += `
-      <tr class="border-b border-slate-100">
-        <td class="p-4 font-semibold">${c.nom}</td>
-        <td class="p-4">${c.tel}</td>
-        <td class="p-4">${c.email}</td>
-        <td class="p-4">${c.adresse}</td>
-        <td class="p-4 text-right">
-          <button onclick="deleteClient(${c.id})" class="text-rose-600 hover:bg-rose-50 p-2 rounded-lg"><i class="fa-solid fa-trash"></i></button>
-        </td>
-      </tr>`;
-  });
-}
+  <aside class="w-full md:w-64 bg-slate-900 text-slate-300 flex flex-col justify-between p-4">
+    <div class="space-y-6">
+      <div class="flex items-center gap-3 p-2">
+        <div class="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center text-white text-2xl font-black">J</div>
+        <div>
+          <h1 class="font-bold text-white leading-tight">JPP Plomberie</h1>
+          <p class="text-xs text-emerald-400">● En ligne</p>
+        </div>
+      </div>
+      <nav class="space-y-1">
+        <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-xl text-sm font-medium"><i class="fa-solid fa-chart-pie w-5"></i> Dashboard</a>
+        <a href="clients.html" class="flex items-center gap-3 px-4 py-3 bg-blue-600 text-white rounded-xl text-sm font-medium"><i class="fa-solid fa-users w-5"></i> Clients</a>
+        <a href="interventions.html" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-xl text-sm font-medium"><i class="fa-solid fa-clipboard-list w-5"></i> Interventions</a>
+        <a href="devis.html" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-xl text-sm font-medium"><i class="fa-solid fa-file-invoice-dollar w-5"></i> Devis</a>
+        <a href="stock.html" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-xl text-sm font-medium"><i class="fa-solid fa-boxes-stacked w-5"></i> Stock</a>
+      </nav>
+    </div>
+    <button onclick="logout()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl text-slate-400 hover:bg-slate-800 hover:text-rose-400 transition">
+      <i class="fa-solid fa-right-from-bracket"></i> Déconnexion
+    </button>
+  </aside>
 
-function saveClient(e) {
-  e.preventDefault();
-  const db = getDB();
-  
-  db.clients.push({
-    id: Date.now(),
-    nom: document.getElementById('client-nom').value,
-    tel: document.getElementById('client-tel').value,
-    email: document.getElementById('client-email').value,
-    adresse: document.getElementById('client-adresse').value
-  });
+  <main class="flex-1 p-8 overflow-y-auto space-y-6">
+    <h2 class="text-2xl font-bold text-slate-900">Gestion des Clients</h2>
 
-  saveDB(db);
-  e.target.reset();
-  renderClients();
-}
+    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+      <form onsubmit="saveClient(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <input type="text" id="client-nom" placeholder="Nom complet" class="px-4 py-2.5 rounded-xl border text-sm" required>
+        <input type="tel" id="client-tel" placeholder="Téléphone" class="px-4 py-2.5 rounded-xl border text-sm" required>
+        <input type="email" id="client-email" placeholder="Email" class="px-4 py-2.5 rounded-xl border text-sm">
+        <input type="text" id="client-adresse" placeholder="Adresse" class="px-4 py-2.5 rounded-xl border text-sm">
+        <button type="submit" class="md:col-span-4 bg-blue-600 text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700">Ajouter Client</button>
+      </form>
+    </div>
 
-function deleteClient(id) {
-  const db = getDB();
-  db.clients = db.clients.filter(c => c.id !== id);
-  saveDB(db);
-  renderClients();
-}
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <table class="w-full text-left text-sm">
+        <thead class="bg-slate-50 border-b text-xs uppercase text-slate-400">
+          <tr><th class="p-4">Nom</th><th class="p-4">Téléphone</th><th class="p-4">Email</th><th class="p-4">Adresse</th><th class="p-4 text-right">Actions</th></tr>
+        </thead>
+        <tbody id="table-clients" class="divide-y"></tbody>
+      </table>
+    </div>
+  </main>
 
-document.addEventListener('DOMContentLoaded', renderClients);
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/clients.js"></script>
+</body>
+</
+  html>

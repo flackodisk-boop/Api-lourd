@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html lang="fr" class="h-full bg-slate-50">
+<html lang="en" class="h-full bg-slate-50">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - JPP Plomberie</title>
+  <title>Dashboard - JPP Plumbing</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="h-full flex flex-col md:flex-row">
 
@@ -15,40 +14,40 @@
       <div class="flex items-center gap-3 p-2">
         <div class="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center text-white text-2xl font-black">J</div>
         <div>
-          <h1 class="font-bold text-white leading-tight">JPP Plomberie</h1>
-          <p class="text-xs text-emerald-400">● En ligne</p>
+          <h1 class="font-bold text-white leading-tight">JPP Plumbing</h1>
+          <p class="text-xs text-emerald-400">● Online</p>
         </div>
       </div>
       
       <nav class="space-y-1">
         <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 bg-blue-600 text-white rounded-xl text-sm font-medium"><i class="fa-solid fa-chart-pie w-5"></i> Dashboard</a>
         <a href="clients.html" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-xl text-sm font-medium"><i class="fa-solid fa-users w-5"></i> Clients</a>
-        <a href="interventions.html" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-xl text-sm font-medium"><i class="fa-solid fa-clipboard-list w-5"></i> Interventions</a>
-        <a href="devis.html" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-xl text-sm font-medium"><i class="fa-solid fa-file-invoice-dollar w-5"></i> Devis / Factures</a>
+        <a href="interventions.html" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-xl text-sm font-medium"><i class="fa-solid fa-clipboard-list w-5"></i> Jobs</a>
+        <a href="devis.html" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-xl text-sm font-medium"><i class="fa-solid fa-file-invoice-dollar w-5"></i> Invoices</a>
         <a href="stock.html" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-xl text-sm font-medium"><i class="fa-solid fa-boxes-stacked w-5"></i> Stock</a>
       </nav>
     </div>
 
     <button onclick="logout()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl text-slate-400 hover:bg-slate-800 hover:text-rose-400 transition">
-      <i class="fa-solid fa-right-from-bracket"></i> Déconnexion
+      <i class="fa-solid fa-right-from-bracket"></i> Logout
     </button>
   </aside>
 
   <main class="flex-1 p-8 overflow-y-auto">
-    <h2 class="text-2xl font-bold text-slate-900 mb-6">Tableau de bord</h2>
+    <h2 class="text-2xl font-bold text-slate-900 mb-6">Dashboard Overview</h2>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-        <p class="text-xs text-slate-400 font-semibold uppercase">Clients</p>
+        <p class="text-xs text-slate-400 font-semibold uppercase">Total Clients</p>
         <h3 id="stat-clients" class="text-3xl font-extrabold mt-2">0</h3>
       </div>
       <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-        <p class="text-xs text-slate-400 font-semibold uppercase">Interventions en cours</p>
+        <p class="text-xs text-slate-400 font-semibold uppercase">Active Jobs</p>
         <h3 id="stat-interventions" class="text-3xl font-extrabold text-blue-600 mt-2">0</h3>
       </div>
       <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-        <p class="text-xs text-slate-400 font-semibold uppercase">Chiffre d'affaires</p>
-        <h3 id="stat-ca" class="text-3xl font-extrabold text-emerald-600 mt-2">0.00 €</h3>
+        <p class="text-xs text-slate-400 font-semibold uppercase">Total Revenue</p>
+        <h3 id="stat-ca" class="text-3xl font-extrabold text-emerald-600 mt-2">$0.00</h3>
       </div>
     </div>
   </main>
@@ -58,14 +57,12 @@
   <script>
     requireAuth();
     
-    // Chargement des statistiques au chargement
     document.addEventListener('DOMContentLoaded', () => {
       const db = getDB();
       document.getElementById('stat-clients').innerText = db.clients.length;
-      document.getElementById('stat-interventions').innerText = db.interventions.filter(i => i.statut === 'En cours').length;
-      document.getElementById('stat-ca').innerText = (db.caTotal || 0).toFixed(2) + " €";
+      document.getElementById('stat-interventions').innerText = db.interventions.length;
+      document.getElementById('stat-ca').innerText = "$" + (db.caTotal || 0).toFixed(2);
     });
   </script>
 </body>
 </html>
-  

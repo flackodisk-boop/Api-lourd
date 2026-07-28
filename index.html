@@ -1,116 +1,270 @@
 <!DOCTYPE html>
-<html lang="fr" class="scroll-smooth">
+<html lang="fr" class="h-full bg-slate-950">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JPP Plomberie - Service & Maintenance Pro</title>
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>JPP Plomberie — App Community</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
-
   <style>
-    body { font-family: 'Inter', sans-serif; }
+    @keyframes pulse-logo {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(0.92); opacity: 0.85; }
+    }
+    .animate-splash {
+      animation: pulse-logo 1.4s infinite ease-in-out;
+    }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between">
+<body class="h-full text-slate-100 flex flex-col justify-between overflow-x-hidden font-sans select-none">
 
-  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-      
-      <a href="index.html" class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-red-600/30">
+  <div id="splash-screen" class="fixed inset-0 bg-slate-950 flex flex-col items-center justify-between p-8 z-50 transition-all duration-700">
+    <div></div>
+    
+    <div class="flex flex-col items-center space-y-4">
+      <div class="w-20 h-20 rounded-3xl bg-red-600 flex items-center justify-center text-white text-5xl font-black shadow-2xl shadow-red-600/40 animate-splash">
+        J
+      </div>
+      <h1 class="text-xl font-bold tracking-tight text-white">JPP <span class="text-blue-500">Plomberie</span></h1>
+    </div>
+
+    <div class="text-center space-y-1">
+      <p class="text-[10px] text-slate-500 font-mono uppercase tracking-widest">Powered by ProApp</p>
+      <p class="text-[9px] text-slate-600">v1.3.0 — Community Chat</p>
+    </div>
+  </div>
+
+  <div id="app-container" class="hidden flex-1 flex flex-col pb-20">
+
+    <header class="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 p-4 sticky top-0 z-30 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-red-600 flex items-center justify-center text-white text-lg font-black shadow-lg shadow-red-600/30">
           J
         </div>
-        <span class="font-bold text-xl tracking-tight text-white">JPP <span class="text-blue-500">Plomberie</span></span>
-      </a>
-
-      <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
-        <a href="#services" class="hover:text-blue-400 transition">Services</a>
-        <a href="#contact" class="hover:text-blue-400 transition">Urgence / Contact</a>
-      </nav>
-
-      <div class="flex items-center gap-3">
-        <a href="login.html" class="px-4 py-2 text-xs md:text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition">
-          Espace Pro / Connexion
-        </a>
-        <a href="inscription.html" class="px-4 py-2 text-xs md:text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg shadow-blue-600/30 transition">
-          Créer un compte
-        </a>
+        <span class="font-bold text-sm text-white">JPP Plomberie</span>
       </div>
-    </div>
-  </header>
+      
+      <button onclick="window.location.href='login.html'" id="btn-auth" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-700 transition">
+        <i class="fa-solid fa-user mr-1.5"></i> Connexion
+      </button>
+    </header>
 
-  <section class="relative py-20 md:py-32 px-6 max-w-7xl mx-auto text-center">
-    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-950/60 border border-blue-800/50 text-blue-400 text-xs font-semibold mb-6">
-      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Service disponible 24/7
-    </div>
+    <main class="flex-1 p-4 max-w-lg mx-auto w-full space-y-6">
 
-    <h1 class="text-4xl md:text-6xl font-extrabold text-white tracking-tight max-w-4xl mx-auto leading-tight">
-      Solution complète pour vos travaux et dépannages de <span class="text-blue-500">plomberie</span>.
-    </h1>
-
-    <p class="text-slate-400 text-base md:text-lg max-w-2xl mx-auto mt-6">
-      Interventions rapides, création de devis instantanés et suivi complet de votre plomberie en toute simplicité.
-    </p>
-
-    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
-      <a href="login.html" class="w-full sm:w-auto px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-600/30 transition flex items-center justify-center gap-2">
-        <i class="fa-solid fa-right-to-bracket"></i> Accéder au Dashboard
-      </a>
-      <a href="#services" class="w-full sm:w-auto px-8 py-3.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl transition flex items-center justify-center gap-2">
-        Découvrir nos prestations
-      </a>
-    </div>
-  </section>
-
-  <section id="services" class="py-16 bg-slate-800/40 border-t border-slate-800/60">
-    <div class="max-w-7xl mx-auto px-6">
-      <div class="text-center max-w-xl mx-auto mb-12">
-        <h2 class="text-2xl md:text-3xl font-bold text-white">Nos Prestations</h2>
-        <p class="text-slate-400 text-sm mt-2">Un service de qualité professionnelle à portée de main.</p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="bg-slate-800/80 p-6 rounded-2xl border border-slate-700/50 space-y-4">
-          <div class="w-12 h-12 bg-blue-600/20 text-blue-400 rounded-xl flex items-center justify-center text-xl font-bold">
-            <i class="fa-solid fa-wrench"></i>
-          </div>
-          <h3 class="text-lg font-bold text-white">Dépannage Urgent</h3>
-          <p class="text-slate-400 text-sm">Prise en charge rapide pour fuites d'eau, canalisations bouchées et pannes de chauffe-eau.</p>
+      <section id="page-home" class="space-y-6">
+        <div class="bg-gradient-to-br from-blue-900/40 to-slate-900 p-6 rounded-3xl border border-blue-500/20 shadow-xl space-y-3">
+          <span class="bg-blue-500/20 text-blue-400 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Espace Client & Artisan</span>
+          <h2 class="text-2xl font-extrabold text-white leading-tight">Gestion rapide de vos travaux & dépannages</h2>
+          <p class="text-xs text-slate-400 leading-relaxed">Suivez vos interventions, créez vos devis et échangez en direct avec la communauté.</p>
         </div>
 
-        <div class="bg-slate-800/80 p-6 rounded-2xl border border-slate-700/50 space-y-4">
-          <div class="w-12 h-12 bg-emerald-600/20 text-emerald-400 rounded-xl flex items-center justify-center text-xl font-bold">
-            <i class="fa-solid fa-file-invoice"></i>
+        <div class="grid grid-cols-2 gap-3">
+          <button onclick="navTo('chat')" class="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex flex-col items-start space-y-2 hover:border-blue-500/50 transition">
+            <i class="fa-solid fa-comments text-xl text-blue-500"></i>
+            <span class="text-xs font-bold text-white">Forum & Chat</span>
+            <span class="text-[10px] text-slate-500">Discuter en direct</span>
+          </button>
+
+          <button onclick="navTo('interventions')" class="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex flex-col items-start space-y-2 hover:border-slate-700 transition">
+            <i class="fa-solid fa-clipboard-list text-xl text-emerald-500"></i>
+            <span class="text-xs font-bold text-white">Interventions</span>
+            <span class="text-[10px] text-slate-500">Suivi des chantiers</span>
+          </button>
+        </div>
+      </section>
+
+      <section id="page-chat" class="hidden space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+          <div>
+            <h3 class="text-lg font-bold text-white">Espace Discussion</h3>
+            <p class="text-[10px] text-slate-400">Messages partagés par tous les utilisateurs</p>
           </div>
-          <h3 class="text-lg font-bold text-white">Devis & Facturation</h3>
-          <p class="text-slate-400 text-sm">Générez des devis clairs et des factures conformes en quelques clics depuis votre espace.</p>
+          <span class="text-[10px] bg-emerald-500/10 text-emerald-400 font-bold px-2 py-1 rounded-full">● En direct</span>
         </div>
 
-        <div class="bg-slate-800/80 p-6 rounded-2xl border border-slate-700/50 space-y-4">
-          <div class="w-12 h-12 bg-purple-600/20 text-purple-400 rounded-xl flex items-center justify-center text-xl font-bold">
-            <i class="fa-solid fa-boxes-stacked"></i>
+        <form onsubmit="sendMessage(event)" class="bg-slate-900 p-3 rounded-2xl border border-slate-800 space-y-2">
+          <input type="text" id="chat-user" placeholder="Votre nom ou pseudo..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500" required>
+          
+          <div class="flex gap-2">
+            <input type="text" id="chat-text" placeholder="Écrivez un message..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500" required>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
           </div>
-          <h3 class="text-lg font-bold text-white">Gestion de Stock & Clients</h3>
-          <p class="text-slate-400 text-sm">Suivi rigoureux de vos pièces détachées, matériel et fiches clients pour votre entreprise.</p>
+        </form>
+
+        <div id="messages-container" class="space-y-3 max-h-[380px] overflow-y-auto pr-1">
+          </div>
+      </section>
+
+      <section id="page-interventions" class="hidden space-y-4">
+        <h3 class="text-lg font-bold text-white">Vos Interventions</h3>
+        <div id="list-interventions" class="space-y-2"></div>
+      </section>
+
+      <section id="page-clients" class="hidden space-y-4">
+        <h3 class="text-lg font-bold text-white">Liste des Clients</h3>
+        <div id="list-clients" class="space-y-2"></div>
+      </section>
+
+    </main>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/90 backdrop-blur-lg border-t border-slate-800 py-2 px-6 flex justify-around items-center z-40">
+      <button onclick="navTo('home')" id="tab-home" class="flex flex-col items-center space-y-1 text-blue-500">
+        <i class="fa-solid fa-house text-lg"></i>
+        <span class="text-[10px] font-medium">Accueil</span>
+      </button>
+
+      <button onclick="navTo('chat')" id="tab-chat" class="flex flex-col items-center space-y-1 text-slate-500">
+        <i class="fa-solid fa-comments text-lg"></i>
+        <span class="text-[10px] font-medium">Chat</span>
+      </button>
+
+      <button onclick="navTo('interventions')" id="tab-interventions" class="flex flex-col items-center space-y-1 text-slate-500">
+        <i class="fa-solid fa-wrench text-lg"></i>
+        <span class="text-[10px] font-medium">Chantiers</span>
+      </button>
+
+      <button onclick="navTo('clients')" id="tab-clients" class="flex flex-col items-center space-y-1 text-slate-500">
+        <i class="fa-solid fa-users text-lg"></i>
+        <span class="text-[10px] font-medium">Clients</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <script>
+    // 1. Initialisation de la BDD
+    function initDB() {
+      if (!localStorage.getItem('jpp_db')) {
+        const defaultData = {
+          messages: [
+            { id: 1, user: "Support JPP", text: "Bienvenue sur l'application officielle !", date: "10:00" },
+            { id: 2, user: "Jean Dupont", text: "Bonjour, est-ce possible d'avoir un devis rapidement ?", date: "10:15" }
+          ],
+          clients: [
+            { id: 1, nom: "M. Dupont Jean", tel: "06 12 34 56 78", ville: "Paris" }
+          ],
+          interventions: [
+            { id: 1, client: "Dupont Jean", type: "Fuite d'eau cuisine", status: "En cours" }
+          ]
+        };
+        localStorage.setItem('jpp_db', JSON.stringify(defaultData));
+      }
+    }
+
+    function getDB() {
+      initDB();
+      return JSON.parse(localStorage.getItem('jpp_db'));
+    }
+
+    function saveDB(data) {
+      localStorage.setItem('jpp_db', JSON.stringify(data));
+    }
+
+    // 2. Lancement au démarrage (Splash Screen)
+    document.addEventListener('DOMContentLoaded', () => {
+      initDB();
+
+      setTimeout(() => {
+        document.getElementById('splash-screen').classList.add('opacity-0', 'pointer-events-none');
+        document.getElementById('app-container').classList.remove('hidden');
+
+        setTimeout(() => document.getElementById('splash-screen').remove(), 700);
+        renderData();
+      }, 2200);
+
+      // Rafraîchir les messages automatiquement toutes les 3 secondes pour simuler du temps réel
+      setInterval(renderMessages, 3000);
+    });
+
+    // 3. Navigation par onglets
+    function navTo(pageId) {
+      ['home', 'chat', 'interventions', 'clients'].forEach(id => {
+        document.getElementById(`page-${id}`).classList.add('hidden');
+        const tab = document.getElementById(`tab-${id}`);
+        if(tab) {
+          tab.classList.remove('text-blue-500');
+          tab.classList.add('text-slate-500');
+        }
+      });
+
+      document.getElementById(`page-${pageId}`).classList.remove('hidden');
+      const activeTab = document.getElementById(`tab-${pageId}`);
+      if(activeTab) {
+        activeTab.classList.remove('text-slate-500');
+        activeTab.classList.add('text-blue-500');
+      }
+    }
+
+    // 4. Fonction d'envoi de message
+    function sendMessage(e) {
+      e.preventDefault();
+      const user = document.getElementById('chat-user').value.trim();
+      const text = document.getElementById('chat-text').value.trim();
+
+      if (!user || !text) return;
+
+      const db = getDB();
+      const now = new Date();
+      const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+      // Ajouter le message dans la BDD
+      db.messages.unshift({
+        id: Date.now(),
+        user: user,
+        text: text,
+        date: timeStr
+      });
+
+      saveDB(db);
+      document.getElementById('chat-text').value = '';
+      renderMessages();
+    }
+
+    // 5. Affichage des messages
+    function renderMessages() {
+      const db = getDB();
+      const container = document.getElementById('messages-container');
+      if (!container) return;
+
+      container.innerHTML = db.messages.map(m => `
+        <div class="bg-slate-900 p-3 rounded-2xl border border-slate-800 space-y-1">
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-bold text-blue-400">${m.user}</span>
+            <span class="text-[9px] text-slate-500 font-mono">${m.date}</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">${m.text}</p>
         </div>
-      </div>
-    </div>
-  </section>
+      `).join('');
+    }
 
-  <footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500">
-    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-      <p>© 2026 JPP Plomberie. Tous droits réservés.</p>
-      <div class="flex gap-4">
-        <a href="login.html" class="hover:text-slate-300">Connexion</a>
-        <a href="inscription.html" class="hover:text-slate-300">Inscription</a>
-      </div>
-    </div>
-  </footer>
+    function renderData() {
+      renderMessages();
 
-  <script src="js/app.js"></script>
-<
-  /body>
+      const db = getDB();
+
+      // Interventions
+      document.getElementById('list-interventions').innerHTML = db.interventions.map(i => `
+        <div class="bg-slate-900 p-3.5 rounded-2xl border border-slate-800 flex justify-between items-center">
+          <div>
+            <h4 class="text-xs font-bold text-white">${i.type}</h4>
+            <p class="text-[10px] text-slate-400">${i.client}</p>
+          </div>
+          <span class="text-[10px] px-2.5 py-1 rounded-full font-bold bg-amber-500/10 text-amber-400">${i.status}</span>
+        </div>
+      `).join('');
+
+      // Clients
+      document.getElementById('list-clients').innerHTML = db.clients.map(c => `
+        <div class="bg-slate-900 p-3.5 rounded-2xl border border-slate-800 flex justify-between items-center">
+          <div>
+            <h4 class="text-xs font-bold text-white">${c.nom}</h4>
+            <p class="text-[10px] text-slate-400">${c.ville} — ${c.tel}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+  </script>
+</body>
 </html>

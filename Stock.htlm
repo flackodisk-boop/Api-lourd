@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full bg-slate-50">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock - JPP Plomberie</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="h-full flex flex-col md:flex-row">
+
+  <aside class="w-full md:w-64 bg-slate-900 text-slate-300 flex flex-col justify-between p-4">
+    <div class="space-y-6">
+      <div class="flex items-center gap-3 p-2">
+        <div class="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center text-white text-2xl font-black">J</div>
+        <div>
+          <h1 class="font-bold text-white leading-tight">JPP Plomberie</h1>
+          <p class="text-xs text-emerald-400">● En ligne</p>
+        </div>
+      </div>
+      <nav class="space-y-1">
+        <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-xl text-sm font-medium"><i class="fa-solid fa-chart-pie w-5"></i> Dashboard</a>
+        <a href="clients.html" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-xl text-sm font-medium"><i class="fa-solid fa-users w-5"></i> Clients</a>
+        <a href="interventions.html" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-xl text-sm font-medium"><i class="fa-solid fa-clipboard-list w-5"></i> Interventions</a>
+        <a href="devis.html" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 rounded-xl text-sm font-medium"><i class="fa-solid fa-file-invoice-dollar w-5"></i> Devis</a>
+        <a href="stock.html" class="flex items-center gap-3 px-4 py-3 bg-blue-600 text-white rounded-xl text-sm font-medium"><i class="fa-solid fa-boxes-stacked w-5"></i> Stock</a>
+      </nav>
+    </div>
+    <button onclick="logout()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl text-slate-400 hover:bg-slate-800 hover:text-rose-400 transition">
+      <i class="fa-solid fa-right-from-bracket"></i> Déconnexion
+    </button>
+  </aside>
+
+  <main class="flex-1 p-8 overflow-y-auto space-y-6">
+    <h2 class="text-2xl font-bold text-slate-900">Stock & Matériel</h2>
+
+    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+      <form onsubmit="saveStock(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <input type="text" id="stock-nom" placeholder="Article (ex: Joint Téflon)" class="px-4 py-2.5 rounded-xl border text-sm" required>
+        <input type="number" id="stock-qte" placeholder="Quantité" class="px-4 py-2.5 rounded-xl border text-sm" required>
+        <input type="number" step="0.01" id="stock-prix" placeholder="Prix unitaire HT" class="px-4 py-2.5 rounded-xl border text-sm" required>
+        <button type="submit" class="md:col-span-3 bg-blue-600 text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700">Ajouter Article</button>
+      </form>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <table class="w-full text-left text-sm">
+        <thead class="bg-slate-50 border-b text-xs uppercase text-slate-400">
+          <tr><th class="p-4">Article</th><th class="p-4">Quantité</th><th class="p-4">Prix</th><th class="p-4 text-right">Actions</th></tr>
+        </thead>
+        <tbody id="table-stock" class="divide-y"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    requireAuth();
+    function renderStock() {
+      const db = getDB();
+      const tbody = document.getElementById('table-stock');
+      if(!tbody) return;
+      tbody.innerHTML = '';
+      db.stock.forEach(s => {
+        tbody.innerHTML += `
+          <tr class="border-b border-slate-100">
+            <td class="p-4 font-semibold">${s.nom}</td>
+            <td class="p-4 font-bold">${s.qte}</td>
+            <td class="p-4">${parseFloat(s.prix).toFixed(2)} €</td>
+            <td class="p-4 text-right">
+              <button onclick="deleteStock(${s.id})" class="text-rose-600 hover:bg-rose-50 p-2 rounded-lg"><i class="fa-solid fa-trash"></i></button>
+            </td>
+          </tr>`;
+      });
+    }
+
+    function saveStock(e) {
+      e.preventDefault();
+      const db = getDB();
+      db.stock.push({
+        id: Date.now(),
+        nom: document.getElementById('stock-nom').value,
+        qte: parseInt(document.getElementById('stock-qte').value),
+        prix: parseFloat(document.getElementById('stock-prix').value)
+      });
+      saveDB(db);
+      e.target.reset();
+      renderStock();
+    }
+
+    function deleteStock(id) {
+      const db = getDB();
+      db.stock = db.stock.filter(s => s.id !== id);
+      saveDB(db);
+      renderStock();
+    }
+
+    document.addEventListener('DOMContentLoaded', renderStock);
+  </script>
+</body>
+  
+</html>

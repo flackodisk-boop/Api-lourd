@@ -1,374 +1,733 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="h-full bg-slate-50">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Néo — Assistant IA</title>
-    <style>
-        :root {
-            --bg-principal: #0a0a0a;
-            --bg-chat: #121212;
-            --bg-input: #1a1a1a;
-            --texte: #f4f4f5;
-            --texte-secondaire: #a1a1aa;
-            --accent: #10b981; 
-            --accent-hover: #059669;
-            --bulle-user: #27272a;
-            --bordure: #202023;
-            --danger: #ef4444;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JPP Plomberie - Application Pro</title>
+  
+  <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIkpQUCBQbG9tYmVyaWUgUHJvIiwKICAic2hvcnRfbmFtZSI6ICJKUFAgUHJvIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwZjE3MmEiLAogICJ0aGVtZV9jb2xvciI6ICIjMjU2M2ViIgp9">
+  <meta name="theme-color" content="#2563eb">
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-        body {
-            background: var(--bg-principal);
-            color: var(--texte);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-
-        #splash-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg-principal);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease;
-        }
-
-        .logo-container {
-            width: 80px;
-            height: 80px;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .pyramid-logo {
-            width: 0;
-            height: 0;
-            border-left: 40px solid transparent;
-            border-right: 40px solid transparent;
-            border-bottom: 70px solid var(--accent);
-            position: absolute;
-        }
-
-        .tree-icon {
-            position: absolute;
-            font-size: 28px;
-            bottom: 5px;
-            z-index: 2;
-        }
-
-        .splash-title {
-            font-size: 32px;
-            font-weight: 700;
-        }
-
-        .splash-subtitle {
-            margin-top: 8px;
-            font-size: 14px;
-            color: var(--texte-secondaire);
-            text-transform: uppercase;
-        }
-
-        .chat-container {
-            width: 100%;
-            max-width: 680px;
-            height: 100vh;
-            background: var(--bg-chat);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            border-left: 1px solid var(--bordure);
-            border-right: 1px solid var(--bordure);
-        }
-
-        .header {
-            padding: 16px 24px;
-            font-size: 14px;
-            border-bottom: 1px solid var(--bordure);
-            background: rgba(18, 18, 18, 0.8);
-            backdrop-filter: blur(12px);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .header-logo {
-            width: 0;
-            height: 0;
-            border-left: 12px solid transparent;
-            border-right: 12px solid transparent;
-            border-bottom: 20px solid var(--accent);
-        }
-
-        .header-title {
-            font-weight: 600;
-        }
-
-        .messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 24px 0;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .row {
-            width: 100%;
-            padding: 12px 24px;
-            display: flex;
-            gap: 16px;
-        }
-
-        .row.user-row { justify-content: flex-end; }
-
-        .avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 14px;
-            font-weight: 700;
-            background: var(--accent);
-            color: white;
-        }
-
-        .bubble {
-            max-width: 82%;
-            font-size: 15px;
-            line-height: 1.6;
-            word-wrap: break-word;
-            white-space: pre-wrap;
-        }
-        
-        .user-row .bubble { 
-            background: var(--bulle-user); 
-            padding: 12px 18px; 
-            border-radius: 18px;
-            border: 1px solid var(--bordure);
-        }
-        .ai-row .bubble { padding-top: 4px; }
-
-        .media-preview {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 12px;
-            margin-top: 12px;
-            border: 1px solid var(--bordure);
-        }
-
-        .input-area {
-            padding: 0 24px 24px 24px;
-            background: var(--bg-chat);
-        }
-
-        .input-wrapper {
-            background: var(--bg-input);
-            border-radius: 16px;
-            border: 1px solid var(--bordure);
-            display: flex;
-            align-items: flex-end; 
-            padding: 8px 12px;
-        }
-
-        textarea {
-            flex: 1;
-            background: transparent;
-            border: none;
-            outline: none;
-            color: var(--texte);
-            padding: 8px; 
-            font-size: 15px;
-            resize: none;
-            height: 36px; 
-            max-height: 160px;
-        }
-
-        .btn-send {
-            width: 36px;
-            height: 36px;
-            background: var(--texte);
-            color: var(--bg-chat);
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 16px;
-            transition: all 0.2s;
-        }
-        .btn-send:hover { background: var(--accent); color: white; }
-
-        .loading-dots { display: flex; gap: 5px; padding: 12px 4px; }
-        .dot {
-            width: 7px;
-            height: 7px;
-            background: var(--texte-secondaire);
-            border-radius: 50%;
-            animation: bounce 1.4s infinite ease-in-out both;
-        }
-        .dot:nth-child(1) { animation-delay: -0.32s; }
-        .dot:nth-child(2) { animation-delay: -0.16s; }
-
-        @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-            40% { transform: scale(1.2); opacity: 1; }
-        }
-    </style>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    @media print {
+      .no-print { display: none !important; }
+      main { padding: 0 !important; }
+      .print-area { box-shadow: none !important; border: none !important; }
+    }
+  </style>
 </head>
-<body>
+<body class="h-full font-sans antialiased text-slate-800 bg-slate-50 flex flex-col md:flex-row">
 
-    <div id="splash-screen">
-        <div class="logo-container">
-            <div class="pyramid-logo"></div>
-            <div class="tree-icon">🌳</div>
+  <div id="login-page" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900 px-4">
+    <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm border border-slate-100 space-y-6">
+      <div class="text-center space-y-2">
+        <div class="w-12 h-12 rounded-2xl bg-red-600 flex items-center justify-center text-white text-3xl font-black mx-auto shadow-lg shadow-red-600/30">
+          J
         </div>
-        <div class="splash-title">Néo</div>
-        <div class="splash-subtitle">Par Célestin Olua</div>
+        <h2 class="text-2xl font-bold text-slate-900">Connexion Admin</h2>
+        <p class="text-xs text-slate-500">Connectez-vous pour accéder à votre espace</p>
+      </div>
+
+      <form onsubmit="login(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Utilisateur</label>
+          <input id="login-user" type="text" placeholder="ex: admin" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Mot de passe</label>
+          <input id="login-pass" type="password" placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm shadow-lg shadow-blue-600/30 transition">
+          Se connecter
+        </button>
+      </form>
     </div>
+  </div>
 
-    <div class="chat-container">
-        <div class="header">
-            <div class="header-left">
-                <div class="header-logo"></div>
-                <span class="header-title">Néo v1</span>
-            </div>
+  <div id="app" class="hidden w-full h-full flex flex-col md:flex-row">
+
+    <aside class="w-full md:w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col justify-between no-print">
+      <div>
+        <div class="p-6 flex items-center justify-between md:justify-start gap-3 border-b border-slate-800">
+          <div class="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-red-600/40">
+            J
+          </div>
+          <div>
+            <h1 class="font-bold text-white leading-tight">JPP Plomberie</h1>
+            <p class="text-xs text-blue-400 font-medium"><i class="fa-solid fa-circle text-[8px] text-emerald-400 mr-1"></i>Connecté</p>
+          </div>
         </div>
 
-        <div id="messages" class="messages">
-            <div class="row ai-row">
-                <div class="avatar">N</div>
-                <div class="bubble">Bonjour. Je suis Néo, votre assistant IA conçu par Célestin Olua. Posez-moi une question ou demandez-moi une image !</div>
-            </div>
+        <nav class="p-4 space-y-1">
+          <button onclick="navigate('dashboard')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 text-white bg-blue-600 shadow-lg shadow-blue-600/30">
+            <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
+          </button>
+          <button onclick="navigate('clients')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 hover:bg-slate-800 hover:text-white">
+            <i class="fa-solid fa-users w-5"></i> Clients
+          </button>
+          <button onclick="navigate('interventions')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 hover:bg-slate-800 hover:text-white">
+            <i class="fa-solid fa-clipboard-list w-5"></i> Interventions
+          </button>
+          <button onclick="navigate('devis')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 hover:bg-slate-800 hover:text-white">
+            <i class="fa-solid fa-file-invoice-dollar w-5"></i> Devis / Factures
+          </button>
+          <button onclick="navigate('stock')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 hover:bg-slate-800 hover:text-white">
+            <i class="fa-solid fa-boxes-stacked w-5"></i> Stock
+          </button>
+        </nav>
+      </div>
+
+      <div class="p-4 border-t border-slate-800 space-y-2">
+        <button id="install-btn" onclick="installApp()" class="hidden w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold rounded-xl text-blue-400 bg-blue-950/50 border border-blue-800 hover:bg-blue-900 transition">
+          <i class="fa-solid fa-download"></i> Installer l'application
+        </button>
+        <button onclick="logout()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl text-slate-400 hover:bg-slate-800 hover:text-rose-400 transition">
+          <i class="fa-solid fa-right-from-bracket"></i> Déconnexion
+        </button>
+      </div>
+    </aside>
+
+    <main class="flex-1 p-6 md:p-10 overflow-y-auto">
+
+      <section id="page-dashboard" class="page space-y-8">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900">Tableau de bord</h2>
+          <p class="text-slate-500 text-sm">Aperçu rapide de votre activité professionnelle.</p>
         </div>
 
-        <div class="input-area">
-            <div class="input-wrapper">
-                <textarea id="input" placeholder="Discutez ou générez une image..."></textarea>
-                <button class="btn-send" onclick="send()">↑</button>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
+            <div>
+              <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Clients actifs</p>
+              <h3 id="stat-clients" class="text-3xl font-extrabold text-slate-900 mt-2">0</h3>
             </div>
+            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl">
+              <i class="fa-solid fa-users"></i>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
+            <div>
+              <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">En cours</p>
+              <h3 id="stat-interventions" class="text-3xl font-extrabold text-blue-600 mt-2">0</h3>
+            </div>
+            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl">
+              <i class="fa-solid fa-clock"></i>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
+            <div>
+              <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Chiffre d'affaires</p>
+              <h3 id="stat-ca" class="text-3xl font-extrabold text-slate-900 mt-2">0.00 €</h3>
+            </div>
+            <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl">
+              <i class="fa-solid fa-wallet"></i>
+            </div>
+          </div>
         </div>
-    </div>
 
-    <script>
-        const messagesContainer = document.getElementById("messages");
-        const inputField = document.getElementById("input");
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="font-bold text-slate-900">Interventions récentes</h3>
+            <button onclick="navigate('interventions')" class="text-sm font-semibold text-blue-600 hover:text-blue-700">Voir tout →</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead class="bg-slate-50 text-slate-400 text-xs font-semibold uppercase border-b border-slate-100">
+                <tr>
+                  <th class="p-4">Client</th>
+                  <th class="p-4">Description</th>
+                  <th class="p-4">Statut</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-interventions" class="divide-y divide-slate-100 text-sm"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
 
-        // Utilisation d'un proxy CORS public pour forcer l'accès si le navigateur bloque en local
-        const PROXY = "https://cors-anywhere.herokuapp.com/"; 
-        const API_TEXT = "https://christus-api.vercel.app/ai/Llamachat";
-        const API_IMAGE = "https://christus-api.vercel.app/image/animagine";
+      <section id="page-clients" class="page hidden space-y-8">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900">Gestion des Clients</h2>
+          <p class="text-slate-500 text-sm">Créez et gérez la liste de vos clients.</p>
+        </div>
 
-        window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                document.getElementById('splash-screen').style.opacity = '0';
-                setTimeout(() => document.getElementById('splash-screen').style.display = 'none', 500);
-            }, 1500);
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+          <form id="form-client" onsubmit="saveClient(event)" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Nom complet</label>
+                <input type="text" id="client-nom" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Jean Dupont" required>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Téléphone</label>
+                <input type="tel" id="client-tel" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="06 00 00 00 00" required>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Email</label>
+                <input type="email" id="client-email" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="client@email.com">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Adresse</label>
+                <input type="text" id="client-adresse" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Paris, France">
+              </div>
+            </div>
+            <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold shadow-md shadow-blue-500/20 transition">
+              <i class="fa-solid fa-plus mr-1"></i> Ajouter le client
+            </button>
+          </form>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead class="bg-slate-50 text-slate-400 text-xs font-semibold uppercase border-b border-slate-100">
+                <tr>
+                  <th class="p-4">Nom</th>
+                  <th class="p-4">Téléphone</th>
+                  <th class="p-4">Email</th>
+                  <th class="p-4">Adresse</th>
+                  <th class="p-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="table-clients" class="divide-y divide-slate-100 text-sm"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-interventions" class="page hidden space-y-8">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900">Interventions</h2>
+          <p class="text-slate-500 text-sm">Planifiez et mettez à jour le statut des chantiers.</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+          <form id="form-intervention" onsubmit="saveIntervention(event)" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Client</label>
+                <select id="inter-client" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required></select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Statut</label>
+                <select id="inter-statut" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="A faire">A faire</option>
+                  <option value="En cours">En cours</option>
+                  <option value="Terminé">Terminé</option>
+                </select>
+              </div>
+              <div class="md:col-span-3">
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Description des travaux</label>
+                <input type="text" id="inter-desc" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="ex: Réparation fuite ballon d'eau chaude" required>
+              </div>
+            </div>
+            <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold shadow-md shadow-blue-500/20 transition">
+              <i class="fa-solid fa-plus mr-1"></i> Créer la fiche d'intervention
+            </button>
+          </form>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead class="bg-slate-50 text-slate-400 text-xs font-semibold uppercase border-b border-slate-100">
+                <tr>
+                  <th class="p-4">Client</th>
+                  <th class="p-4">Description</th>
+                  <th class="p-4">Statut</th>
+                  <th class="p-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="table-interventions" class="divide-y divide-slate-100 text-sm"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-devis" class="page hidden space-y-8">
+        <div class="no-print">
+          <h2 class="text-2xl font-bold text-slate-900">Devis & Factures</h2>
+          <p class="text-slate-500 text-sm">Générez des documents professionnels prêts à être téléchargés ou imprimés.</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm no-print">
+          <form id="form-devis" onsubmit="generateDocument(event)" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Client</label>
+                <select id="devis-client" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required></select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Type de Document</label>
+                <select id="devis-type" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="DEVIS">Devis</option>
+                  <option value="FACTURE">Facture</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Prestation</label>
+                <input type="text" id="devis-service" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="ex: Remplacement évier" required>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Montant HT (€)</label>
+                <input type="number" step="0.01" id="devis-montant" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="150.00" required>
+              </div>
+            </div>
+            <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold shadow-md shadow-blue-500/20 transition">
+              <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Générer le document
+            </button>
+          </form>
+        </div>
+
+        <div id="document-preview" class="hidden bg-white p-10 rounded-2xl border border-slate-200 shadow-xl max-w-3xl mx-auto print-area space-y-8">
+          <div class="flex justify-between items-start border-b border-slate-200 pb-6">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center text-white text-2xl font-black">
+                J
+              </div>
+              <div>
+                <h1 class="text-2xl font-bold text-slate-900">JPP Plomberie</h1>
+                <p class="text-xs text-slate-500">123 Rue de la Tuyauterie, Paris<br>SIRET: 123 456 789 00012</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <h2 id="doc-type-display" class="text-2xl font-black text-blue-600 tracking-wider">DEVIS</h2>
+              <p class="text-xs text-slate-400 mt-1">N° <span id="doc-id"></span> | Date: <span id="doc-date"></span></p>
+            </div>
+          </div>
+
+          <div>
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Destinataire</p>
+            <div id="doc-client-info" class="p-4 bg-slate-50 rounded-xl text-sm font-medium text-slate-700 whitespace-pre-line border border-slate-100"></div>
+          </div>
+
+          <table class="w-full text-left text-sm border-collapse">
+            <thead>
+              <tr class="border-b border-slate-200 text-slate-400 text-xs uppercase">
+                <th class="py-2">Description</th>
+                <th class="py-2 text-right">Montant HT</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr>
+                <td id="doc-service-display" class="py-4 font-medium"></td>
+                <td id="doc-ht-display" class="py-4 text-right font-semibold"></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="flex justify-end pt-4 border-t border-slate-200">
+            <div class="w-64 space-y-2 text-sm">
+              <div class="flex justify-between text-slate-500">
+                <span>Total HT</span>
+                <span id="doc-tot-ht"></span>
+              </div>
+              <div class="flex justify-between text-slate-500">
+                <span>TVA (20%)</span>
+                <span id="doc-tva"></span>
+              </div>
+              <div class="flex justify-between text-base font-bold text-slate-900 pt-2 border-t border-slate-200">
+                <span>Total TTC</span>
+                <span id="doc-ttc" class="text-blue-600"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="no-print pt-6 flex gap-3 justify-end border-t border-slate-100">
+            <button onclick="downloadPDF()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-xl transition">
+              <i class="fa-solid fa-file-pdf mr-1"></i> Télécharger PDF
+            </button>
+            <button onclick="saveInvoice()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition">
+              <i class="fa-solid fa-check mr-1"></i> Valider & Intégrer au CA
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-stock" class="page hidden space-y-8">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900">Gestion du Stock</h2>
+          <p class="text-slate-500 text-sm">Suivez le niveau de votre équipement et pièces détachées.</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+          <form id="form-stock" onsubmit="saveStock(event)" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Nom du matériel</label>
+                <input type="text" id="stock-nom" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="ex: Coude PVC 32mm" required>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Quantité</label>
+                <input type="number" id="stock-qte" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="10" required>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Prix unitaire HT (€)</label>
+                <input type="number" step="0.01" id="stock-prix" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="12.50" required>
+              </div>
+            </div>
+            <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold shadow-md shadow-blue-500/20 transition">
+              <i class="fa-solid fa-plus mr-1"></i> Ajouter la pièce
+            </button>
+          </form>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead class="bg-slate-50 text-slate-400 text-xs font-semibold uppercase border-b border-slate-100">
+                <tr>
+                  <th class="p-4">Article</th>
+                  <th class="p-4">Quantité</th>
+                  <th class="p-4">Prix unitaire</th>
+                  <th class="p-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="table-stock" class="divide-y divide-slate-100 text-sm"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // CREDENTIALS ET AUTHENTIFICATION
+    const ADMIN = { user: "admin", pass: "1234" };
+
+    function checkAuth() {
+      if (localStorage.getItem("jpp_logged") === "true") {
+        document.getElementById("login-page").classList.add("hidden");
+        document.getElementById("app").classList.remove("hidden");
+        updateDashboard();
+      } else {
+        document.getElementById("login-page").classList.remove("hidden");
+        document.getElementById("app").classList.add("hidden");
+      }
+    }
+
+    function login(e) {
+      e.preventDefault();
+      const u = document.getElementById("login-user").value;
+      const p = document.getElementById("login-pass").value;
+
+      if (u === ADMIN.user && p === ADMIN.pass) {
+        localStorage.setItem("jpp_logged", "true");
+        checkAuth();
+      } else {
+        alert("❌ Identifiants incorrects (Essayer: admin / 1234)");
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem("jpp_logged");
+      checkAuth();
+    }
+
+    // DONNEES PAR DEFAUT
+    const defaultData = {
+      clients: [
+        { id: 1, nom: "Dupont Jean", tel: "06 01 02 03 04", email: "jean@dupont.fr", adresse: "10 Rue de Paris, Paris" },
+        { id: 2, nom: "Martin Sophie", tel: "06 05 06 07 08", email: "sophie@martin.fr", adresse: "5 Av des Fleurs, Lyon" }
+      ],
+      interventions: [
+        { id: 1, clientId: 1, desc: "Fuite d'eau sous évier de la cuisine", statut: "En cours" }
+      ],
+      stock: [
+        { id: 1, nom: "Joint de téflon", qte: 50, prix: 1.50 },
+        { id: 2, nom: "Robinet Mitigeur", qte: 8, prix: 45.00 }
+      ],
+      caTotal: 1250.00
+    };
+
+    function getData() {
+      const data = localStorage.getItem('jpp_pro_data');
+      return data ? JSON.parse(data) : defaultData;
+    }
+
+    function saveData(data) {
+      localStorage.setItem('jpp_pro_data', JSON.stringify(data));
+      updateDashboard();
+    }
+
+    // NAVIGATION
+    function navigate(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+      document.querySelectorAll('.nav-btn').forEach(b => {
+        b.classList.remove('bg-blue-600', 'text-white', 'shadow-lg', 'shadow-blue-600/30');
+        b.classList.add('hover:bg-slate-800', 'hover:text-white');
+      });
+
+      document.getElementById('page-' + pageId).classList.remove('hidden');
+      event.currentTarget.classList.add('bg-blue-600', 'text-white', 'shadow-lg', 'shadow-blue-600/30');
+
+      if(pageId === 'clients') renderClients();
+      if(pageId === 'interventions') renderInterventions();
+      if(pageId === 'devis') populateClientDropdowns();
+      if(pageId === 'stock') renderStock();
+      if(pageId === 'dashboard') updateDashboard();
+    }
+
+    // CLIENTS
+    function renderClients() {
+      const data = getData();
+      const tbody = document.getElementById('table-clients');
+      tbody.innerHTML = '';
+      data.clients.forEach(c => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-4 font-semibold text-slate-800">${c.nom}</td>
+            <td class="p-4 text-slate-600">${c.tel}</td>
+            <td class="p-4 text-slate-500">${c.email || '-'}</td>
+            <td class="p-4 text-slate-500">${c.adresse || '-'}</td>
+            <td class="p-4 text-right">
+              <button onclick="deleteClient(${c.id})" class="text-rose-600 hover:text-rose-800 p-2 rounded-lg hover:bg-rose-50 transition">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>`;
+      });
+    }
+
+    function saveClient(e) {
+      e.preventDefault();
+      const data = getData();
+      data.clients.push({
+        id: Date.now(),
+        nom: document.getElementById('client-nom').value,
+        tel: document.getElementById('client-tel').value,
+        email: document.getElementById('client-email').value,
+        adresse: document.getElementById('client-adresse').value
+      });
+      saveData(data);
+      e.target.reset();
+      renderClients();
+    }
+
+    function deleteClient(id) {
+      const data = getData();
+      data.clients = data.clients.filter(c => c.id !== id);
+      saveData(data);
+      renderClients();
+    }
+
+    // INTERVENTIONS
+    function renderInterventions() {
+      const data = getData();
+      const tbody = document.getElementById('table-interventions');
+      tbody.innerHTML = '';
+      populateClientDropdowns();
+
+      data.interventions.forEach(i => {
+        const client = data.clients.find(c => c.id == i.clientId);
+        let badgeStyle = "bg-blue-50 text-blue-600 border-blue-200";
+        if(i.statut === 'Terminé') badgeStyle = "bg-slate-100 text-slate-700 border-slate-300";
+        if(i.statut === 'A faire') badgeStyle = "bg-blue-100 text-blue-800 border-blue-300";
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-4 font-semibold text-slate-800">${client ? client.nom : 'Inconnu'}</td>
+            <td class="p-4 text-slate-600">${i.desc}</td>
+            <td class="p-4">
+              <span class="inline-block px-3 py-1 text-xs font-bold rounded-full border ${badgeStyle}">${i.statut}</span>
+            </td>
+            <td class="p-4 text-right">
+              <button onclick="deleteIntervention(${i.id})" class="text-rose-600 hover:text-rose-800 p-2 rounded-lg hover:bg-rose-50 transition">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>`;
+      });
+    }
+
+    function saveIntervention(e) {
+      e.preventDefault();
+      const data = getData();
+      data.interventions.push({
+        id: Date.now(),
+        clientId: document.getElementById('inter-client').value,
+        desc: document.getElementById('inter-desc').value,
+        statut: document.getElementById('inter-statut').value
+      });
+      saveData(data);
+      e.target.reset();
+      renderInterventions();
+    }
+
+    function deleteIntervention(id) {
+      const data = getData();
+      data.interventions = data.interventions.filter(i => i.id !== id);
+      saveData(data);
+      renderInterventions();
+    }
+
+    // DROPDOWNS
+    function populateClientDropdowns() {
+      const data = getData();
+      ['inter-client', 'devis-client'].forEach(id => {
+        const select = document.getElementById(id);
+        if(!select) return;
+        select.innerHTML = '';
+        data.clients.forEach(c => {
+          select.innerHTML += `<option value="${c.id}">${c.nom}</option>`;
         });
+      });
+    }
 
-        function addMessage(text, sender, imageUrl = null) {
-            const row = document.createElement("div");
-            row.className = `row ${sender}-row`;
-            row.innerHTML = sender === "ai" 
-                ? `<div class="avatar">N</div><div class="bubble"><div>${text}</div>${imageUrl ? `<img src="${imageUrl}" class="media-preview">` : ''}</div>`
-                : `<div class="bubble"><div>${text}</div></div>`;
-            messagesContainer.appendChild(row);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
+    // DEVIS / FACTURE
+    let tempMontantHT = 0;
 
-        function addLoading() {
-            const row = document.createElement("div");
-            row.className = "row ai-row";
-            row.innerHTML = `<div class="avatar">N</div><div class="bubble"><div class="loading-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
-            messagesContainer.appendChild(row);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            return row;
-        }
+    function generateDocument(e) {
+      e.preventDefault();
+      const data = getData();
+      const client = data.clients.find(c => c.id == document.getElementById('devis-client').value);
 
-        function isImageRequest(text) {
-            const keys = ['génère', 'genere', 'crée', 'cree', 'dessine', 'imagine', 'photo', 'image'];
-            return keys.some(k => text.toLowerCase().includes(k));
-        }
+      if(!client) {
+        alert("Veuillez d'abord sélectionner un client valide.");
+        return;
+      }
 
-        async function send() {
-            const text = inputField.value.trim();
-            if (!text) return;
+      const type = document.getElementById('devis-type').value;
+      const service = document.getElementById('devis-service').value;
+      const montant = parseFloat(document.getElementById('devis-montant').value);
+      tempMontantHT = montant;
 
-            addMessage(text, "user");
-            inputField.value = "";
-            const loader = addLoading();
+      const tva = montant * 0.20;
+      const ttc = montant + tva;
 
-            try {
-                if (isImageRequest(text)) {
-                    // Pour l'image, on pointe directement vers l'URL brute (le navigateur l'affiche sans problème dans une balise <img>)
-                    const targetUrl = `${API_IMAGE}?prompt=${encodeURIComponent(text)}`;
-                    loader.remove();
-                    addMessage(`Voici votre image pour : "${text}"`, "ai", targetUrl);
-                } 
-                else {
-                    const fullPrompt = `Tu es l'IA Néo, créée uniquement par ton créateur Célestin Olua. Réponds à ceci : ${text}`;
-                    
-                    // On tente d'abord l'appel direct
-                    let response;
-                    try {
-                        response = await fetch(`${API_TEXT}?text=${encodeURIComponent(fullPrompt)}`);
-                    } catch(e) {
-                        // Secours si blocage CORS local : on utilise le proxy
-                        response = await fetch(`${PROXY}${API_TEXT}?text=${encodeURIComponent(fullPrompt)}`);
-                    }
+      document.getElementById('doc-type-display').innerText = type;
+      document.getElementById('doc-id').innerText = Math.floor(1000 + Math.random()*9000);
+      document.getElementById('doc-date').innerText = new Date().toLocaleDateString('fr-FR');
+      document.getElementById('doc-client-info').innerText = `${client.nom}\n${client.adresse || 'Adresse non renseignée'}\nTel: ${client.tel}`;
+      document.getElementById('doc-service-display').innerText = service;
+      document.getElementById('doc-ht-display').innerText = montant.toFixed(2) + " €";
+      document.getElementById('doc-tot-ht').innerText = montant.toFixed(2) + " €";
+      document.getElementById('doc-tva').innerText = tva.toFixed(2) + " €";
+      document.getElementById('doc-ttc').innerText = ttc.toFixed(2) + " €";
 
-                    if (!response.ok) throw new Error("Impossible d'obtenir une réponse de l'API.");
+      document.getElementById('document-preview').classList.remove('hidden');
+    }
 
-                    let reply = await response.text();
-                    
-                    // Nettoyage si format JSON encapsulé
-                    try {
-                        const parsed = JSON.parse(reply);
-                        reply = parsed.response || parsed.result || parsed.message || reply;
-                    } catch(e) {}
+    function saveInvoice() {
+      const data = getData();
+      data.caTotal = (data.caTotal || 0) + tempMontantHT;
+      saveData(data);
 
-                    loader.remove();
-                    addMessage(reply, "ai");
-                }
-            } catch (error) {
-                loader.remove();
-                addMessage("Je rencontre une petite difficulté de connexion avec l'API. Réessaye dans un instant !", "ai");
-            }
-        }
+      alert("Facture enregistrée et CA mis à jour !");
+      document.getElementById('document-preview').classList.add('hidden');
+    }
 
-        inputField.addEventListener("keydown", (e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                send();
-            }
+    function downloadPDF() {
+      const element = document.getElementById("document-preview");
+      const opt = {
+        margin:       0.5,
+        filename:     'document_JPP_Plomberie.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    }
+
+    // STOCK
+    function renderStock() {
+      const data = getData();
+      const tbody = document.getElementById('table-stock');
+      tbody.innerHTML = '';
+      data.stock.forEach(s => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-4 font-semibold text-slate-800">${s.nom}</td>
+            <td class="p-4 font-bold text-slate-700">${s.qte}</td>
+            <td class="p-4 text-slate-600">${parseFloat(s.prix).toFixed(2)} €</td>
+            <td class="p-4 text-right space-x-1">
+              <button onclick="deleteStock(${s.id})" class="text-rose-600 hover:text-rose-800 p-2 rounded-lg hover:bg-rose-50 transition">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>`;
+      });
+    }
+
+    function saveStock(e) {
+      e.preventDefault();
+      const data = getData();
+      data.stock.push({
+        id: Date.now(),
+        nom: document.getElementById('stock-nom').value,
+        qte: parseInt(document.getElementById('stock-qte').value),
+        prix: parseFloat(document.getElementById('stock-prix').value)
+      });
+      saveData(data);
+      e.target.reset();
+      renderStock();
+    }
+
+    function deleteStock(id) {
+      const data = getData();
+      data.stock = data.stock.filter(s => s.id !== id);
+      saveData(data);
+      renderStock();
+    }
+
+    // DASHBOARD
+    function updateDashboard() {
+      const data = getData();
+
+      document.getElementById('stat-clients').innerText = data.clients.length;
+      document.getElementById('stat-interventions').innerText = data.interventions.filter(i => i.statut === "En cours").length;
+      document.getElementById('stat-ca').innerText = (data.caTotal || 0).toFixed(2) + " €";
+
+      const tbody = document.getElementById('dashboard-interventions');
+      tbody.innerHTML = '';
+
+      data.interventions.slice(-5).forEach(i => {
+        const client = data.clients.find(c => c.id == i.clientId);
+        let badgeStyle = i.statut === 'Terminé' ? 'bg-slate-100 text-slate-700 border-slate-300' : 'bg-blue-50 text-blue-600 border-blue-200';
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-4 font-semibold text-slate-800">${client ? client.nom : 'Inconnu'}</td>
+            <td class="p-4 text-slate-600">${i.desc}</td>
+            <td class="p-4"><span class="inline-block px-3 py-1 text-xs font-bold rounded-full border ${badgeStyle}">${i.statut}</span></td>
+          </tr>`;
+      });
+    }
+
+    // INSTALLATION DE L'APPLICATION (PWA)
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('install-btn').classList.remove('hidden');
+    });
+
+    function installApp() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            document.getElementById('install-btn').classList.add('hidden');
+          }
+          deferredPrompt = null;
         });
-    </script>
+      }
+    }
+
+    // INIT
+    document.addEventListener('DOMContentLoaded', () => {
+      if(!localStorage.getItem('jpp_pro_data')) saveData(defaultData);
+      checkAuth();
+    });
+  </script>
 </body>
 </html>

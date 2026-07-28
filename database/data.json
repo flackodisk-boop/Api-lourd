@@ -1,0 +1,22 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "nom": "Admin",
+      "email": "admin@jpp.fr",
+      "user": "admin",
+      "pass": "1234",
+      "role": "admin"
+    }
+  ],
+  "clients": [
+    { "id": 1, "nom": "Dupont Jean", "tel": "0601020304", "email": "jean@dupont.fr", "adresse": "10 Rue de Paris" }
+  ],
+  "interventions": [
+    { "id": 1, "clientId": 1, "desc": "Fuite d'eau évier", "statut": "En cours" }
+  ],
+  "stock": [
+    { "id": 1, "nom": "Joint Teflon", "qte": 50, "prix": 1.5 }
+  ],
+  "caTotal": 1250.00
+}

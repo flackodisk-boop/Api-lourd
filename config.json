@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "G-Chat",
+    "name": "JPP-Plomberie-App",
     "version": "1.0.0",
     "environment": "production",
     "security": {
@@ -32,6 +32,54 @@
     "maxMessageLength": 4096,
     "rateLimitWindowMs": 60000,
     "maxMessagesPerWindow": 100
-  }
+  },
+  "users": [
+    {
+      "id": 1,
+      "nom": "Administrateur",
+      "email": "admin@jpp.fr",
+      "user": "admin",
+      "pass": "1234",
+      "role": "admin"
+    }
+  ],
+  "clients": [
+    {
+      "id": 1,
+      "nom": "Dupont Jean",
+      "tel": "06 01 02 03 04",
+      "email": "jean@dupont.fr",
+      "adresse": "10 Rue de Paris, Paris"
+    },
+    {
+      "id": 2,
+      "nom": "Martin Sophie",
+      "tel": "06 05 06 07 08",
+      "email": "sophie@martin.fr",
+      "adresse": "5 Av des Fleurs, Lyon"
+    }
+  ],
+  "interventions": [
+    {
+      "id": 1,
+      "clientId": 1,
+      "desc": "Fuite d'eau sous évier de la cuisine",
+      "statut": "En cours"
+    }
+  ],
+  "stock": [
+    {
+      "id": 1,
+      "nom": "Joint de téflon",
+      "qte": 50,
+      "prix": 1.5
+    },
+    {
+      "id": 2,
+      "nom": "Robinet Mitigeur",
+      "qte": 8,
+      "prix": 45.0
+    }
+  ],
+  "caTotal": 1250.00
 }
-

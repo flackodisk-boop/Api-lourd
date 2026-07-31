@@ -36,7 +36,7 @@
     </div>
     <div class="text-center space-y-1">
       <div class="w-8 h-1 bg-gradient-to-r from-red-500 to-blue-500 mx-auto rounded-full animate-pulse"></div>
-      <p class="text-[10px] text-slate-600 font-mono">v8.0.0 — Mistral Edition</p>
+      <p class="text-[10px] text-slate-600 font-mono">v9.0.0 — Mistral Direct + Relais CORS</p>
     </div>
   </div>
 
@@ -307,7 +307,7 @@
       }
     }
 
-    // FONCTION IA AVEC SEULEMENT L'API MISTRALAI
+    // FONCTION IA AVEC RELAIS DU PROXY POUR DÉBLOQUER LES REQUÊTES NAVIGATEUR
     async function generateAIReply(userText, hasImage) {
       showTypingIndicator(true);
 
@@ -339,11 +339,25 @@ STYLE :
 Utilisateur : ${promptMessage}
 NEO :`;
 
-      try {
-        const res = await fetch(`https://christus-api.vercel.app/ai/MistralAI?prompt=${encodeURIComponent(fullPrompt)}`);
-        const data = await res.json();
+      const targetApiUrl = `https://christus-api.vercel.app/ai/MistralAI?prompt=${encodeURIComponent(fullPrompt)}`;
+      
+      // Passage par un serveur relais (CorsProxy) pour éviter d'être bloqué en local
+      const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetApiUrl)}`;
 
-        let reply = data?.response || data?.result || data?.message || "⚠️ Aucune réponse renvoyée par l'API.";
+      try {
+        let response = await fetch(proxyUrl);
+        
+        // Si le proxy principal a un souci, on tente un fallback direct
+        if (!response.ok) {
+          response = await fetch(targetApiUrl);
+        }
+
+        const data = await response.json();
+        let reply = data?.response || data?.result || data?.message;
+
+        if (!reply) {
+          reply = "⚠️ L'API MistralAI n'a pas renvoyé de texte validé.";
+        }
 
         showTypingIndicator(false);
 
@@ -357,14 +371,24 @@ NEO :`;
       } catch (err) {
         showTypingIndicator(false);
 
-        pushMessage(
-          "❌ Erreur de connexion à l'API MistralAI",
-          null,
-          "NEO",
-          "https://api.dicebear.com/7.x/bottts/svg?seed=neo"
-        );
+        // Détection de la question créateur en cas d'échec réseau dur
+        if (promptMessage.toLowerCase().includes("qui t'a créé") || promptMessage.toLowerCase().includes("créateur")) {
+          pushMessage(
+            "J’ai été créé par Célestin 🇨🇩",
+            null,
+            "NEO",
+            "https://api.dicebear.com/7.x/bottts/svg?seed=neo"
+          );
+        } else {
+          pushMessage(
+            "❌ Erreur de réseau vers l'API MistralAI. Vérifiez votre connexion internet.",
+            null,
+            "NEO",
+            "https://api.dicebear.com/7.x/bottts/svg?seed=neo"
+          );
+        }
 
-        console.error("Erreur API MistralAI:", err);
+        console.error("Détails erreur API Mistral:", err);
       }
     }
 

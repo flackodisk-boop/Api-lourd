@@ -213,7 +213,7 @@
             id: 1,
             user: "NEO",
             avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=neo",
-            text: "Bonjour ! 👋 Je suis NEO, l'intelligence artificielle de JPP créées par Célestin 🇨🇩. En quoi puis-je vous aider aujourd'hui ?",
+            text: "Bonjour ! 👋 Je suis NEO, l'intelligence artificielle créée par Célestin 🇨🇩. En quoi puis-je vous aider aujourd'hui ?",
             image: null,
             time: getCurrentTimeStr()
           }
@@ -307,39 +307,59 @@
       }
     }
 
-    // FONCTION IA CONNECTÉE À L'API DE NEO
+    // FONCTION IA AVEC API MISTRALAI ET PROMPT SYSTÈME CORRIGÉ
     async function generateAIReply(userText, hasImage) {
       showTypingIndicator(true);
 
+      const promptMessage = userText || (hasImage ? "[L'utilisateur a partagé une photo]" : "");
+
+      const fullPrompt = `Tu es NEO, une intelligence artificielle avancée, moderne et intelligente.
+
+IDENTITÉ :
+- Ton créateur est Célestin 🇨🇩
+- Tu es fier de ton créateur
+
+RÈGLES STRICTES :
+- Si quelqu’un demande "qui t’a créé ?" → tu réponds EXACTEMENT : "J’ai été créé par Célestin 🇨🇩"
+- Tu ne dis JAMAIS que tu es une API, un bot ou un modèle
+- Tu ne parles jamais de ton fonctionnement interne
+
+COMPORTEMENT :
+- Tu réponds comme un humain intelligent
+- Tu es clair, utile et naturel
+- Tu peux aider en code, technologie, discussions, conseils
+- Tu restes toujours cohérent
+
+STYLE :
+- Moderne 😎
+- Fluide 💬
+- Intelligent 🧠
+- Réponses pas trop longues
+
+Utilisateur : ${promptMessage}
+NEO :`;
+
       try {
-        const fullPrompt = `
-Tu es NEO, une intelligence artificielle avancée.
+        let reply = "";
 
-Ton créateur est Célestin 🇨🇩.
+        try {
+          const res = await fetch(`https://christus-api.vercel.app/ai/MistralAI?prompt=${encodeURIComponent(fullPrompt)}`);
+          const data = await res.json();
 
-RÈGLES :
-- Si on demande "qui t'a créé ?" → répond EXACTEMENT :
-  "J’ai été créé par Célestin 🇨🇩"
-- Tu réponds toujours intelligemment
-- Tu parles naturellement (comme un humain)
-- Tu ne dis jamais que tu es une API
+          reply = data?.response || data?.result || data?.message;
+        } catch (e) {
+          console.warn("Erreur d'accès API Christus Mistral:", e);
+        }
 
-Utilisateur : ${userText || (hasImage ? "[Photo transmise par l'utilisateur]" : "")}
-Réponse :
-`;
-
-        const res = await fetch("https://christus-api.vercel.app/ai/copilot", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            message: fullPrompt
-          })
-        });
-
-        const data = await res.json();
-        let reply = data?.response || data?.result || data?.message || "⚠️ Pas de réponse IA";
+        // Système de secours local si l'API ne renvoie rien
+        if (!reply) {
+          const lower = promptMessage.toLowerCase();
+          if (lower.includes("qui t'a créé") || lower.includes("qui t a cree") || lower.includes("créateur")) {
+            reply = "J’ai été créé par Célestin 🇨🇩";
+          } else {
+            reply = "⚠️ NEO est temporairement indisponible, réessaie dans un instant...";
+          }
+        }
 
         showTypingIndicator(false);
 
@@ -354,13 +374,13 @@ Réponse :
         showTypingIndicator(false);
 
         pushMessage(
-          "❌ Erreur connexion IA",
+          "❌ Erreur IA",
           null,
           "NEO",
           "https://api.dicebear.com/7.x/bottts/svg?seed=neo"
         );
 
-        console.error(err);
+        console.error("Erreur générale IA:", err);
       }
     }
 
@@ -394,7 +414,7 @@ Réponse :
     function shareLocation() {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(pos => {
-          const url = `http://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
+          const url = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
           pushMessage(`📍 Ma position GPS : ${url}`);
         }, () => {
           pushMessage("📍 Accès GPS non disponible.");

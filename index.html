@@ -36,7 +36,7 @@
     </div>
     <div class="text-center space-y-1">
       <div class="w-8 h-1 bg-gradient-to-r from-red-500 to-blue-500 mx-auto rounded-full animate-pulse"></div>
-      <p class="text-[10px] text-slate-600 font-mono">v6.0.0 — Ultimate Suite</p>
+      <p class="text-[10px] text-slate-600 font-mono">v8.0.0 — Mistral Edition</p>
     </div>
   </div>
 
@@ -213,7 +213,7 @@
             id: 1,
             user: "NEO",
             avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=neo",
-            text: "Bonjour ! 👋 Je suis NEO, l'intelligence artificielle créée par Célestin 🇨🇩. En quoi puis-je vous aider aujourd'hui ?",
+            text: "Bonjour ! 👋 Je suis NEO, l'intelligence artificielle créée par Célestin 🇨🇩. Pose-moi une question !",
             image: null,
             time: getCurrentTimeStr()
           }
@@ -307,7 +307,7 @@
       }
     }
 
-    // FONCTION IA AVEC API MISTRALAI ET PROMPT SYSTÈME CORRIGÉ
+    // FONCTION IA AVEC SEULEMENT L'API MISTRALAI
     async function generateAIReply(userText, hasImage) {
       showTypingIndicator(true);
 
@@ -340,26 +340,10 @@ Utilisateur : ${promptMessage}
 NEO :`;
 
       try {
-        let reply = "";
+        const res = await fetch(`https://christus-api.vercel.app/ai/MistralAI?prompt=${encodeURIComponent(fullPrompt)}`);
+        const data = await res.json();
 
-        try {
-          const res = await fetch(`https://christus-api.vercel.app/ai/MistralAI?prompt=${encodeURIComponent(fullPrompt)}`);
-          const data = await res.json();
-
-          reply = data?.response || data?.result || data?.message;
-        } catch (e) {
-          console.warn("Erreur d'accès API Christus Mistral:", e);
-        }
-
-        // Système de secours local si l'API ne renvoie rien
-        if (!reply) {
-          const lower = promptMessage.toLowerCase();
-          if (lower.includes("qui t'a créé") || lower.includes("qui t a cree") || lower.includes("créateur")) {
-            reply = "J’ai été créé par Célestin 🇨🇩";
-          } else {
-            reply = "⚠️ NEO est temporairement indisponible, réessaie dans un instant...";
-          }
-        }
+        let reply = data?.response || data?.result || data?.message || "⚠️ Aucune réponse renvoyée par l'API.";
 
         showTypingIndicator(false);
 
@@ -374,13 +358,13 @@ NEO :`;
         showTypingIndicator(false);
 
         pushMessage(
-          "❌ Erreur IA",
+          "❌ Erreur de connexion à l'API MistralAI",
           null,
           "NEO",
           "https://api.dicebear.com/7.x/bottts/svg?seed=neo"
         );
 
-        console.error("Erreur générale IA:", err);
+        console.error("Erreur API MistralAI:", err);
       }
     }
 
@@ -388,7 +372,7 @@ NEO :`;
       const statusText = document.getElementById('status-text');
       if (isTyping) {
         statusText.className = "text-[10px] text-blue-400 flex items-center gap-1";
-        statusText.innerHTML = `<span class="w-2 h-2 bg-blue-500 rounded-full animate-ping"></span> NEO écrit...`;
+        statusText.innerHTML = `<span class="w-2 h-2 bg-blue-500 rounded-full animate-ping"></span> NEO réfléchit...`;
       } else {
         statusText.className = "text-[10px] text-emerald-400 flex items-center gap-1";
         statusText.innerHTML = `<span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span> NEO IA Connectée`;

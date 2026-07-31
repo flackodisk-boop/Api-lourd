@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>JPP Plomberie & AI Assistant</title>
+  <title>JPP & AI Assistant NEO</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -30,7 +30,7 @@
         </div>
       </div>
       <div class="text-center space-y-1">
-        <h1 class="text-2xl font-black tracking-wider text-white">JPP <span class="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">AI APP</span></h1>
+        <h1 class="text-2xl font-black tracking-wider text-white">JPP <span class="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">NEO AI</span></h1>
         <p class="text-xs text-slate-400 font-mono tracking-widest uppercase">Assistant Intelligent & Services</p>
       </div>
     </div>
@@ -55,7 +55,7 @@
             <i class="fa-solid fa-circle-check text-blue-500 text-[10px]"></i>
           </h1>
           <p id="status-text" class="text-[10px] text-emerald-400 flex items-center gap-1">
-            <span id="status-dot" class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span> IA Connectée
+            <span id="status-dot" class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span> NEO IA Connectée
           </p>
         </div>
       </div>
@@ -90,9 +90,9 @@
             <span>Devis</span>
           </button>
 
-          <button onclick="sendQuickAction('💡 Aide-moi à rédiger un texte ou un email.')" class="bg-amber-950/40 border border-amber-800/50 hover:bg-amber-900/50 text-amber-300 p-2 rounded-xl text-[10px] font-bold flex flex-col items-center gap-1 transition active:scale-95">
-            <i class="fa-solid fa-wand-magic-sparkles text-amber-500 text-sm"></i>
-            <span>IA Generative</span>
+          <button onclick="sendQuickAction('Qui t\'a créé ?')" class="bg-amber-950/40 border border-amber-800/50 hover:bg-amber-900/50 text-amber-300 p-2 rounded-xl text-[10px] font-bold flex flex-col items-center gap-1 transition active:scale-95">
+            <i class="fa-solid fa-code text-amber-500 text-sm"></i>
+            <span>Créateur</span>
           </button>
 
           <button onclick="shareLocation()" class="bg-emerald-950/40 border border-emerald-800/50 hover:bg-emerald-900/50 text-emerald-300 p-2 rounded-xl text-[10px] font-bold flex flex-col items-center gap-1 transition active:scale-95">
@@ -107,7 +107,7 @@
           </label>
           <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
 
-          <input type="text" id="chat-text" placeholder="Posez n'importe quelle question..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+          <input type="text" id="chat-text" placeholder="Posez une question à NEO..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
 
           <button type="submit" class="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white w-9 h-9 rounded-xl text-xs font-bold transition flex items-center justify-center shadow-lg shadow-blue-600/30 active:scale-90">
             <i class="fa-solid fa-paper-plane"></i>
@@ -117,7 +117,7 @@
 
       <section id="page-settings" class="hidden flex-1 overflow-y-auto space-y-4 py-2 chat-scroll">
         <h2 class="text-lg font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-sliders text-blue-500"></i> Paramètres de l'application
+          <i class="fa-solid fa-sliders text-blue-500"></i> Paramètres
         </h2>
 
         <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-3">
@@ -132,25 +132,21 @@
         </div>
 
         <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-3">
-          <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Préférences App & IA</h3>
+          <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Préférences App</h3>
           <div class="flex justify-between items-center py-1">
             <span class="text-xs text-slate-300">Notifications sonores</span>
             <input type="checkbox" id="toggle-sound" class="w-4 h-4 text-blue-600 rounded bg-slate-950 border-slate-800 cursor-pointer" checked onchange="toggleSoundPref()">
           </div>
-          <div class="flex justify-between items-center py-1 border-t border-slate-800/60">
-            <span class="text-xs text-slate-300">Mode Sombre Profond</span>
-            <input type="checkbox" id="toggle-dark" class="w-4 h-4 text-blue-600 rounded bg-slate-950 border-slate-800 cursor-pointer" checked onchange="toggleTheme(this)">
-          </div>
         </div>
 
         <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-3">
-          <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Stockage & Données</h3>
+          <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Stockage</h3>
           <button onclick="clearChatHistory()" class="w-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 p-2.5 rounded-xl text-xs font-semibold text-left flex items-center justify-between transition">
-            <span>Vider l'historique de discussion</span>
+            <span>Vider l'historique</span>
             <i class="fa-solid fa-broom"></i>
           </button>
           <button onclick="resetApp()" class="w-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 p-2.5 rounded-xl text-xs font-semibold text-left flex items-center justify-between transition">
-            <span>Réinitialiser totalement l'application</span>
+            <span>Réinitialiser l'application</span>
             <i class="fa-solid fa-trash-can"></i>
           </button>
         </div>
@@ -161,7 +157,7 @@
     <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800 py-2 px-6 flex justify-around items-center z-40">
       <button onclick="navTo('chat')" id="tab-chat" class="flex flex-col items-center space-y-1 text-blue-500">
         <i class="fa-solid fa-robot text-lg"></i>
-        <span class="text-[10px] font-medium">Assistant IA</span>
+        <span class="text-[10px] font-medium">NEO IA</span>
       </button>
 
       <button onclick="navTo('settings')" id="tab-settings" class="flex flex-col items-center space-y-1 text-slate-500">
@@ -173,13 +169,11 @@
   </div>
 
   <script>
-    // Variables globales
     let currentUser = localStorage.getItem('app_user') || "Utilisateur_" + Math.floor(Math.random() * 899 + 100);
     let currentAvatar = localStorage.getItem('app_avatar') || `https://api.dicebear.com/7.x/bottts/svg?seed=${currentUser}`;
     let attachedImageBase64 = null;
     let soundEnabled = localStorage.getItem('app_sound') !== 'false';
 
-    // Initialisation au chargement
     function initApp() {
       document.getElementById('header-user-name').innerText = currentUser;
       document.getElementById('settings-avatar').src = currentAvatar;
@@ -199,7 +193,6 @@
       }, 1500);
     });
 
-    // Navigation Onglets
     function navTo(pageId) {
       document.getElementById('page-chat').classList.add('hidden');
       document.getElementById('page-settings').classList.add('hidden');
@@ -213,15 +206,14 @@
       if(pageId === 'chat') scrollToBottom();
     }
 
-    // Gestion du LocalStorage
     function initChatStorage() {
       if (!localStorage.getItem('jpp_app_db_v6')) {
         const initialMessages = [
           {
             id: 1,
-            user: "JPP AI Assistant",
-            avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=JPP_AI_Bot",
-            text: "Bonjour ! 👋 Je suis votre assistant polyvalent JPP. Je peux répondre à vos questions générales, gérer vos urgences ou établir des devis. Comment puis-je vous aider ?",
+            user: "NEO",
+            avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=neo",
+            text: "Bonjour ! 👋 Je suis NEO, l'intelligence artificielle de JPP créées par Célestin 🇨🇩. En quoi puis-je vous aider aujourd'hui ?",
             image: null,
             time: getCurrentTimeStr()
           }
@@ -240,7 +232,6 @@
       return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
     }
 
-    // Sauvegarde Profil
     function saveProfile() {
       const newName = document.getElementById('input-username').value.trim();
       if (newName) {
@@ -261,16 +252,6 @@
       localStorage.setItem('app_sound', soundEnabled);
     }
 
-    function toggleTheme(checkbox) {
-      const body = document.getElementById('app-body');
-      if (checkbox.checked) {
-        body.classList.replace('bg-slate-900', 'bg-slate-950');
-      } else {
-        body.classList.replace('bg-slate-950', 'bg-slate-900');
-      }
-    }
-
-    // Son de Notification Web Audio API
     function playSound() {
       if (!soundEnabled) return;
       try {
@@ -287,7 +268,6 @@
       } catch(e) {}
     }
 
-    // Support des Images
     function handleFileSelect(e) {
       const file = e.target.files[0];
       if (file) {
@@ -307,7 +287,6 @@
       document.getElementById('image-preview-bar').classList.add('hidden');
     }
 
-    // Envoi des messages
     function pushMessage(text, image = null, user = currentUser, avatar = currentAvatar) {
       const messages = getMessages();
       messages.push({
@@ -328,41 +307,71 @@
       }
     }
 
-    // Moteur d'IA Polyvalent (Général + Plomberie)
-    function generateAIReply(userText, hasImage) {
+    // FONCTION IA CONNECTÉE À L'API DE NEO
+    async function generateAIReply(userText, hasImage) {
       showTypingIndicator(true);
 
-      setTimeout(() => {
-        let reply = "";
-        const lower = (userText || "").toLowerCase();
+      try {
+        const fullPrompt = `
+Tu es NEO, une intelligence artificielle avancée.
 
-        if (hasImage) {
-          reply = "📸 Photo bien reçue ! Je l'ai analysée. S'il s'agit d'un problème matériel, un expert JPP peut intervenir avec la pièce adaptée.";
-        } else if (lower.includes("fuite") || lower.includes("urgence") || lower.includes("eau")) {
-          reply = "🚨 **URGENCE DÉTECTÉE** : Coupez immédiatement la vanne d'arrivée d'eau générale. Une équipe technique peut être rapidement dépêchée sur votre zone.";
-        } else if (lower.includes("devis") || lower.includes("prix") || lower.includes("tarif")) {
-          reply = "📋 Pour un devis précis, indiquez-nous l'intervention souhaitée ou partagez une photo du problème.";
-        } else if (lower.includes("bonjour") || lower.includes("salut") || lower.includes("hello")) {
-          reply = `Bonjour ! En quoi puis-je vous assister aujourd'hui ?`;
-        } else if (lower.includes("qui es-tu") || lower.includes("qui es tu")) {
-          reply = "Je suis l'IA de l'application JPP, conçue pour vous aider à la fois sur vos questions du quotidien et sur vos besoins de plomberie et services !";
-        } else {
-          reply = "J'ai bien pris en compte votre demande. Je reste à votre entière disposition si vous avez besoin d'autres précisions !";
-        }
+Ton créateur est Célestin 🇨🇩.
+
+RÈGLES :
+- Si on demande "qui t'a créé ?" → répond EXACTEMENT :
+  "J’ai été créé par Célestin 🇨🇩"
+- Tu réponds toujours intelligemment
+- Tu parles naturellement (comme un humain)
+- Tu ne dis jamais que tu es une API
+
+Utilisateur : ${userText || (hasImage ? "[Photo transmise par l'utilisateur]" : "")}
+Réponse :
+`;
+
+        const res = await fetch("https://christus-api.vercel.app/ai/copilot", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: fullPrompt
+          })
+        });
+
+        const data = await res.json();
+        let reply = data?.response || data?.result || data?.message || "⚠️ Pas de réponse IA";
 
         showTypingIndicator(false);
-        pushMessage(reply, null, "JPP AI Assistant", "https://api.dicebear.com/7.x/bottts/svg?seed=JPP_AI_Bot");
-      }, 1200);
+
+        pushMessage(
+          reply,
+          null,
+          "NEO",
+          "https://api.dicebear.com/7.x/bottts/svg?seed=neo"
+        );
+
+      } catch (err) {
+        showTypingIndicator(false);
+
+        pushMessage(
+          "❌ Erreur connexion IA",
+          null,
+          "NEO",
+          "https://api.dicebear.com/7.x/bottts/svg?seed=neo"
+        );
+
+        console.error(err);
+      }
     }
 
     function showTypingIndicator(isTyping) {
       const statusText = document.getElementById('status-text');
       if (isTyping) {
         statusText.className = "text-[10px] text-blue-400 flex items-center gap-1";
-        statusText.innerHTML = `<span class="w-2 h-2 bg-blue-500 rounded-full animate-ping"></span> L'IA écrit...`;
+        statusText.innerHTML = `<span class="w-2 h-2 bg-blue-500 rounded-full animate-ping"></span> NEO écrit...`;
       } else {
         statusText.className = "text-[10px] text-emerald-400 flex items-center gap-1";
-        statusText.innerHTML = `<span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span> IA Connectée`;
+        statusText.innerHTML = `<span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span> NEO IA Connectée`;
       }
     }
 
@@ -385,17 +394,16 @@
     function shareLocation() {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(pos => {
-          const url = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
-          pushMessage(`📍 Ma position actuelle : ${url}`);
+          const url = `http://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
+          pushMessage(`📍 Ma position GPS : ${url}`);
         }, () => {
-          pushMessage("📍 Impossible d'accéder à la géolocalisation GPS.");
+          pushMessage("📍 Accès GPS non disponible.");
         });
       } else {
-        alert("Géolocalisation non supportée.");
+        alert("Géolocalisation non supportée par votre navigateur.");
       }
     }
 
-    // Affichage visuel des messages
     function renderMessages() {
       const messages = getMessages();
       const container = document.getElementById('messages-container');
@@ -439,7 +447,7 @@
     }
 
     function resetApp() {
-      if (confirm("Réinitialiser complètement l'application ?")) {
+      if (confirm("Réinitialiser l'application ?")) {
         localStorage.clear();
         location.reload();
       }

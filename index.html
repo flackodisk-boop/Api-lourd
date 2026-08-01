@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Nexus Social & Chat Network</title>
+  <title>Nexus Realtime Network - Version Complète</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -18,29 +18,27 @@
     .chat-scroll::-webkit-scrollbar-thumb { background: #00d9ff; border-radius: 10px; }
     .meta-gradient { background: linear-gradient(135deg, #0066ff, #00d9ff); }
     .story-ring { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+    .emoji-pop:hover { transform: scale(1.3); transition: transform 0.2s ease; }
   </style>
 </head>
 <body class="h-full text-slate-100 flex justify-center items-center bg-slate-950 antialiased select-none">
 
   <div class="w-full max-w-md h-full md:h-[95vh] md:rounded-3xl bg-slate-900 border border-cyan-500/20 shadow-2xl flex flex-col overflow-hidden relative">
 
-    <div id="view-auth" class="absolute inset-0 z-50 bg-slate-950 p-6 flex flex-col justify-center items-center space-y-5">
+    <div id="view-auth" class="absolute inset-0 z-50 bg-slate-950 p-6 flex flex-col justify-center items-center space-y-4">
       <div class="text-center space-y-2">
         <div class="w-16 h-16 meta-gradient rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-cyan-500/30">
           <i class="fa-solid fa-share-nodes text-3xl text-white"></i>
         </div>
-        <h2 class="text-2xl font-extrabold text-white tracking-wide">Nexus Network</h2>
-        <p class="text-xs text-slate-400">Rejoignez la communauté multi-utilisateurs</p>
+        <h2 class="text-2xl font-extrabold text-white">Nexus Network</h2>
+        <p class="text-xs text-slate-400">Réseau Social Multi-utilisateurs</p>
       </div>
 
       <div class="w-full space-y-3 bg-slate-900 p-4 rounded-2xl border border-slate-800">
-        <input type="email" id="auth-email" placeholder="Adresse Email" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400">
-        <input type="password" id="auth-pass" placeholder="Mot de passe" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400">
         <input type="text" id="auth-username" placeholder="Pseudo / Nom complet" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400">
-        <input type="text" id="auth-domain" placeholder="Domaine (ex: Dev, Design, Musique)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400">
+        <input type="text" id="auth-domain" placeholder="Votre domaine (ex: Dev, Musique, Design)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400">
 
-        <button onclick="registerUser()" class="w-full py-2.5 meta-gradient rounded-xl text-xs font-bold text-white shadow-lg">Créer un compte</button>
-        <button onclick="loginUser()" class="w-full py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs font-bold text-slate-300">Se connecter</button>
+        <button onclick="loginUser()" class="w-full py-2.5 meta-gradient rounded-xl text-xs font-bold text-white shadow-lg">Se Connecter / Rejoindre</button>
       </div>
     </div>
 
@@ -73,7 +71,7 @@
       <div class="bg-slate-900 border border-slate-800 p-3 rounded-2xl space-y-3 shadow-lg">
         <div class="flex items-center gap-2">
           <img id="post-user-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=guest" class="w-8 h-8 rounded-full border border-cyan-400 object-cover">
-          <input type="text" id="post-input" placeholder="Exprimez-vous sur votre domaine..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
+          <input type="text" id="post-input" placeholder="Que voulez-vous exprimer aujourd'hui ?" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
         </div>
 
         <div id="post-image-preview-box" class="hidden relative rounded-xl overflow-hidden border border-slate-800">
@@ -82,12 +80,11 @@
         </div>
 
         <div class="flex justify-between items-center pt-2 border-t border-slate-800/80">
-          <div class="flex gap-3 text-slate-400 text-xs">
-            <label for="post-file-input" class="hover:text-cyan-400 cursor-pointer flex items-center gap-1 text-[11px]">
-              <i class="fa-solid fa-image text-emerald-400"></i> Photo Galerie
-            </label>
-            <input type="file" id="post-file-input" accept="image/*" class="hidden" onchange="attachImageToPost(event)">
-          </div>
+          <label for="post-file-input" class="hover:text-cyan-400 cursor-pointer flex items-center gap-1 text-[11px] text-slate-400">
+            <i class="fa-solid fa-image text-emerald-400"></i> Photo Galerie
+          </label>
+          <input type="file" id="post-file-input" accept="image/*" class="hidden" onchange="attachImageToPost(event)">
+
           <button onclick="publishPost()" class="px-4 py-1.5 meta-gradient rounded-xl text-xs font-bold text-white shadow-md active:scale-95 transition">
             Publier
           </button>
@@ -99,17 +96,13 @@
 
     <main id="tab-chats" class="hidden flex-1 overflow-y-auto chat-scroll">
       <div class="p-3 border-b border-slate-800/80 bg-slate-950/40 space-y-2">
-        <div class="flex justify-between items-center">
-          <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-wider">Trouver des membres / Groupes</span>
-        </div>
         <div class="relative">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-xs"></i>
-          <input type="text" id="search-user-input" oninput="searchUsersAndChats(this.value)" placeholder="Rechercher un membre par pseudo/domaine..." class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400">
+          <input type="text" id="search-user-input" oninput="searchUsersAndChats(this.value)" placeholder="Rechercher par membre ou domaine..." class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400">
         </div>
       </div>
 
       <div id="search-results" class="p-2 space-y-1 hidden bg-slate-950/80 border-b border-slate-800"></div>
-
       <div id="chats-list" class="divide-y divide-slate-800/40"></div>
     </main>
 
@@ -121,8 +114,8 @@
           </button>
           <img id="room-avatar" src="" class="w-9 h-9 rounded-full border border-cyan-400 object-cover bg-slate-950">
           <div>
-            <h3 id="room-title" class="font-bold text-xs text-white">Chat</h3>
-            <p id="room-status" class="text-[9px] text-emerald-400 font-mono">Connecté via Firebase Cloud</p>
+            <h3 id="room-title" class="font-bold text-xs text-white">Discussion</h3>
+            <p class="text-[9px] text-emerald-400 font-mono">En ligne</p>
           </div>
         </div>
         <button onclick="shareInviteLink()" class="text-cyan-400 text-xs hover:underline">Inviter +</button>
@@ -131,7 +124,7 @@
       <div id="messages-box" class="flex-1 p-3 overflow-y-auto space-y-2.5 chat-scroll"></div>
 
       <form onsubmit="sendMessage(event)" class="p-2.5 bg-slate-900 border-t border-slate-800 flex items-center gap-2">
-        <input type="text" id="chat-input" placeholder="Écrivez votre message..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
+        <input type="text" id="chat-input" placeholder="Écrire un message..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
         <button type="submit" class="w-9 h-9 rounded-xl meta-gradient text-white flex items-center justify-center text-xs shadow-lg">
           <i class="fa-solid fa-paper-plane"></i>
         </button>
@@ -141,16 +134,16 @@
     <nav class="bg-slate-900 border-t border-slate-800 py-2.5 px-8 flex justify-around items-center sticky bottom-0 z-30">
       <button onclick="switchTab('feed')" id="nav-btn-feed" class="flex flex-col items-center gap-1 text-cyan-400">
         <i class="fa-solid fa-newspaper text-base"></i>
-        <span class="text-[9px] font-bold">Fil d'actualité</span>
+        <span class="text-[9px] font-bold">Actualités</span>
       </button>
 
       <button onclick="switchTab('chats')" id="nav-btn-chats" class="flex flex-col items-center gap-1 text-slate-500 hover:text-cyan-400">
         <i class="fa-solid fa-comments text-base"></i>
-        <span class="text-[9px] font-bold">Membres & Chats</span>
+        <span class="text-[9px] font-bold">Discussions</span>
       </button>
 
       <button onclick="openProfileSettings()" class="flex flex-col items-center gap-1 text-slate-500 hover:text-cyan-400">
-        <i class="fa-solid fa-sliders text-base"></i>
+        <i class="fa-solid fa-gear text-base"></i>
         <span class="text-[9px] font-bold">Paramètres</span>
       </button>
     </nav>
@@ -158,7 +151,7 @@
     <div id="modal-settings" class="hidden absolute inset-0 z-50 bg-slate-950/95 p-6 flex flex-col justify-center items-center backdrop-blur-md">
       <div class="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-2xl">
         <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-          <h3 class="font-bold text-sm text-white">Modifier mon Profil</h3>
+          <h3 class="font-bold text-sm text-white">Paramètres du Profil</h3>
           <button onclick="closeModal('modal-settings')" class="text-slate-400 hover:text-white">✕</button>
         </div>
 
@@ -170,110 +163,82 @@
 
         <div class="space-y-3">
           <div>
-            <label class="text-[10px] text-slate-400 block mb-1">Nom / Pseudo</label>
+            <label class="text-[10px] text-slate-400 block mb-1">Pseudo / Nom complet</label>
             <input type="text" id="username-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
           </div>
           <div>
-            <label class="text-[10px] text-slate-400 block mb-1">Domaine d'activité / Expertise</label>
+            <label class="text-[10px] text-slate-400 block mb-1">Domaine d'expertise</label>
             <input type="text" id="domain-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
           </div>
         </div>
 
-        <button onclick="saveUserProfile()" class="w-full py-2.5 meta-gradient rounded-xl text-xs font-bold text-white shadow-lg">Sauvegarder dans Firebase</button>
-        <button onclick="logoutUser()" class="w-full py-2 bg-rose-900/40 border border-rose-800 text-rose-300 rounded-xl text-xs font-semibold">Déconnexion</button>
+        <button onclick="saveUserProfile()" class="w-full py-2.5 meta-gradient rounded-xl text-xs font-bold text-white shadow-lg">Sauvegarder</button>
       </div>
     </div>
 
     <div id="modal-group" class="hidden absolute inset-0 z-50 bg-slate-950/95 p-6 flex flex-col justify-center items-center backdrop-blur-md">
       <div class="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4">
         <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-          <h3 class="font-bold text-sm text-white">Nouveau Groupe de Discussion</h3>
+          <h3 class="font-bold text-sm text-white">Nouveau Groupe</h3>
           <button onclick="closeModal('modal-group')" class="text-slate-400">✕</button>
         </div>
-        <input type="text" id="group-name-input" placeholder="Nom du groupe..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
-        <button onclick="createGroupSubmit()" class="w-full py-2.5 meta-gradient rounded-xl text-xs font-bold text-white">Créer le groupe</button>
+        <input type="text" id="group-name-input" placeholder="Nom du groupe..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+        <button onclick="createGroupSubmit()" class="w-full py-2.5 meta-gradient rounded-xl text-xs font-bold text-white">Créer le Groupe</button>
       </div>
     </div>
 
   </div>
 
   <script>
-    // CONFIGURATION FIREBASE CLOUD (Remplacez par vos clés si besoin)
-    const firebaseConfig = {
-      apiKey: "AIzaSyDemoNexusKeyFirebase2026",
-      authDomain: "nexus-chat-app.firebaseapp.com",
-      projectId: "nexus-chat-app",
-      storageBucket: "nexus-chat-app.appspot.com",
-      messagingSenderId: "1234567890",
-      appId: "1:1234567890:web:nexuschat"
-    };
+    // GESTION DU STOCKAGE ET UTILISATEURS
+    let currentUser = JSON.parse(localStorage.getItem('nexus_user')) || null;
+    let posts = JSON.parse(localStorage.getItem('nexus_posts')) || [];
+    let chats = JSON.parse(localStorage.getItem('nexus_chats')) || [
+      { id: 'global', name: 'Groupe Général 🇨🇩', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=global', messages: [] }
+    ];
+    let knownUsers = JSON.parse(localStorage.getItem('nexus_users_list')) || [
+      { id: 'u1', username: 'Marc Dev', domain: 'Développeur Web', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=marc' },
+      { id: 'u2', username: 'Léa Design', domain: 'UX Designer', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=lea' }
+    ];
 
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    let currentUser = null;
     let tempPostImage = null;
     let activeChatId = null;
 
-    // SURVEILLANCE AUTHENTIFICATION
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        db.collection('users').doc(user.uid).get().then(doc => {
-          if (doc.exists) {
-            currentUser = { uid: user.uid, ...doc.data() };
-            applyUserProfile();
-            document.getElementById('view-auth').classList.add('hidden');
-            initListeners();
-          }
-        });
-      } else {
-        document.getElementById('view-auth').classList.remove('hidden');
+    document.addEventListener('DOMContentLoaded', () => {
+      if (currentUser) {
+        document.getElementById('view-auth').classList.add('hidden');
+        applyUserProfile();
+        renderPosts();
+        renderChatsList();
       }
     });
 
-    // INSCRIPTION & CONNEXION
-    function registerUser() {
-      const email = document.getElementById('auth-email').value;
-      const pass = document.getElementById('auth-pass').value;
-      const username = document.getElementById('auth-username').value || 'Membre Nexus';
-      const domain = document.getElementById('auth-domain').value || 'Général';
-
-      auth.createUserWithEmailAndPassword(email, pass).then(res => {
-        const userData = {
-          username: username,
-          domain: domain,
-          avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${username}`,
-          email: email
-        };
-        db.collection('users').doc(res.user.uid).set(userData).then(() => {
-          currentUser = { uid: res.user.uid, ...userData };
-          applyUserProfile();
-          document.getElementById('view-auth').classList.add('hidden');
-          initListeners();
-        });
-      }).catch(err => alert("Erreur d'inscription : " + err.message));
-    }
-
+    // CONNEXION / INSCRIPTION
     function loginUser() {
-      const email = document.getElementById('auth-email').value;
-      const pass = document.getElementById('auth-pass').value;
+      const username = document.getElementById('auth-username').value.trim() || 'Membre';
+      const domain = document.getElementById('auth-domain').value.trim() || 'Général';
 
-      auth.signInWithEmailAndPassword(email, pass).catch(err => alert("Erreur de connexion : " + err.message));
+      currentUser = {
+        id: 'usr_' + Date.now(),
+        username: username,
+        domain: domain,
+        avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${username}`
+      };
+
+      knownUsers.push(currentUser);
+      localStorage.setItem('nexus_users_list', JSON.stringify(knownUsers));
+      localStorage.setItem('nexus_user', JSON.stringify(currentUser));
+
+      document.getElementById('view-auth').classList.add('hidden');
+      applyUserProfile();
+      renderPosts();
+      renderChatsList();
     }
 
-    function logoutUser() {
-      auth.signOut();
-      closeModal('modal-settings');
-    }
-
-    // MISE À JOUR & PARAMÈTRES
     function applyUserProfile() {
       if (!currentUser) return;
       document.getElementById('header-user-name').innerText = currentUser.username;
-      document.getElementById('header-user-role').innerText = 'Domaine : ' + (currentUser.domain || 'Général');
+      document.getElementById('header-user-role').innerText = 'Domaine : ' + currentUser.domain;
       document.getElementById('header-avatar').src = currentUser.avatar;
       document.getElementById('post-user-avatar').src = currentUser.avatar;
     }
@@ -281,26 +246,18 @@
     function openProfileSettings() {
       if (!currentUser) return;
       document.getElementById('username-input').value = currentUser.username;
-      document.getElementById('domain-input').value = currentUser.domain || '';
+      document.getElementById('domain-input').value = currentUser.domain;
       document.getElementById('avatar-preview').src = currentUser.avatar;
       openModal('modal-settings');
     }
 
     function saveUserProfile() {
-      const username = document.getElementById('username-input').value;
-      const domain = document.getElementById('domain-input').value;
+      currentUser.username = document.getElementById('username-input').value;
+      currentUser.domain = document.getElementById('domain-input').value;
 
-      currentUser.username = username;
-      currentUser.domain = domain;
-
-      db.collection('users').doc(currentUser.uid).update({
-        username: username,
-        domain: domain,
-        avatar: currentUser.avatar
-      }).then(() => {
-        applyUserProfile();
-        closeModal('modal-settings');
-      });
+      localStorage.setItem('nexus_user', JSON.stringify(currentUser));
+      applyUserProfile();
+      closeModal('modal-settings');
     }
 
     function loadAvatarFromGallery(e) {
@@ -315,7 +272,7 @@
       }
     }
 
-    // FIL D'ACTUALITÉ & COMMENTAIRES
+    // GESTION DES POSTS, RÉACTIONS & COMMENTAIRES
     function attachImageToPost(e) {
       const file = e.target.files[0];
       if (file) {
@@ -335,201 +292,184 @@
     }
 
     function publishPost() {
-      const text = document.getElementById('post-input').value;
+      const text = document.getElementById('post-input').value.trim();
       if (!text && !tempPostImage) return;
 
-      db.collection('posts').add({
-        authorId: currentUser.uid,
-        authorName: currentUser.username,
-        authorDomain: currentUser.domain || 'Général',
-        authorAvatar: currentUser.avatar,
+      const newPost = {
+        id: 'post_' + Date.now(),
+        author: currentUser.username,
+        domain: currentUser.domain,
+        avatar: currentUser.avatar,
         content: text,
         image: tempPostImage,
-        likes: [],
-        comments: [],
-        createdAt: Date.now()
-      });
+        likes: 0,
+        reactions: { '👍': 0, '❤️': 0, '😂': 0, '😮': 0, '😢': 0, '😡': 0 },
+        comments: []
+      };
+
+      posts.unshift(newPost);
+      localStorage.setItem('nexus_posts', JSON.stringify(posts));
+      renderPosts();
 
       document.getElementById('post-input').value = '';
       removePostImage();
     }
 
-    function initListeners() {
-      // Relever les Publications
-      db.collection('posts').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
-        const container = document.getElementById('posts-container');
-        container.innerHTML = '';
-        snapshot.forEach(doc => {
-          const p = doc.data();
-          const postId = doc.id;
-          const likesCount = p.likes ? p.likes.length : 0;
-          const commentsCount = p.comments ? p.comments.length : 0;
+    function renderPosts() {
+      const container = document.getElementById('posts-container');
+      container.innerHTML = '';
 
-          container.innerHTML += `
-            <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl space-y-3 shadow-lg">
-              <div class="flex items-center gap-2.5">
-                <img src="${p.authorAvatar}" class="w-9 h-9 rounded-full border border-cyan-400 object-cover bg-slate-950">
-                <div>
-                  <h4 class="font-bold text-xs text-white">${p.authorName}</h4>
-                  <p class="text-[9px] text-cyan-400">${p.authorDomain}</p>
-                </div>
-              </div>
-
-              ${p.content ? `<p class="text-xs text-slate-200 leading-relaxed">${p.content}</p>` : ''}
-              ${p.image ? `<img src="${p.image}" class="w-full max-h-60 object-cover rounded-xl border border-slate-800">` : ''}
-
-              <div class="flex justify-between items-center pt-2 border-t border-slate-800/60 text-xs text-slate-400">
-                <button onclick="toggleLike('${postId}')" class="flex items-center gap-1 hover:text-cyan-400">
-                  <i class="fa-solid fa-thumbs-up"></i> <span>${likesCount}</span>
-                </button>
-                <span class="text-[10px]">${commentsCount} commentaire(s)</span>
-              </div>
-
-              <div class="space-y-1.5 pt-1">
-                <div id="comments-box-${postId}" class="space-y-1">
-                  ${(p.comments || []).map(c => `
-                    <div class="bg-slate-950 p-2 rounded-xl text-[11px]">
-                      <span class="font-bold text-cyan-400">${c.author}:</span> ${c.text}
-                    </div>
-                  `).join('')}
-                </div>
-                <div class="flex gap-2 pt-1">
-                  <input type="text" id="comment-input-${postId}" placeholder="Écrire un commentaire..." class="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-[11px] text-white focus:outline-none">
-                  <button onclick="addComment('${postId}')" class="px-2.5 py-1 meta-gradient text-[10px] font-bold rounded-lg text-white">Envoyer</button>
-                </div>
+      posts.forEach(p => {
+        container.innerHTML += `
+          <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl space-y-3">
+            <div class="flex items-center gap-2.5">
+              <img src="${p.avatar}" class="w-9 h-9 rounded-full border border-cyan-400 object-cover bg-slate-950">
+              <div>
+                <h4 class="font-bold text-xs text-white">${p.author}</h4>
+                <p class="text-[9px] text-cyan-400">${p.domain}</p>
               </div>
             </div>
-          `;
-        });
-      });
 
-      // Relever les Discussions
-      db.collection('chats').onSnapshot(snapshot => {
-        const chatsList = document.getElementById('chats-list');
-        chatsList.innerHTML = '';
-        snapshot.forEach(doc => {
-          const chat = doc.data();
-          const chatId = doc.id;
+            ${p.content ? `<p class="text-xs text-slate-200 leading-relaxed">${p.content}</p>` : ''}
+            ${p.image ? `<img src="${p.image}" class="w-full max-h-60 object-cover rounded-xl border border-slate-800">` : ''}
 
-          chatsList.innerHTML += `
-            <div onclick="openChatRoom('${chatId}', '${chat.name}', '${chat.avatar}')" class="flex items-center gap-3 p-3.5 hover:bg-slate-800/40 cursor-pointer transition">
-              <img src="${chat.avatar}" class="w-10 h-10 rounded-full border border-cyan-400 object-cover bg-slate-950">
-              <div class="flex-1 min-w-0">
-                <h2 class="font-bold text-xs text-white truncate">${chat.name}</h2>
-                <p class="text-[10px] text-slate-400">Discussion active sur le cloud</p>
+            <div class="flex items-center justify-between pt-2 border-t border-slate-800/60 text-xs">
+              <div class="flex gap-2 text-base">
+                <span onclick="reactToPost('${p.id}', '👍')" class="cursor-pointer emoji-pop">👍</span>
+                <span onclick="reactToPost('${p.id}', '❤️')" class="cursor-pointer emoji-pop">❤️</span>
+                <span onclick="reactToPost('${p.id}', '😂')" class="cursor-pointer emoji-pop">😂</span>
+                <span onclick="reactToPost('${p.id}', '😮')" class="cursor-pointer emoji-pop">😮</span>
+              </div>
+              <span class="text-[10px] text-slate-400">${p.likes} Réaction(s) • ${p.comments.length} Commentaire(s)</span>
+            </div>
+
+            <div class="space-y-1.5 pt-1">
+              <div class="space-y-1">
+                ${p.comments.map(c => `
+                  <div class="bg-slate-950 p-2 rounded-xl text-[10px]">
+                    <span class="font-bold text-cyan-400">${c.author}:</span> ${c.text}
+                  </div>
+                `).join('')}
+              </div>
+              <div class="flex gap-1.5 pt-1">
+                <input type="text" id="comment-input-${p.id}" placeholder="Répondre..." class="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-[10px] text-white focus:outline-none">
+                <button onclick="addComment('${p.id}')" class="px-2.5 py-1 meta-gradient text-[9px] font-bold rounded-lg text-white">Publier</button>
               </div>
             </div>
-          `;
-        });
+          </div>
+        `;
       });
     }
 
-    function toggleLike(postId) {
-      const ref = db.collection('posts').doc(postId);
-      ref.get().then(doc => {
-        if (!doc.exists) return;
-        let likes = doc.data().likes || [];
-        if (likes.includes(currentUser.uid)) {
-          likes = likes.filter(id => id !== currentUser.uid);
-        } else {
-          likes.push(currentUser.uid);
-        }
-        ref.update({ likes: likes });
-      });
+    function reactToPost(id, emoji) {
+      const post = posts.find(p => p.id === id);
+      if (post) {
+        post.likes++;
+        localStorage.setItem('nexus_posts', JSON.stringify(posts));
+        renderPosts();
+      }
     }
 
-    function addComment(postId) {
-      const input = document.getElementById(`comment-input-${postId}`);
+    function addComment(id) {
+      const input = document.getElementById(`comment-input-${id}`);
       const text = input.value.trim();
       if (!text) return;
 
-      const ref = db.collection('posts').doc(postId);
-      ref.get().then(doc => {
-        if (!doc.exists) return;
-        let comments = doc.data().comments || [];
-        comments.push({
-          author: currentUser.username,
-          text: text,
-          createdAt: Date.now()
-        });
-        ref.update({ comments: comments });
-        input.value = '';
-      });
+      const post = posts.find(p => p.id === id);
+      if (post) {
+        post.comments.push({ author: currentUser.username, text: text });
+        localStorage.setItem('nexus_posts', JSON.stringify(posts));
+        renderPosts();
+      }
     }
 
-    // RECHERCHE MULTI-UTILISATEURS
+    // RECHERCHE MULTI-MEMBRES ET TCHAT
     function searchUsersAndChats(query) {
-      const resultsContainer = document.getElementById('search-results');
+      const container = document.getElementById('search-results');
       if (!query.trim()) {
-        resultsContainer.classList.add('hidden');
+        container.classList.add('hidden');
         return;
       }
 
-      db.collection('users').get().then(snapshot => {
-        resultsContainer.innerHTML = '';
-        resultsContainer.classList.remove('hidden');
+      container.classList.remove('hidden');
+      container.innerHTML = '';
 
-        snapshot.forEach(doc => {
-          const u = doc.data();
-          if (u.username.toLowerCase().includes(query.toLowerCase()) && doc.id !== currentUser.uid) {
-            resultsContainer.innerHTML += `
-              <div class="flex justify-between items-center p-2 hover:bg-slate-900 rounded-xl">
-                <div class="flex items-center gap-2">
-                  <img src="${u.avatar}" class="w-7 h-7 rounded-full">
-                  <div>
-                    <span class="text-xs font-bold text-white block">${u.username}</span>
-                    <span class="text-[9px] text-cyan-400">${u.domain || 'Général'}</span>
-                  </div>
-                </div>
-                <button onclick="startPrivateChat('${doc.id}', '${u.username}', '${u.avatar}')" class="px-2.5 py-1 meta-gradient rounded-lg text-[10px] font-bold text-white">Démarrer PV</button>
-              </div>
-            `;
-          }
-        });
-      });
-    }
-
-    function startPrivateChat(targetUid, targetName, targetAvatar) {
-      const chatId = [currentUser.uid, targetUid].sort().join('_');
-      db.collection('chats').doc(chatId).set({
-        name: `PV : ${targetName}`,
-        avatar: targetAvatar,
-        type: 'pv',
-        members: [currentUser.uid, targetUid]
-      }).then(() => {
-        openChatRoom(chatId, `PV : ${targetName}`, targetAvatar);
-      });
-    }
-
-    // ENVOI & RÉCEPTION DES MESSAGES DE TCHAT
-    function openChatRoom(chatId, title, avatar) {
-      activeChatId = chatId;
-      document.getElementById('room-title').innerText = title;
-      document.getElementById('room-avatar').src = avatar;
-      document.getElementById('view-chat-room').classList.remove('hidden');
-
-      db.collection('chats').doc(chatId).collection('messages').orderBy('createdAt', 'asc').onSnapshot(snapshot => {
-        const box = document.getElementById('messages-box');
-        box.innerHTML = '';
-        snapshot.forEach(doc => {
-          const m = doc.data();
-          const isMe = m.senderId === currentUser.uid;
-
-          box.innerHTML += `
-            <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
-              <div class="max-w-[80%] ${isMe ? 'meta-gradient text-white' : 'bg-slate-900 text-slate-200 border border-slate-800'} p-2.5 rounded-2xl text-xs shadow-md">
-                ${!isMe ? `<span class="text-[9px] font-bold text-cyan-300 block mb-0.5">${m.senderName}</span>` : ''}
-                <p class="break-words">${m.text}</p>
+      knownUsers.filter(u => u.username.toLowerCase().includes(query.toLowerCase()) && u.id !== currentUser.id).forEach(u => {
+        container.innerHTML += `
+          <div class="flex justify-between items-center p-2 bg-slate-900 rounded-xl">
+            <div class="flex items-center gap-2">
+              <img src="${u.avatar}" class="w-7 h-7 rounded-full">
+              <div>
+                <span class="text-xs font-bold text-white block">${u.username}</span>
+                <span class="text-[9px] text-cyan-400">${u.domain}</span>
               </div>
             </div>
-          `;
-        });
-        box.scrollTop = box.scrollHeight;
+            <button onclick="startPV('${u.username}', '${u.avatar}')" class="px-2.5 py-1 meta-gradient text-[10px] rounded-lg font-bold">Démarrer PV</button>
+          </div>
+        `;
       });
+    }
+
+    function startPV(name, avatar) {
+      let chat = chats.find(c => c.name === `PV : ${name}`);
+      if (!chat) {
+        chat = { id: 'pv_' + Date.now(), name: `PV : ${name}`, avatar: avatar, messages: [] };
+        chats.push(chat);
+        localStorage.setItem('nexus_chats', JSON.stringify(chats));
+      }
+      renderChatsList();
+      openChatRoom(chat.id, chat.name, chat.avatar);
+    }
+
+    function renderChatsList() {
+      const container = document.getElementById('chats-list');
+      container.innerHTML = '';
+
+      chats.forEach(c => {
+        container.innerHTML += `
+          <div onclick="openChatRoom('${c.id}', '${c.name}', '${c.avatar}')" class="flex items-center gap-3 p-3.5 hover:bg-slate-800/40 cursor-pointer transition">
+            <img src="${c.avatar}" class="w-10 h-10 rounded-full border border-cyan-400 object-cover bg-slate-950">
+            <div class="flex-1">
+              <h2 class="font-bold text-xs text-white">${c.name}</h2>
+              <p class="text-[10px] text-slate-400">Discussion ouverte</p>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function openChatRoom(id, name, avatar) {
+      activeChatId = id;
+      document.getElementById('room-title').innerText = name;
+      document.getElementById('room-avatar').src = avatar;
+      document.getElementById('view-chat-room').classList.remove('hidden');
+      renderMessages();
     }
 
     function closeChatRoom() {
       document.getElementById('view-chat-room').classList.add('hidden');
+    }
+
+    function renderMessages() {
+      const chat = chats.find(c => c.id === activeChatId);
+      if (!chat) return;
+
+      const box = document.getElementById('messages-box');
+      box.innerHTML = '';
+
+      chat.messages.forEach(m => {
+        const isMe = m.sender === currentUser.username;
+        box.innerHTML += `
+          <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
+            <div class="max-w-[80%] ${isMe ? 'meta-gradient text-white' : 'bg-slate-900 text-slate-200 border border-slate-800'} p-2.5 rounded-2xl text-xs shadow-md">
+              ${!isMe ? `<span class="text-[9px] font-bold text-cyan-300 block mb-0.5">${m.sender}</span>` : ''}
+              <p class="break-words">${m.text}</p>
+            </div>
+          </div>
+        `;
+      });
+
+      box.scrollTop = box.scrollHeight;
     }
 
     function sendMessage(e) {
@@ -538,34 +478,36 @@
       const text = input.value.trim();
       if (!text || !activeChatId) return;
 
-      db.collection('chats').doc(activeChatId).collection('messages').add({
-        senderId: currentUser.uid,
-        senderName: currentUser.username,
-        text: text,
-        createdAt: Date.now()
-      });
+      const chat = chats.find(c => c.id === activeChatId);
+      if (chat) {
+        chat.messages.push({ sender: currentUser.username, text: text });
+        localStorage.setItem('nexus_chats', JSON.stringify(chats));
+        renderMessages();
+      }
 
       input.value = '';
-    }
-
-    function shareInviteLink() {
-      const link = window.location.href;
-      navigator.clipboard.writeText(link).then(() => {
-        alert("Lien d'invitation copié dans le presse-papier ! Partagez-le avec vos amis.");
-      });
     }
 
     function createGroupSubmit() {
       const name = document.getElementById('group-name-input').value.trim();
       if (!name) return;
 
-      db.collection('chats').add({
+      const newGroup = {
+        id: 'group_' + Date.now(),
         name: 'Groupe : ' + name,
         avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${name}`,
-        type: 'group',
-        createdBy: currentUser.uid
-      }).then(() => {
-        closeModal('modal-group');
+        messages: []
+      };
+
+      chats.push(newGroup);
+      localStorage.setItem('nexus_chats', JSON.stringify(chats));
+      renderChatsList();
+      closeModal('modal-group');
+    }
+
+    function shareInviteLink() {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        alert("Lien d'invitation copié ! Vous pouvez le partager.");
       });
     }
 

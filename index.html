@@ -9,7 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
   <style>
@@ -33,13 +32,12 @@
           <i class="fa-solid fa-share-nodes text-3xl text-white"></i>
         </div>
         <h2 class="text-2xl font-extrabold text-white">Nexus Social</h2>
-        <p class="text-xs text-slate-400">Réseau & Marketplace Multi-utilisateurs</p>
+        <p class="text-xs text-slate-400">Réseau Cloud Multi-utilisateurs</p>
       </div>
 
       <div class="w-full space-y-3 bg-slate-900 p-4 rounded-2xl border border-slate-800">
         <input type="text" id="auth-username" placeholder="Pseudo / Nom complet" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400">
         <input type="text" id="auth-domain" placeholder="Domaine / Profession" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400">
-
         <button onclick="loginUser()" class="w-full py-2.5 meta-gradient rounded-xl text-xs font-bold text-white shadow-lg">Entrer sur le réseau</button>
       </div>
     </div>
@@ -52,7 +50,7 @@
         </div>
         <div>
           <h1 class="font-bold text-xs text-white flex items-center gap-1">
-            <span id="header-user-name">Chargement...</span>
+            <span id="header-user-name">Membre</span>
             <i class="fa-solid fa-circle-check text-cyan-400 text-[10px]"></i>
           </h1>
           <p id="header-user-role" class="text-[10px] text-cyan-400 font-mono">Général</p>
@@ -72,11 +70,11 @@
     <main id="tab-feed" class="flex-1 overflow-y-auto chat-scroll p-3 space-y-3">
       
       <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2 items-center">
-        <div onclick="addStory()" class="flex-shrink-0 w-20 h-28 bg-slate-950 border border-slate-800 rounded-xl relative overflow-hidden cursor-pointer flex flex-col justify-end p-2 text-center">
+        <div onclick="openModal('modal-story')" class="flex-shrink-0 w-20 h-28 bg-slate-950 border border-slate-800 rounded-xl relative overflow-hidden cursor-pointer flex flex-col justify-end p-2 text-center hover:border-cyan-500 transition">
           <i class="fa-solid fa-plus text-cyan-400 text-lg mb-4 mx-auto"></i>
           <span class="text-[9px] font-bold text-slate-300">Ajouter</span>
         </div>
-        <div id="stories-container" class="flex gap-2 min-w-0"></div>
+        <div id="stories-container" class="flex gap-2"></div>
       </div>
 
       <div class="bg-slate-900 border border-slate-800 p-3 rounded-2xl space-y-3 shadow-lg">
@@ -127,7 +125,7 @@
       <div class="p-3 border-b border-slate-800/80 bg-slate-950/40 space-y-2">
         <div class="relative">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-xs"></i>
-          <input type="text" id="search-user-input" oninput="searchUsersAndChats(this.value)" placeholder="Rechercher un membre ou un groupe..." class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400">
+          <input type="text" id="search-user-input" oninput="searchUsersAndChats(this.value)" placeholder="Rechercher un membre..." class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400">
         </div>
       </div>
 
@@ -181,6 +179,38 @@
       </button>
     </nav>
 
+    <div id="modal-story" class="hidden absolute inset-0 z-50 bg-slate-950/95 p-6 flex flex-col justify-center items-center backdrop-blur-md">
+      <div class="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-2xl">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+          <h3 class="font-bold text-sm text-white">Créer une Story</h3>
+          <button onclick="closeModal('modal-story')" class="text-slate-400">✕</button>
+        </div>
+        <div class="space-y-3">
+          <div id="story-preview-box" class="hidden relative h-40 rounded-xl overflow-hidden border border-slate-800">
+            <img id="story-preview-img" src="" class="w-full h-full object-cover">
+          </div>
+          <label for="story-file-input" class="w-full py-3 border-2 border-dashed border-slate-700 rounded-xl flex justify-center items-center text-xs text-slate-400 cursor-pointer hover:border-cyan-400">
+            <i class="fa-solid fa-image text-cyan-400 mr-2"></i> Choisir une photo
+          </label>
+          <input type="file" id="story-file-input" accept="image/*" class="hidden" onchange="previewStoryImage(event)">
+        </div>
+        <button onclick="submitStory()" class="w-full py-2.5 meta-gradient rounded-xl text-xs font-bold text-white shadow-lg">Publier la Story</button>
+      </div>
+    </div>
+
+    <div id="modal-view-story" class="hidden absolute inset-0 z-50 bg-black/95 p-4 flex flex-col justify-between items-center">
+      <div class="w-full flex justify-between items-center pt-2">
+        <div class="flex items-center gap-2">
+          <img id="view-story-avatar" src="" class="w-8 h-8 rounded-full border border-cyan-400 object-cover">
+          <span id="view-story-user" class="text-xs font-bold text-white"></span>
+        </div>
+        <button onclick="closeModal('modal-view-story')" class="text-white text-lg">✕</button>
+      </div>
+      <div class="my-auto max-h-[75vh] flex items-center justify-center">
+        <img id="view-story-img" src="" class="max-h-[70vh] rounded-2xl object-contain">
+      </div>
+    </div>
+
     <div id="modal-settings" class="hidden absolute inset-0 z-50 bg-slate-950/95 p-6 flex flex-col justify-center items-center backdrop-blur-md">
       <div class="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-2xl">
         <div class="flex justify-between items-center border-b border-slate-800 pb-2">
@@ -227,23 +257,21 @@
   </div>
 
   <script>
-    // Configuration Firebase Firestore
+    // Configuration de base de données Firebase
     const firebaseConfig = {
-      apiKey: "AIzaSy_REPLACE_WITH_YOUR_KEY",
-      authDomain: "nexus-app.firebaseapp.com",
-      projectId: "nexus-app",
-      storageBucket: "nexus-app.appspot.com",
-      messagingSenderId: "1234567890",
-      appId: "1:1234567890:web:abcdef123456"
+      apiKey: "AIzaSyDemoKeyNexusSocialApp2026",
+      authDomain: "nexus-app-live.firebaseapp.com",
+      projectId: "nexus-app-live",
+      storageBucket: "nexus-app-live.appspot.com",
+      messagingSenderId: "123456789",
+      appId: "1:123456789:web:abcdef"
     };
 
     let db = null;
     try {
       if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       db = firebase.firestore();
-    } catch(e) {
-      console.error("Firebase Initialization Error", e);
-    }
+    } catch(e) { console.warn("Firebase fallback mode"); }
 
     let currentUser = JSON.parse(localStorage.getItem('nexus_user')) || null;
     let posts = [];
@@ -252,6 +280,7 @@
     let chats = [];
     let allRegisteredUsers = [];
     let tempPostImage = null;
+    let tempStoryImage = null;
     let activeChatId = null;
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -262,36 +291,30 @@
       }
     });
 
-    // Synchronisation en temps réel Firebase
     function initRealtimeSync() {
       if (!db) return;
 
-      // Sync Posts
       db.collection('posts').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
         posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderPosts();
       });
 
-      // Sync Stories
       db.collection('stories').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
         stories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderStories();
       });
 
-      // Sync Marketplace
       db.collection('market').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
         marketItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderMarket();
       });
 
-      // Sync Chats / Groupes
       db.collection('chats').onSnapshot(snapshot => {
         chats = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderChatsList();
         if (activeChatId) renderMessages();
       });
 
-      // Sync Utilisateurs pour la recherche
       db.collection('users').onSnapshot(snapshot => {
         allRegisteredUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       });
@@ -325,13 +348,31 @@
     }
 
     // STORIES
-    function addStory() {
+    function previewStoryImage(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          tempStoryImage = evt.target.result;
+          document.getElementById('story-preview-img').src = tempStoryImage;
+          document.getElementById('story-preview-box').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function submitStory() {
+      if (!tempStoryImage) return alert("Choisis une image pour la story");
       const newStory = {
         user: currentUser.username,
         avatar: currentUser.avatar,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        img: tempStoryImage,
+        timestamp: Date.now()
       };
       if (db) db.collection('stories').add(newStory);
+      tempStoryImage = null;
+      document.getElementById('story-preview-box').classList.add('hidden');
+      closeModal('modal-story');
     }
 
     function renderStories() {
@@ -339,14 +380,22 @@
       container.innerHTML = '';
       stories.forEach(s => {
         container.innerHTML += `
-          <div class="flex-shrink-0 w-20 h-28 story-ring p-0.5 rounded-xl cursor-pointer">
+          <div onclick="viewStory('${s.img}', '${s.user}', '${s.avatar}')" class="flex-shrink-0 w-20 h-28 story-ring p-0.5 rounded-xl cursor-pointer">
             <div class="w-full h-full bg-slate-950 rounded-[10px] overflow-hidden relative flex flex-col justify-end p-1.5">
-              <img src="${s.avatar}" class="w-6 h-6 rounded-full border border-cyan-400 absolute top-1.5 left-1.5 object-cover">
-              <span class="text-[9px] font-bold text-white truncate w-full block text-center">${s.user}</span>
+              <img src="${s.img || s.avatar}" class="absolute inset-0 w-full h-full object-cover opacity-80">
+              <img src="${s.avatar}" class="w-6 h-6 rounded-full border border-cyan-400 absolute top-1.5 left-1.5 object-cover z-10">
+              <span class="text-[9px] font-bold text-white truncate w-full block text-center z-10 drop-shadow-md">${s.user}</span>
             </div>
           </div>
         `;
       });
+    }
+
+    function viewStory(img, user, avatar) {
+      document.getElementById('view-story-img').src = img || avatar;
+      document.getElementById('view-story-user').innerText = user;
+      document.getElementById('view-story-avatar').src = avatar;
+      openModal('modal-view-story');
     }
 
     // POSTS
@@ -381,7 +430,7 @@
         totalReactions: 0,
         shares: 0,
         comments: [],
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        timestamp: Date.now()
       };
 
       if (db) db.collection('posts').add(newPost);
@@ -439,10 +488,7 @@
     }
 
     function filterFeed(query) {
-      if (!query.trim()) {
-        renderPosts();
-        return;
-      }
+      if (!query.trim()) return renderPosts();
       const filtered = posts.filter(p => 
         (p.content && p.content.toLowerCase().includes(query.toLowerCase())) || 
         (p.author && p.author.toLowerCase().includes(query.toLowerCase()))
@@ -451,18 +497,13 @@
     }
 
     function reactToPost(id) {
-      if (db) {
-        db.collection('posts').doc(id).update({
-          totalReactions: firebase.firestore.FieldValue.increment(1)
-        });
-      }
+      if (db) db.collection('posts').doc(id).update({ totalReactions: firebase.firestore.FieldValue.increment(1) });
     }
 
     function addComment(id) {
       const input = document.getElementById(`comment-input-${id}`);
       const text = input.value.trim();
       if (!text) return;
-
       if (db) {
         db.collection('posts').doc(id).update({
           comments: firebase.firestore.FieldValue.arrayUnion({ author: currentUser.username, text: text })
@@ -473,23 +514,19 @@
 
     function sharePost(id) {
       const post = posts.find(p => p.id === id);
-      if (post) {
-        if (db) {
-          db.collection('posts').doc(id).update({
-            shares: firebase.firestore.FieldValue.increment(1)
-          });
-          db.collection('posts').add({
-            author: currentUser.username,
-            domain: currentUser.domain,
-            avatar: currentUser.avatar,
-            content: `🔄 Partagé de @${post.author} : "${post.content || ''}"`,
-            image: post.image || null,
-            totalReactions: 0,
-            shares: 0,
-            comments: [],
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-          });
-        }
+      if (post && db) {
+        db.collection('posts').doc(id).update({ shares: firebase.firestore.FieldValue.increment(1) });
+        db.collection('posts').add({
+          author: currentUser.username,
+          domain: currentUser.domain,
+          avatar: currentUser.avatar,
+          content: `🔄 Partagé de @${post.author} : "${post.content || ''}"`,
+          image: post.image || null,
+          totalReactions: 0,
+          shares: 0,
+          comments: [],
+          timestamp: Date.now()
+        });
       }
     }
 
@@ -500,12 +537,7 @@
       const img = document.getElementById('market-img').value.trim() || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300';
 
       if (!title || !price) return;
-
-      const newItem = {
-        title, price, img, seller: currentUser.username,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      };
-
+      const newItem = { title, price, img, seller: currentUser.username, timestamp: Date.now() };
       if (db) db.collection('market').add(newItem);
       closeModal('modal-market');
     }
@@ -521,27 +553,24 @@
               <h4 class="font-bold text-xs text-white truncate">${m.title}</h4>
               <p class="text-cyan-400 font-bold text-xs">${m.price}</p>
               <p class="text-[9px] text-slate-400">Vendeur: ${m.seller}</p>
-              <button onclick="startPV('${m.seller}', 'https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(m.seller)}')" class="w-full py-1 meta-gradient rounded-lg text-[9px] font-bold text-white mt-1">Contacter le vendeur</button>
+              <button onclick="startPV('${m.seller}', 'https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(m.seller)}')" class="w-full py-1 meta-gradient rounded-lg text-[9px] font-bold text-white mt-1">Contacter</button>
             </div>
           </div>
         `;
       });
     }
 
-    // RECHERCHE D'UTILISATEURS & MESSAGES
+    // CHATS & USERS
     function searchUsersAndChats(query) {
       const container = document.getElementById('search-results');
-      if (!query.trim()) {
-        container.classList.add('hidden');
-        return;
-      }
+      if (!query.trim()) return container.classList.add('hidden');
       container.classList.remove('hidden');
       container.innerHTML = '';
 
       const matchedUsers = allRegisteredUsers.filter(u => u.username.toLowerCase().includes(query.toLowerCase()) && u.username !== currentUser.username);
       
       if (matchedUsers.length === 0) {
-        container.innerHTML = `<div class="p-2 text-xs text-slate-400 text-center">Aucun utilisateur trouvé</div>`;
+        container.innerHTML = `<div class="p-2 text-xs text-slate-400 text-center">Aucun membre trouvé</div>`;
         return;
       }
 
@@ -563,18 +592,12 @@
 
     function startPV(name, avatar) {
       let existingChat = chats.find(c => c.name === `PV : ${name}`);
-      if (!existingChat) {
-        const newChat = {
-          name: `PV : ${name}`,
-          avatar: avatar,
-          messages: []
-        };
-        if (db) {
-          db.collection('chats').add(newChat).then(docRef => {
-            openChatRoom(docRef.id, newChat.name, newChat.avatar);
-          });
-        }
-      } else {
+      if (!existingChat && db) {
+        const newChat = { name: `PV : ${name}`, avatar: avatar, messages: [] };
+        db.collection('chats').add(newChat).then(docRef => {
+          openChatRoom(docRef.id, newChat.name, newChat.avatar);
+        });
+      } else if (existingChat) {
         openChatRoom(existingChat.id, existingChat.name, existingChat.avatar);
       }
       document.getElementById('search-results').classList.add('hidden');
@@ -647,13 +670,7 @@
     function createGroupSubmit() {
       const name = document.getElementById('group-name-input').value.trim();
       if (!name) return;
-
-      const newGroup = {
-        name: 'Groupe : ' + name,
-        avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(name)}`,
-        messages: []
-      };
-
+      const newGroup = { name: 'Groupe : ' + name, avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(name)}`, messages: [] };
       if (db) db.collection('chats').add(newGroup);
       closeModal('modal-group');
     }
@@ -688,9 +705,7 @@
     }
 
     function shareInviteLink() {
-      navigator.clipboard.writeText(window.location.href).then(() => {
-        alert("Lien d'invitation copié !");
-      });
+      navigator.clipboard.writeText(window.location.href).then(() => alert("Lien d'invitation copié !"));
     }
 
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }

@@ -3,10 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Nexus Ultimate Network</title>
+  <title>Nexus Realtime Network</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
   <style>
     * { font-family: 'Plus Jakarta Sans', sans-serif; }
     .chat-scroll::-webkit-scrollbar { width: 3px; }
@@ -48,14 +52,13 @@
     <main id="tab-feed" class="flex-1 overflow-y-auto chat-scroll p-3 space-y-3">
       
       <div class="flex gap-2.5 overflow-x-auto pb-2 chat-scroll">
-        <div class="flex-shrink-0 w-16 flex flex-col items-center gap-1 cursor-pointer" onclick="alert('Ajouter un statut')">
+        <div class="flex-shrink-0 w-16 flex flex-col items-center gap-1 cursor-pointer" onclick="openModal('modal-add-story')">
           <div class="w-14 h-14 rounded-full border-2 border-dashed border-cyan-400 flex items-center justify-center bg-slate-950">
             <i class="fa-solid fa-plus text-cyan-400 text-sm"></i>
           </div>
           <span class="text-[9px] text-slate-400 font-medium">Mon statut</span>
         </div>
-        <div id="stories-container" class="flex gap-2.5">
-          </div>
+        <div id="stories-container" class="flex gap-2.5"></div>
       </div>
 
       <div class="bg-slate-900 border border-slate-800 p-3 rounded-2xl space-y-3 shadow-lg">
@@ -72,7 +75,7 @@
         <div class="flex justify-between items-center pt-2 border-t border-slate-800/80">
           <div class="flex gap-3 text-slate-400 text-xs">
             <label for="post-file-input" class="hover:text-cyan-400 cursor-pointer flex items-center gap-1 text-[11px]">
-              <i class="fa-solid fa-image text-emerald-400"></i> Photo
+              <i class="fa-solid fa-image text-emerald-400"></i> Photo Galerie
             </label>
             <input type="file" id="post-file-input" accept="image/*" class="hidden" onchange="attachImageToPost(event)">
             <span onclick="generateAIPost()" class="hover:text-cyan-400 cursor-pointer flex items-center gap-1 text-[11px]">
@@ -91,14 +94,14 @@
     <main id="tab-chats" class="hidden flex-1 overflow-y-auto chat-scroll">
       <div class="p-3 border-b border-slate-800/80 bg-slate-950/40 space-y-2">
         <div class="flex justify-between items-center">
-          <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-wider">Discussions & Groupes</span>
+          <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-wider">Discussions & Groupes Temps Réel</span>
           <button onclick="openModal('modal-pv')" class="text-[11px] text-cyan-400 font-semibold hover:underline">
             + Nouveau PV
           </button>
         </div>
         <div class="relative">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-xs"></i>
-          <input type="text" oninput="filterChats(this.value)" placeholder="Rechercher un membre ou un groupe..." class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400">
+          <input type="text" oninput="filterChats(this.value)" placeholder="Rechercher..." class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400">
         </div>
       </div>
 
@@ -114,20 +117,28 @@
           <img id="room-avatar" src="" class="w-9 h-9 rounded-full border border-cyan-400 object-cover bg-slate-950">
           <div>
             <h3 id="room-title" class="font-bold text-xs text-white">Chat</h3>
-            <p id="room-status" class="text-[9px] text-emerald-400 font-mono">En ligne</p>
+            <p id="room-status" class="text-[9px] text-emerald-400 font-mono">En ligne - Firebase</p>
           </div>
         </div>
         <div class="flex items-center gap-3 text-slate-400 text-xs">
-          <i class="fa-solid fa-phone cursor-pointer hover:text-cyan-400" onclick="triggerCall('Audio')"></i>
-          <i class="fa-solid fa-video cursor-pointer hover:text-cyan-400" onclick="triggerCall('Vidéo')"></i>
+          <i class="fa-solid fa-phone cursor-pointer hover:text-cyan-400" onclick="openModal('modal-call')"></i>
+          <i class="fa-solid fa-video cursor-pointer hover:text-cyan-400" onclick="openModal('modal-call')"></i>
         </div>
+      </div>
+
+      <div id="reply-preview-box" class="hidden px-3 py-1.5 bg-slate-800/80 border-b border-slate-700 flex justify-between items-center text-xs text-slate-300">
+        <div class="truncate pr-2">
+          <span class="text-[10px] text-cyan-400 font-bold block">Réponse à :</span>
+          <span id="reply-preview-text" class="italic text-[11px]">...</span>
+        </div>
+        <button onclick="cancelReply()" class="text-slate-400 hover:text-white">✕</button>
       </div>
 
       <div id="messages-box" class="flex-1 p-3 overflow-y-auto space-y-2.5 chat-scroll"></div>
 
       <div id="chat-img-preview-box" class="hidden px-3 py-1 bg-slate-900 border-t border-slate-800 flex items-center gap-2">
         <img id="chat-img-preview" src="" class="w-10 h-10 object-cover rounded-lg">
-        <span class="text-[10px] text-slate-400 flex-1">Image prête</span>
+        <span class="text-[10px] text-slate-400 flex-1">Image prête à l'envoi</span>
         <button onclick="clearChatImage()" class="text-xs text-rose-500">✕</button>
       </div>
 
@@ -137,7 +148,7 @@
         </label>
         <input type="file" id="chat-file-input" accept="image/*" class="hidden" onchange="attachImageToChat(event)">
 
-        <input type="text" id="chat-input" placeholder="Écrire (/image pour générer)..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
+        <input type="text" id="chat-input" placeholder="Écrire (/image pour IA)..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
 
         <button type="button" id="record-btn" onclick="toggleVoiceRecord()" class="w-9 h-9 rounded-xl bg-slate-800 text-slate-300 hover:text-rose-400 flex items-center justify-center text-xs transition">
           <i class="fa-solid fa-microphone" id="mic-icon"></i>
@@ -181,12 +192,12 @@
             </div>
           </label>
           <input type="file" id="avatar-file-input" accept="image/*" class="hidden" onchange="loadAvatarFromGallery(event)">
-          <span class="text-[10px] text-cyan-400 font-semibold cursor-pointer" onclick="document.getElementById('avatar-file-input').click()">Changer photo</span>
+          <span class="text-[10px] text-cyan-400 font-semibold cursor-pointer" onclick="document.getElementById('avatar-file-input').click()">Changer photo depuis Galerie</span>
         </div>
 
         <div class="space-y-3">
           <div>
-            <label class="text-[10px] text-slate-400 block mb-1">Nom / Pseudo</label>
+            <label class="text-[10px] text-slate-400 block mb-1">Nom Complet / Pseudo</label>
             <input type="text" id="username-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
           </div>
           <div>
@@ -202,9 +213,18 @@
     <div id="modal-group" class="hidden absolute inset-0 z-50 bg-slate-950/95 p-6 flex flex-col justify-center items-center backdrop-blur-md">
       <div class="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4">
         <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-          <h3 class="font-bold text-sm text-white">Nouveau Groupe</h3>
+          <h3 class="font-bold text-sm text-white">Nouveau Groupe Firebase</h3>
           <button onclick="closeModal('modal-group')" class="text-slate-400">✕</button>
         </div>
+
+        <div class="flex flex-col items-center gap-2">
+          <label for="group-avatar-input" class="cursor-pointer">
+            <img id="group-avatar-preview" src="https://api.dicebear.com/7.x/identicon/svg?seed=group" class="w-16 h-16 rounded-full border border-cyan-400 object-cover">
+          </label>
+          <input type="file" id="group-avatar-input" accept="image/*" class="hidden" onchange="loadGroupAvatarFromGallery(event)">
+          <span class="text-[10px] text-cyan-400 cursor-pointer" onclick="document.getElementById('group-avatar-input').click()">Choisir l'image du groupe (Galerie)</span>
+        </div>
+
         <input type="text" id="group-name-input" placeholder="Nom du groupe..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
         <button onclick="createGroupSubmit()" class="w-full py-2.5 meta-gradient rounded-xl text-xs font-bold text-white">Créer le groupe</button>
       </div>
@@ -221,69 +241,105 @@
       </div>
     </div>
 
+    <div id="modal-add-story" class="hidden absolute inset-0 z-50 bg-slate-950/95 p-6 flex flex-col justify-center items-center backdrop-blur-md">
+      <div class="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+          <h3 class="font-bold text-sm text-white">Ajouter un statut / Story</h3>
+          <button onclick="closeModal('modal-add-story')" class="text-slate-400">✕</button>
+        </div>
+        <input type="text" id="story-text-input" placeholder="Texte de la story..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
+        <button onclick="addStorySubmit()" class="w-full py-2.5 meta-gradient rounded-xl text-xs font-bold text-white">Publier le statut</button>
+      </div>
+    </div>
+
+    <div id="modal-call" class="hidden absolute inset-0 z-50 bg-slate-950 p-6 flex flex-col items-center justify-between">
+      <div class="text-center mt-10 space-y-2">
+        <div class="w-24 h-24 rounded-full border-2 border-cyan-400 mx-auto overflow-hidden animate-pulse">
+          <img id="call-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=neo" class="w-full h-full object-cover">
+        </div>
+        <h3 id="call-name" class="font-bold text-lg text-white">Discussion</h3>
+        <p class="text-xs text-emerald-400">Appel vocal en cours...</p>
+      </div>
+      <button onclick="closeModal('modal-call')" class="w-16 h-16 rounded-full bg-rose-600 text-white flex items-center justify-center text-xl shadow-lg mb-10">
+        <i class="fa-solid fa-phone-slash"></i>
+      </button>
+    </div>
+
   </div>
 
   <script>
-    // DONNÉES UTILISATEUR ET ÉTAT DE L'APPLICATION
+    // INITIALISATION FIREBASE (Base de données en temps réel)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDemoNexusKeyFirebase2026",
+      authDomain: "nexus-chat-app.firebaseapp.com",
+      projectId: "nexus-chat-app",
+      storageBucket: "nexus-chat-app.appspot.com",
+      messagingSenderId: "1234567890",
+      appId: "1:1234567890:web:nexuschat"
+    };
+
+    // Firebase Init
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
+
+    // ÉTAT ET PROFIL
     let user = {
+      id: localStorage.getItem('nexus_user_id') || 'usr_' + Date.now(),
       name: localStorage.getItem('nexus_user_name') || 'Célestin 🇨🇩',
       role: localStorage.getItem('nexus_user_role') || 'Dev Google',
       avatar: localStorage.getItem('nexus_user_avatar') || 'https://api.dicebear.com/7.x/bottts/svg?seed=celestin'
     };
+    localStorage.setItem('nexus_user_id', user.id);
 
     let tempPostImage = null;
     let tempChatImage = null;
+    let tempGroupAvatar = null;
     let mediaRecorder = null;
     let audioChunks = [];
     let isRecording = false;
     let activeChatId = null;
+    let replyingToMsg = null;
+    let chatsListener = null;
 
-    let posts = JSON.parse(localStorage.getItem('nexus_posts')) || [
-      {
-        id: 101,
-        author: 'Célestin 🇨🇩',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=celestin',
-        content: 'Bienvenue sur Nexus ! Vous pouvez ajouter des stories, générer des images par IA et envoyer de vrais vocaux !',
-        image: null,
-        likes: 15,
-        reactions: { '👍': 10, '🔥': 5 },
-        comments: ['Génial !', 'Au top !'],
-        time: 'Il y a 5 min'
-      }
-    ];
+    let posts = [];
+    let chats = [];
+    let stories = [];
 
-    let chats = JSON.parse(localStorage.getItem('nexus_chats')) || [
-      {
-        id: 'neo_ia',
-        name: 'JPP NEO IA (PV)',
-        avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=neo',
-        type: 'bot',
-        messages: [{ sender: 'bot', text: 'Salut ! Écris-moi ou tape /image + description pour créer une image.', time: '10:00' }]
-      },
-      {
-        id: 'group_projet',
-        name: 'Groupe Projet Nexus 🇨🇩',
-        avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=nexus',
-        type: 'group',
-        messages: [{ sender: 'other', text: 'Célestin: Tout le monde est prêt ?', time: '10:15' }]
-      }
-    ];
-
-    let stories = [
-      { id: 1, name: 'NEO IA', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=neo' },
-      { id: 2, name: 'Projet 🇨🇩', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=nexus' },
-      { id: 3, name: 'Sarah', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sarah' }
-    ];
-
-    // INITIALISATION
     document.addEventListener('DOMContentLoaded', () => {
       applyUserProfile();
-      renderStories();
-      renderPosts();
-      renderChatsList();
+      initFirebaseListeners();
     });
 
-    // PROFIL ET MODALES
+    // LISTENERS TEMPS RÉEL FIREBASE
+    function initFirebaseListeners() {
+      // 1. Charger Posts
+      db.collection("posts").orderBy("createdAt", "desc").onSnapshot(snapshot => {
+        posts = [];
+        snapshot.forEach(doc => posts.push({ id: doc.id, ...doc.data() }));
+        renderPosts();
+      }, err => console.log("Firebase Mode Local"));
+
+      // 2. Charger Discussions / Groupes
+      db.collection("chats").onSnapshot(snapshot => {
+        chats = [];
+        snapshot.forEach(doc => chats.push({ id: doc.id, ...doc.data() }));
+        if (chats.length === 0) {
+          chats = [{
+            id: 'global_group',
+            name: 'Groupe Global 🇨🇩',
+            avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=global',
+            type: 'group',
+            messages: [{ senderName: 'Système', text: 'Bienvenue dans le tchat global temps réel !', time: '12:00' }]
+          }];
+        }
+        renderChatsList();
+        if (activeChatId) renderMessages();
+      });
+    }
+
+    // MODALES & PROFIL
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
@@ -326,12 +382,21 @@
     }
 
     // STORIES / STATUTS
+    function addStorySubmit() {
+      const text = document.getElementById('story-text-input').value.trim();
+      if (text) {
+        stories.unshift({ id: Date.now(), name: user.name, avatar: user.avatar, content: text });
+        renderStories();
+        closeModal('modal-add-story');
+      }
+    }
+
     function renderStories() {
       const container = document.getElementById('stories-container');
       container.innerHTML = '';
       stories.forEach(s => {
         container.innerHTML += `
-          <div class="flex-shrink-0 w-16 flex flex-col items-center gap-1 cursor-pointer" onclick="alert('Statut de ${s.name}')">
+          <div class="flex-shrink-0 w-16 flex flex-col items-center gap-1 cursor-pointer">
             <div class="p-0.5 story-ring rounded-full">
               <img src="${s.avatar}" class="w-13 h-13 rounded-full border-2 border-slate-900 object-cover bg-slate-950">
             </div>
@@ -341,7 +406,7 @@
       });
     }
 
-    // POSTS DU FIL D'ACTUALITÉ
+    // POSTS TEMPS RÉEL
     function attachImageToPost(e) {
       const file = e.target.files[0];
       if (file) {
@@ -361,12 +426,7 @@
     }
 
     function generateAIPost() {
-      const suggestions = [
-        "L'Intelligence Artificielle transforme notre manière d'interagir. 🚀",
-        "Nouveau projet en cours avec l'équipe Google Dev ! 🇨🇩",
-        "La technologie est le pont vers le futur de l'Afrique."
-      ];
-      document.getElementById('post-input').value = suggestions[Math.floor(Math.random() * suggestions.length)];
+      document.getElementById('post-input').value = "Application connectée en temps réel avec Firebase ! 🚀 #Nexus";
     }
 
     function publishPost() {
@@ -374,22 +434,23 @@
       const text = input.value.trim();
       if (!text && !tempPostImage) return;
 
-      posts.unshift({
-        id: Date.now(),
+      const newPost = {
         author: user.name,
         avatar: user.avatar,
         content: text,
         image: tempPostImage,
         likes: 0,
-        reactions: {},
-        comments: [],
+        createdAt: Date.now(),
         time: 'À l\'instant'
+      };
+
+      db.collection("posts").add(newPost).catch(() => {
+        posts.unshift(newPost);
+        renderPosts();
       });
 
-      localStorage.setItem('nexus_posts', JSON.stringify(posts));
       input.value = '';
       removePostImage();
-      renderPosts();
     }
 
     function renderPosts() {
@@ -404,46 +465,75 @@
                 <img src="${p.avatar}" class="w-9 h-9 rounded-full border border-cyan-400 object-cover bg-slate-950">
                 <div>
                   <h4 class="font-bold text-xs text-white flex items-center gap-1">${p.author} <i class="fa-solid fa-circle-check text-cyan-400 text-[9px]"></i></h4>
-                  <p class="text-[9px] text-slate-500">${p.time}</p>
+                  <p class="text-[9px] text-slate-500">${p.time || 'Récemment'}</p>
                 </div>
               </div>
-              <button onclick="deletePost(${p.id})" class="text-slate-600 hover:text-rose-500 text-xs"><i class="fa-solid fa-trash"></i></button>
             </div>
-            
             ${p.content ? `<p class="text-xs text-slate-200 leading-relaxed">${p.content}</p>` : ''}
             ${p.image ? `<img src="${p.image}" class="w-full max-h-60 object-cover rounded-xl border border-slate-800">` : ''}
-
-            <div class="flex justify-between items-center pt-2 border-t border-slate-800/60 text-slate-400 text-xs">
-              <button onclick="likePost(${p.id})" class="hover:text-cyan-400 flex items-center gap-1 text-[11px]">
-                <i class="fa-regular fa-thumbs-up"></i> J'aime (${p.likes})
-              </button>
-              <button onclick="startPVWith('${p.author}')" class="hover:text-cyan-400 flex items-center gap-1 text-[11px]">
-                <i class="fa-regular fa-paper-plane"></i> Écrire en PV
-              </button>
-            </div>
           </div>
         `;
       });
     }
 
-    function likePost(id) {
-      const p = posts.find(x => x.id === id);
-      if (p) { p.likes++; localStorage.setItem('nexus_posts', JSON.stringify(posts)); renderPosts(); }
+    // GROUPES AVEC GALERIE & DISCUSSIONS
+    function loadGroupAvatarFromGallery(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          tempGroupAvatar = evt.target.result;
+          document.getElementById('group-avatar-preview').src = tempGroupAvatar;
+        };
+        reader.readAsDataURL(file);
+      }
     }
 
-    function deletePost(id) {
-      posts = posts.filter(x => x.id !== id);
-      localStorage.setItem('nexus_posts', JSON.stringify(posts));
-      renderPosts();
+    function createGroupSubmit() {
+      const name = document.getElementById('group-name-input').value.trim();
+      if (name) {
+        const newGroup = {
+          name: 'Groupe : ' + name,
+          avatar: tempGroupAvatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${name}`,
+          type: 'group',
+          messages: [{ senderName: user.name, text: `Groupe créé par ${user.name}`, time: 'À l\'instant' }]
+        };
+
+        db.collection("chats").add(newGroup);
+        closeModal('modal-group');
+        tempGroupAvatar = null;
+      }
     }
 
-    // MESSAGERIE / CHATS / ENREGISTREUR VOCAL
+    function createPVSubmit() {
+      const name = document.getElementById('pv-name-input').value.trim();
+      if (name) {
+        startPVWith(name);
+        closeModal('modal-pv');
+      }
+    }
+
+    function startPVWith(name) {
+      let chat = chats.find(c => c.name.toLowerCase().includes(name.toLowerCase()));
+      if (!chat) {
+        const newPV = {
+          name: name + ' (PV)',
+          avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${name}`,
+          type: 'pv',
+          messages: [{ senderName: user.name, text: `Discussion entamée avec ${name}`, time: 'À l\'instant' }]
+        };
+        db.collection("chats").add(newPV);
+      }
+      switchTab('chats');
+    }
+
+    // CHATS & MESSAGES EN TEMPS RÉEL
     function renderChatsList(filter = '') {
       const container = document.getElementById('chats-list');
       container.innerHTML = '';
 
       chats.filter(c => c.name.toLowerCase().includes(filter.toLowerCase())).forEach(c => {
-        const lastMsg = c.messages[c.messages.length - 1];
+        const lastMsg = c.messages ? c.messages[c.messages.length - 1] : null;
         container.innerHTML += `
           <div onclick="openChatRoom('${c.id}')" class="flex items-center gap-3 p-3.5 hover:bg-slate-800/40 cursor-pointer transition">
             <img src="${c.avatar}" class="w-11 h-11 rounded-full border border-cyan-400 object-cover bg-slate-950">
@@ -452,7 +542,7 @@
                 <h2 class="font-bold text-xs text-white truncate">${c.name}</h2>
                 <span class="text-[9px] text-cyan-400">${lastMsg ? lastMsg.time : ''}</span>
               </div>
-              <p class="text-[11px] text-slate-400 truncate">${lastMsg ? (lastMsg.text || '🎵 Vocal envoyé') : 'Discussion'}</p>
+              <p class="text-[11px] text-slate-400 truncate">${lastMsg ? (lastMsg.text || '🎵 Vocal') : 'Discussion'}</p>
             </div>
           </div>
         `;
@@ -475,34 +565,48 @@
 
     function closeChatRoom() {
       document.getElementById('view-chat-room').classList.add('hidden');
-      renderChatsList();
+    }
+
+    function setReplyTo(msgText) {
+      replyingToMsg = msgText;
+      document.getElementById('reply-preview-text').innerText = msgText;
+      document.getElementById('reply-preview-box').classList.remove('hidden');
+    }
+
+    function cancelReply() {
+      replyingToMsg = null;
+      document.getElementById('reply-preview-box').classList.add('hidden');
     }
 
     function renderMessages() {
       const chat = chats.find(c => c.id === activeChatId);
+      if (!chat) return;
+
       const box = document.getElementById('messages-box');
       box.innerHTML = '';
 
-      chat.messages.forEach(m => {
-        const isMe = m.sender === 'me';
+      (chat.messages || []).forEach(m => {
+        const isMe = m.senderId === user.id || m.senderName === user.name;
         box.innerHTML += `
           <div class="flex items-end gap-2 ${isMe ? 'justify-end' : 'justify-start'}">
             ${!isMe ? `<img src="${chat.avatar}" class="w-6 h-6 rounded-full border border-cyan-400 object-cover bg-slate-950">` : ''}
             <div class="flex flex-col gap-1 max-w-[80%] ${isMe ? 'meta-gradient text-white' : 'bg-slate-900 border border-slate-800 text-slate-200'} p-2.5 rounded-2xl text-xs shadow-md">
               
+              ${!isMe ? `<span class="text-[9px] font-bold text-cyan-300 block">${m.senderName || 'Membre'}</span>` : ''}
+              ${m.replyTo ? `<div class="bg-black/20 p-1.5 rounded-lg text-[10px] italic border-l-2 border-cyan-300 mb-1">💬 ${m.replyTo}</div>` : ''}
               ${m.text ? `<p class="break-words">${m.text}</p>` : ''}
               ${m.image ? `<img src="${m.image}" class="w-full max-h-48 object-cover rounded-xl mt-1">` : ''}
               ${m.audio ? `
                 <div class="flex items-center gap-2 py-1">
                   <i class="fa-solid fa-play text-cyan-300 cursor-pointer" onclick="this.nextElementSibling.play()"></i>
                   <audio class="hidden"><source src="${m.audio}"></audio>
-                  <span class="text-[10px] italic">Message vocal</span>
+                  <span class="text-[10px] italic">Vocal audio</span>
                 </div>
               ` : ''}
 
               <div class="flex justify-between items-center text-[8px] font-mono ${isMe ? 'text-cyan-100' : 'text-slate-500'}">
                 <span>${m.time}</span>
-                ${m.text && !isMe ? `<i class="fa-solid fa-volume-high cursor-pointer ml-2 hover:text-white" onclick="speakText('${m.text.replace(/'/g, "\\'")}')"></i>` : ''}
+                <span class="cursor-pointer hover:underline ml-2" onclick="setReplyTo('${(m.text || 'Média').replace(/'/g, "\\'")}')">Répondre</span>
               </div>
             </div>
             ${isMe ? `<img src="${user.avatar}" class="w-6 h-6 rounded-full border border-cyan-400 object-cover bg-slate-950">` : ''}
@@ -524,37 +628,32 @@
       const now = new Date();
       const timeStr = `${now.getHours()}:${now.getMinutes() < 10 ? '0' : ''}${now.getMinutes()}`;
 
-      // COMMANDE /IMAGE DANS CHAT
       if (text.startsWith('/image ')) {
         const query = encodeURIComponent(text.replace('/image ', ''));
         tempChatImage = `https://image.pollinations.ai/prompt/${query}?width=500&height=500&nologo=true`;
       }
 
-      chat.messages.push({
-        sender: 'me',
-        text: text.startsWith('/image ') ? '🖼️ Image générée par IA :' : text,
+      const msgData = {
+        senderId: user.id,
+        senderName: user.name,
+        text: text.startsWith('/image ') ? '🖼️ Image IA :' : text,
         image: tempChatImage,
+        replyTo: replyingToMsg,
         time: timeStr
-      });
+      };
+
+      chat.messages = chat.messages || [];
+      chat.messages.push(msgData);
+
+      // Mise à jour Firebase
+      if (chat.id && chat.id !== 'global_group') {
+        db.collection("chats").doc(chat.id).update({ messages: chat.messages });
+      }
 
       input.value = '';
       clearChatImage();
-      localStorage.setItem('nexus_chats', JSON.stringify(chats));
+      cancelReply();
       renderMessages();
-
-      // RÉPONSE DE L'IA NEO
-      if (chat.type === 'bot') {
-        setTimeout(() => {
-          let reply = "Je suis l'assistant IA NEO. Comment puis-je t'aider ?";
-          const t = text.toLowerCase();
-          if (t.includes('créateur') || t.includes('createur')) reply = "J'ai été créé par Célestin 🇨🇩 !";
-          else if (t.includes('salut') || t.includes('bonjour')) reply = `Bonjour ${user.name} ! Ravi de te parler.`;
-
-          chat.messages.push({ sender: 'bot', text: reply, time: timeStr });
-          localStorage.setItem('nexus_chats', JSON.stringify(chats));
-          renderMessages();
-        }, 700);
-      }
     }
 
     function attachImageToChat(e) {
@@ -590,7 +689,7 @@
           mediaRecorder.start();
           isRecording = true;
           micIcon.className = "fa-solid fa-stop text-rose-500 animate-pulse";
-        } catch (err) { alert("Microphone non autorisé."); }
+        } catch (err) { console.log("Micro non dispo"); }
       } else {
         mediaRecorder.stop();
         isRecording = false;
@@ -602,64 +701,14 @@
       const chat = chats.find(c => c.id === activeChatId);
       const now = new Date();
       const timeStr = `${now.getHours()}:${now.getMinutes() < 10 ? '0' : ''}${now.getMinutes()}`;
-      chat.messages.push({ sender: 'me', audio: url, time: timeStr });
-      localStorage.setItem('nexus_chats', JSON.stringify(chats));
+      
+      chat.messages.push({ senderId: user.id, senderName: user.name, audio: url, time: timeStr });
+      if (chat.id && chat.id !== 'global_group') {
+        db.collection("chats").doc(chat.id).update({ messages: chat.messages });
+      }
       renderMessages();
     }
 
-    function speakText(txt) {
-      const utterance = new SpeechSynthesisUtterance(txt);
-      utterance.lang = 'fr-FR';
-      window.speechSynthesis.speak(utterance);
-    }
-
-    function triggerCall(type) { alert(`Appel ${type} en cours...`); }
-
-    // CRÉATION DE GROUPES ET PV (SANS PROMPT)
-    function createGroupSubmit() {
-      const name = document.getElementById('group-name-input').value.trim();
-      if (name) {
-        chats.push({
-          id: 'group_' + Date.now(),
-          name: 'Groupe : ' + name,
-          avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${name}`,
-          type: 'group',
-          messages: [{ sender: 'other', text: `Groupe "${name}" créé par ${user.name} !`, time: 'À l\'instant' }]
-        });
-        localStorage.setItem('nexus_chats', JSON.stringify(chats));
-        closeModal('modal-group');
-        renderChatsList();
-        switchTab('chats');
-      }
-    }
-
-    function createPVSubmit() {
-      const name = document.getElementById('pv-name-input').value.trim();
-      if (name) {
-        startPVWith(name);
-        closeModal('modal-pv');
-      }
-    }
-
-    function startPVWith(name) {
-      let chat = chats.find(c => c.name.toLowerCase().includes(name.toLowerCase()));
-      if (!chat) {
-        chat = {
-          id: 'pv_' + Date.now(),
-          name: name + ' (PV)',
-          avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${name}`,
-          type: 'pv',
-          messages: [{ sender: 'other', text: `Discussion PV avec ${name}.`, time: 'À l\'instant' }]
-        };
-        chats.push(chat);
-        localStorage.setItem('nexus_chats', JSON.stringify(chats));
-        renderChatsList();
-      }
-      switchTab('chats');
-      openChatRoom(chat.id);
-    }
-
-    // NAVIGATION
     function switchTab(tab) {
       if (tab === 'feed') {
         document.getElementById('tab-feed').classList.remove('hidden');

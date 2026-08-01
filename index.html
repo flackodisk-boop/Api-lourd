@@ -70,12 +70,13 @@
     </header>
 
     <main id="tab-feed" class="flex-1 overflow-y-auto chat-scroll p-3 space-y-3">
-      <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+      
+      <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2 items-center">
         <div onclick="addStory()" class="flex-shrink-0 w-20 h-28 bg-slate-950 border border-slate-800 rounded-xl relative overflow-hidden cursor-pointer flex flex-col justify-end p-2 text-center">
           <i class="fa-solid fa-plus text-cyan-400 text-lg mb-4 mx-auto"></i>
           <span class="text-[9px] font-bold text-slate-300">Ajouter</span>
         </div>
-        <div id="stories-container" class="flex gap-2"></div>
+        <div id="stories-container" class="flex gap-2 min-w-0"></div>
       </div>
 
       <div class="bg-slate-900 border border-slate-800 p-3 rounded-2xl space-y-3 shadow-lg">
@@ -226,23 +227,22 @@
   </div>
 
   <script>
-    // 1. CONFIGURATION FIREBASE (Remplace avec tes identifiants Firebase)
+    // Configuration Firebase Firestore
     const firebaseConfig = {
-      apiKey: "TON_API_KEY",
-      authDomain: "TON_PROJET.firebaseapp.com",
-      projectId: "TON_PROJET",
-      storageBucket: "TON_PROJET.appspot.com",
-      messagingSenderId: "123456789",
-      appId: "1:123456789:web:abcdef"
+      apiKey: "AIzaSy_REPLACE_WITH_YOUR_KEY",
+      authDomain: "nexus-app.firebaseapp.com",
+      projectId: "nexus-app",
+      storageBucket: "nexus-app.appspot.com",
+      messagingSenderId: "1234567890",
+      appId: "1:1234567890:web:abcdef123456"
     };
 
-    // Initialisation Firebase (si non configuré, fonctionnement de secours)
     let db = null;
     try {
       if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       db = firebase.firestore();
     } catch(e) {
-      console.warn("Firebase non configuré, mode local actif.", e);
+      console.error("Firebase Initialization Error", e);
     }
 
     let currentUser = JSON.parse(localStorage.getItem('nexus_user')) || null;
@@ -250,6 +250,7 @@
     let marketItems = [];
     let stories = [];
     let chats = [];
+    let allRegisteredUsers = [];
     let tempPostImage = null;
     let activeChatId = null;
 
@@ -257,41 +258,45 @@
       if (currentUser) {
         document.getElementById('view-auth').classList.add('hidden');
         applyUserProfile();
-        listenToRealtimeData();
+        initRealtimeSync();
       }
     });
 
-    // 2. SYNCHRONISATION EN TEMPS RÉEL MULTI-UTILISATEURS
-    function listenToRealtimeData() {
+    // Synchronisation en temps réel Firebase
+    function initRealtimeSync() {
       if (!db) return;
 
-      // Écouter les posts partagés par TOUS les utilisateurs
+      // Sync Posts
       db.collection('posts').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
         posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderPosts();
       });
 
-      // Écouter le marché
-      db.collection('market').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
-        marketItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderMarket();
-      });
-
-      // Écouter les stories
+      // Sync Stories
       db.collection('stories').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
         stories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderStories();
       });
 
-      // Écouter les groupes et discussions
+      // Sync Marketplace
+      db.collection('market').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+        marketItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderMarket();
+      });
+
+      // Sync Chats / Groupes
       db.collection('chats').onSnapshot(snapshot => {
         chats = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderChatsList();
         if (activeChatId) renderMessages();
       });
+
+      // Sync Utilisateurs pour la recherche
+      db.collection('users').onSnapshot(snapshot => {
+        allRegisteredUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      });
     }
 
-    // AUTHENTIFICATION
     function loginUser() {
       const username = document.getElementById('auth-username').value.trim() || 'Membre';
       const domain = document.getElementById('auth-domain').value.trim() || 'Général';
@@ -308,7 +313,7 @@
 
       document.getElementById('view-auth').classList.add('hidden');
       applyUserProfile();
-      listenToRealtimeData();
+      initRealtimeSync();
     }
 
     function applyUserProfile() {
@@ -317,6 +322,31 @@
       document.getElementById('header-user-role').innerText = currentUser.domain;
       document.getElementById('header-avatar').src = currentUser.avatar;
       document.getElementById('post-user-avatar').src = currentUser.avatar;
+    }
+
+    // STORIES
+    function addStory() {
+      const newStory = {
+        user: currentUser.username,
+        avatar: currentUser.avatar,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      if (db) db.collection('stories').add(newStory);
+    }
+
+    function renderStories() {
+      const container = document.getElementById('stories-container');
+      container.innerHTML = '';
+      stories.forEach(s => {
+        container.innerHTML += `
+          <div class="flex-shrink-0 w-20 h-28 story-ring p-0.5 rounded-xl cursor-pointer">
+            <div class="w-full h-full bg-slate-950 rounded-[10px] overflow-hidden relative flex flex-col justify-end p-1.5">
+              <img src="${s.avatar}" class="w-6 h-6 rounded-full border border-cyan-400 absolute top-1.5 left-1.5 object-cover">
+              <span class="text-[9px] font-bold text-white truncate w-full block text-center">${s.user}</span>
+            </div>
+          </div>
+        `;
+      });
     }
 
     // POSTS
@@ -354,12 +384,7 @@
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       };
 
-      if (db) {
-        db.collection('posts').add(newPost);
-      } else {
-        posts.unshift({ id: 'p_' + Date.now(), ...newPost });
-        renderPosts();
-      }
+      if (db) db.collection('posts').add(newPost);
 
       document.getElementById('post-input').value = '';
       removePostImage();
@@ -413,6 +438,18 @@
       });
     }
 
+    function filterFeed(query) {
+      if (!query.trim()) {
+        renderPosts();
+        return;
+      }
+      const filtered = posts.filter(p => 
+        (p.content && p.content.toLowerCase().includes(query.toLowerCase())) || 
+        (p.author && p.author.toLowerCase().includes(query.toLowerCase()))
+      );
+      renderPosts(filtered);
+    }
+
     function reactToPost(id) {
       if (db) {
         db.collection('posts').doc(id).update({
@@ -434,29 +471,26 @@
       input.value = '';
     }
 
-    // STORIES
-    function addStory() {
-      const newStory = {
-        user: currentUser.username,
-        avatar: currentUser.avatar,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      };
-      if (db) db.collection('stories').add(newStory);
-    }
-
-    function renderStories() {
-      const container = document.getElementById('stories-container');
-      container.innerHTML = '';
-      stories.forEach(s => {
-        container.innerHTML += `
-          <div class="flex-shrink-0 w-20 h-28 story-ring p-0.5 rounded-xl cursor-pointer">
-            <div class="w-full h-full bg-slate-950 rounded-[10px] overflow-hidden relative flex flex-col justify-end p-1.5">
-              <img src="${s.avatar}" class="w-6 h-6 rounded-full border border-cyan-400 absolute top-1.5 left-1.5">
-              <span class="text-[9px] font-bold text-white truncate">${s.user}</span>
-            </div>
-          </div>
-        `;
-      });
+    function sharePost(id) {
+      const post = posts.find(p => p.id === id);
+      if (post) {
+        if (db) {
+          db.collection('posts').doc(id).update({
+            shares: firebase.firestore.FieldValue.increment(1)
+          });
+          db.collection('posts').add({
+            author: currentUser.username,
+            domain: currentUser.domain,
+            avatar: currentUser.avatar,
+            content: `🔄 Partagé de @${post.author} : "${post.content || ''}"`,
+            image: post.image || null,
+            totalReactions: 0,
+            shares: 0,
+            comments: [],
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        }
+      }
     }
 
     // MARKETPLACE
@@ -487,13 +521,66 @@
               <h4 class="font-bold text-xs text-white truncate">${m.title}</h4>
               <p class="text-cyan-400 font-bold text-xs">${m.price}</p>
               <p class="text-[9px] text-slate-400">Vendeur: ${m.seller}</p>
+              <button onclick="startPV('${m.seller}', 'https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(m.seller)}')" class="w-full py-1 meta-gradient rounded-lg text-[9px] font-bold text-white mt-1">Contacter le vendeur</button>
             </div>
           </div>
         `;
       });
     }
 
-    // MESSAGERIE
+    // RECHERCHE D'UTILISATEURS & MESSAGES
+    function searchUsersAndChats(query) {
+      const container = document.getElementById('search-results');
+      if (!query.trim()) {
+        container.classList.add('hidden');
+        return;
+      }
+      container.classList.remove('hidden');
+      container.innerHTML = '';
+
+      const matchedUsers = allRegisteredUsers.filter(u => u.username.toLowerCase().includes(query.toLowerCase()) && u.username !== currentUser.username);
+      
+      if (matchedUsers.length === 0) {
+        container.innerHTML = `<div class="p-2 text-xs text-slate-400 text-center">Aucun utilisateur trouvé</div>`;
+        return;
+      }
+
+      matchedUsers.forEach(u => {
+        container.innerHTML += `
+          <div class="flex justify-between items-center p-2 bg-slate-900 rounded-xl">
+            <div class="flex items-center gap-2">
+              <img src="${u.avatar}" class="w-7 h-7 rounded-full object-cover">
+              <div>
+                <span class="text-xs font-bold text-white block">${u.username}</span>
+                <span class="text-[9px] text-cyan-400">${u.domain}</span>
+              </div>
+            </div>
+            <button onclick="startPV('${u.username}', '${u.avatar}')" class="px-2.5 py-1 meta-gradient text-[10px] rounded-lg font-bold text-white">Message PV</button>
+          </div>
+        `;
+      });
+    }
+
+    function startPV(name, avatar) {
+      let existingChat = chats.find(c => c.name === `PV : ${name}`);
+      if (!existingChat) {
+        const newChat = {
+          name: `PV : ${name}`,
+          avatar: avatar,
+          messages: []
+        };
+        if (db) {
+          db.collection('chats').add(newChat).then(docRef => {
+            openChatRoom(docRef.id, newChat.name, newChat.avatar);
+          });
+        }
+      } else {
+        openChatRoom(existingChat.id, existingChat.name, existingChat.avatar);
+      }
+      document.getElementById('search-results').classList.add('hidden');
+      switchTab('chats');
+    }
+
     function renderChatsList() {
       const container = document.getElementById('chats-list');
       container.innerHTML = '';
@@ -571,7 +658,41 @@
       closeModal('modal-group');
     }
 
-    // UTILITAIRES DE NAVIGATION
+    function openProfileSettings() {
+      if (!currentUser) return;
+      document.getElementById('username-input').value = currentUser.username;
+      document.getElementById('domain-input').value = currentUser.domain;
+      document.getElementById('avatar-preview').src = currentUser.avatar;
+      openModal('modal-settings');
+    }
+
+    function saveUserProfile() {
+      currentUser.username = document.getElementById('username-input').value;
+      currentUser.domain = document.getElementById('domain-input').value;
+      localStorage.setItem('nexus_user', JSON.stringify(currentUser));
+      if (db) db.collection('users').doc(currentUser.id).set(currentUser);
+      applyUserProfile();
+      closeModal('modal-settings');
+    }
+
+    function loadAvatarFromGallery(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          currentUser.avatar = evt.target.result;
+          document.getElementById('avatar-preview').src = currentUser.avatar;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function shareInviteLink() {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        alert("Lien d'invitation copié !");
+      });
+    }
+
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 

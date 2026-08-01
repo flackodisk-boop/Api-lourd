@@ -3,281 +3,300 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Nexus Social & Chat</title>
+  <title>Nexus Social & Voice Pro</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * { font-family: 'Plus Jakarta Sans', 'Poppins', sans-serif; }
-    .chat-scroll::-webkit-scrollbar { width: 4px; }
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .chat-scroll::-webkit-scrollbar { width: 3px; }
     .chat-scroll::-webkit-scrollbar-thumb { background: #00d9ff; border-radius: 10px; }
-    .neon-border { box-shadow: 0 0 20px rgba(0, 217, 255, 0.2); }
+    .neon-border { box-shadow: 0 0 25px rgba(0, 217, 255, 0.15); }
     .meta-gradient { background: linear-gradient(135deg, #0066ff, #00d9ff); }
-    
-    @keyframes logo-glow {
-      0%, 100% { box-shadow: 0 0 25px rgba(225, 29, 72, 0.6), 0 0 50px rgba(59, 130, 246, 0.4); transform: scale(1); }
-      50% { box-shadow: 0 0 40px rgba(225, 29, 72, 0.9), 0 0 70px rgba(59, 130, 246, 0.7); transform: scale(1.05); }
-    }
-    .cool-logo-glow { animation: logo-glow 2.5s infinite ease-in-out; }
   </style>
 </head>
 <body class="h-full text-slate-100 flex justify-center items-center bg-slate-950 antialiased select-none">
 
-  <div id="splash-screen" class="fixed inset-0 bg-slate-950 flex flex-col items-center justify-between p-8 z-50 transition-all duration-700">
-    <div></div>
-    <div class="flex flex-col items-center space-y-6">
-      <div class="relative group">
-        <div class="absolute -inset-1 bg-gradient-to-r from-red-600 via-purple-600 to-blue-600 rounded-3xl blur-md opacity-75 animate-pulse"></div>
-        <div class="relative w-24 h-24 rounded-3xl bg-slate-900 border border-slate-700 flex items-center justify-center text-white text-6xl font-black cool-logo-glow">
-          <span class="bg-gradient-to-tr from-red-500 via-rose-400 to-blue-500 bg-clip-text text-transparent">J</span>
-        </div>
-      </div>
-      <div class="text-center space-y-1">
-        <h1 class="text-2xl font-black tracking-wider text-white">Nexus <span class="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Social Network</span></h1>
-        <p class="text-xs text-slate-400 font-mono uppercase">Créé par Célestin 🇨🇩</p>
-      </div>
-    </div>
-    <p class="text-[10px] text-slate-600 font-mono">v11.0 — Mode Réseau & PV</p>
-  </div>
+  <div class="w-full max-w-md h-full md:h-[95vh] md:rounded-3xl bg-slate-900 border border-cyan-500/20 shadow-2xl flex flex-col overflow-hidden relative neon-border">
 
-  <div class="w-full max-w-md h-full md:h-[95vh] md:rounded-3xl bg-slate-900 border border-cyan-500/30 shadow-2xl flex flex-col overflow-hidden relative neon-border">
-
-    <div id="view-auth" class="absolute inset-0 z-40 bg-slate-950 p-6 flex flex-col justify-center items-center gap-6">
+    <div id="view-auth" class="absolute inset-0 z-50 bg-slate-950 p-6 flex flex-col justify-center items-center gap-6">
       <div class="text-center space-y-2">
-        <div class="w-16 h-16 rounded-2xl meta-gradient flex items-center justify-center text-3xl mx-auto shadow-lg shadow-cyan-500/50">
-          👤
+        <div class="w-16 h-16 rounded-2xl meta-gradient flex items-center justify-center text-3xl mx-auto shadow-lg shadow-cyan-500/30">
+          ⚙️
         </div>
-        <h2 class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Créer mon Profil</h2>
-        <p class="text-xs text-slate-400">Configurez votre compte comme sur Facebook</p>
+        <h2 class="text-2xl font-bold text-white">Paramètres du Profil</h2>
+        <p class="text-xs text-slate-400">Gérez votre profil Nexus</p>
       </div>
 
       <form onsubmit="handleRegister(event)" class="w-full space-y-4">
         <div class="flex flex-col items-center gap-2">
-          <label for="avatar-input" class="relative cursor-pointer group">
-            <img id="avatar-preview" src="https://api.dicebear.com/7.x/bottts/svg?seed=user" class="w-20 h-20 rounded-full border-2 border-cyan-400 object-cover bg-slate-900 shadow-xl">
-            <div class="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-              <i class="fa-solid fa-camera text-white text-lg"></i>
+          <label for="avatar-file-input" class="relative cursor-pointer group">
+            <img id="avatar-preview" src="https://api.dicebear.com/7.x/bottts/svg?seed=user" class="w-24 h-24 rounded-full border-2 border-cyan-400 object-cover bg-slate-900 shadow-xl">
+            <div class="absolute inset-0 bg-black/60 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition">
+              <i class="fa-solid fa-camera text-white text-xl"></i>
             </div>
           </label>
-          <input type="file" id="avatar-input" accept="image/*" class="hidden" onchange="previewAvatar(event)">
-          <span class="text-[10px] text-cyan-400 font-semibold">Choisir une photo de profil</span>
+          <input type="file" id="avatar-file-input" accept="image/*" class="hidden" onchange="loadAvatarFromGallery(event)">
+          <span class="text-[11px] text-cyan-400 font-semibold cursor-pointer" onclick="document.getElementById('avatar-file-input').click()">Changer la photo de profil</span>
         </div>
 
         <div>
-          <label class="text-[11px] font-semibold text-slate-400 block mb-1">Nom Complet / Pseudo</label>
+          <label class="text-[11px] font-semibold text-slate-400 block mb-1">Nom Complet</label>
           <input type="text" id="username-input" required placeholder="Ex: Célestin 🇨🇩" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400">
         </div>
 
         <div>
-          <label class="text-[11px] font-semibold text-slate-400 block mb-1">Bio / Profession</label>
-          <input type="text" id="role-input" placeholder="Ex: Développeur & Passionné d'IA" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400">
+          <label class="text-[11px] font-semibold text-slate-400 block mb-1">Rôle / Statut</label>
+          <input type="text" id="role-input" placeholder="Ex: Dev Google" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400">
         </div>
 
-        <button type="submit" class="w-full py-3 meta-gradient rounded-xl font-bold text-xs text-white shadow-lg shadow-cyan-500/30 hover:opacity-90 transition">
-          Rejoindre le Réseau
+        <button type="submit" class="w-full py-3 meta-gradient rounded-xl font-bold text-xs text-white shadow-lg hover:opacity-90 transition">
+          Sauvegarder les paramètres
         </button>
       </form>
-
-      <div class="mt-auto flex items-center gap-1.5 text-slate-500 text-[11px]">
-        <span>From</span>
-        <i class="fa-brands fa-meta text-cyan-400 text-sm"></i>
-        <span class="font-bold text-slate-400 tracking-wider">Meta Nexus</span>
-      </div>
     </div>
 
-    <header class="bg-slate-900/90 border-b border-cyan-500/20 p-3.5 flex items-center justify-between sticky top-0 z-30 backdrop-blur-md">
+    <header class="bg-slate-900/90 border-b border-slate-800 p-3.5 flex items-center justify-between sticky top-0 z-30 backdrop-blur-md">
       <div class="flex items-center gap-3">
-        <img id="user-display-avatar" src="" class="w-9 h-9 rounded-full border border-cyan-400 object-cover hidden">
+        <img id="header-avatar" src="" class="w-10 h-10 rounded-full border border-cyan-400 object-cover bg-slate-950">
         <div>
-          <h1 class="font-bold text-sm bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent" id="user-display-name">Nexus Social</h1>
-          <p class="text-[9px] text-cyan-400 font-mono flex items-center gap-1" id="user-display-role">En ligne</p>
+          <h1 class="font-bold text-xs text-white flex items-center gap-1.5">
+            <span id="header-user-name">Membre</span>
+          </h1>
+          <p id="header-user-role" class="text-[10px] text-cyan-400 font-mono">Dev Google</p>
         </div>
       </div>
-      <div class="flex items-center gap-3 text-slate-400">
-        <button onclick="promptNewGroup()" class="text-xs bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-lg hover:text-cyan-400 flex items-center gap-1">
-          <i class="fa-solid fa-users"></i> + Groupe
+      <div class="flex items-center gap-2">
+        <button onclick="openNewGroupModal()" class="text-xs bg-slate-800/80 border border-slate-700/80 text-slate-200 px-3 py-1.5 rounded-xl flex items-center gap-1.5">
+          <i class="fa-solid fa-users text-cyan-400"></i>
+          <span>+ Groupe</span>
         </button>
-        <i class="fa-solid fa-ellipsis-vertical hover:text-cyan-400 cursor-pointer transition" onclick="showInfo()"></i>
+        <button onclick="openProfileSettings()" class="w-8 h-8 rounded-xl bg-slate-800/50 flex items-center justify-center text-slate-400 hover:text-white">
+          <i class="fa-solid fa-gear"></i>
+        </button>
       </div>
     </header>
 
-    <div id="tab-feed-view" class="flex-1 overflow-y-auto chat-scroll p-3 space-y-4">
-      
+    <main id="tab-feed" class="flex-1 overflow-y-auto chat-scroll p-3 space-y-3">
       <div class="bg-slate-900 border border-slate-800 p-3 rounded-2xl space-y-3">
         <div class="flex items-center gap-2">
-          <img id="feed-user-avatar" src="" class="w-8 h-8 rounded-full border border-cyan-400 object-cover">
+          <img id="post-user-avatar" src="" class="w-8 h-8 rounded-full border border-cyan-400 object-cover">
           <input type="text" id="post-input" placeholder="Que voulez-vous exprimer aujourd'hui ?" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
         </div>
-        <div class="flex justify-between items-center pt-2 border-t border-slate-800/60">
-          <div class="flex gap-3 text-slate-400 text-xs">
-            <span class="hover:text-cyan-400 cursor-pointer flex items-center gap-1 text-[11px]"><i class="fa-solid fa-image text-emerald-400"></i> Photo</span>
-            <span class="hover:text-cyan-400 cursor-pointer flex items-center gap-1 text-[11px]"><i class="fa-solid fa-tag text-blue-400"></i> Identifier</span>
-          </div>
-          <button onclick="createPost()" class="px-3 py-1.5 meta-gradient rounded-xl text-xs font-bold text-white shadow-md">Publier</button>
+
+        <div id="post-image-preview-box" class="hidden relative rounded-xl overflow-hidden border border-slate-800">
+          <img id="post-image-preview" src="" class="w-full max-h-48 object-cover">
+          <button onclick="removePostImage()" class="absolute top-2 right-2 bg-black/70 text-white w-6 h-6 rounded-full text-xs">✕</button>
+        </div>
+
+        <div class="flex justify-between items-center pt-2 border-t border-slate-800/80">
+          <label for="post-file-input" class="hover:text-cyan-400 cursor-pointer flex items-center gap-1.5 text-[11px] text-slate-400">
+            <i class="fa-solid fa-image text-emerald-400"></i> Importer Photo
+          </label>
+          <input type="file" id="post-file-input" accept="image/*" class="hidden" onchange="attachImageToPost(event)">
+          <button onclick="publishPost()" class="px-4 py-1.5 meta-gradient rounded-xl text-xs font-bold text-white">
+            Publier
+          </button>
         </div>
       </div>
 
-      <div id="posts-container" class="space-y-4"></div>
-    </div>
+      <div id="posts-container" class="space-y-3"></div>
+    </main>
 
-    <div id="tab-chats-view" class="hidden flex-1 overflow-y-auto chat-scroll divide-y divide-slate-800/50">
-      <div class="p-2 flex justify-between items-center bg-slate-950/50">
-        <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-wider px-2">Conversations & Groupes</span>
-        <button onclick="promptNewPV()" class="text-[11px] text-slate-300 hover:text-cyan-400 px-2">+ Nouveau PV</button>
+    <main id="tab-chats" class="hidden flex-1 overflow-y-auto chat-scroll">
+      <div class="p-3 border-b border-slate-800/80 flex justify-between items-center bg-slate-950/40">
+        <span class="text-[10px] font-bold text-cyan-400 uppercase">Conversations & Groupes</span>
+        <button onclick="openNewPVModal()" class="text-[11px] text-cyan-400 font-semibold hover:underline">
+          + Nouveau PV
+        </button>
       </div>
-      <div id="chats-list-container"></div>
-    </div>
 
-    <div id="view-chat-room" class="hidden flex-1 flex-col h-full bg-slate-950 overflow-hidden relative">
-      <div class="bg-slate-900 border-b border-slate-800 p-2.5 flex items-center justify-between z-10">
-        <div class="flex items-center gap-2">
-          <i class="fa-solid fa-arrow-left text-slate-400 p-2 cursor-pointer hover:text-white" onclick="closeChat()"></i>
-          <img id="room-avatar" src="" class="w-8 h-8 rounded-full border border-cyan-400 object-cover">
+      <div id="chats-list" class="divide-y divide-slate-800/40"></div>
+    </main>
+
+    <div id="view-chat-room" class="hidden absolute inset-0 z-40 bg-slate-950 flex flex-col">
+      <div class="bg-slate-900 border-b border-slate-800 p-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <button onclick="closeChatRoom()" class="text-slate-400 hover:text-white p-1">
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+          <img id="room-avatar" src="" class="w-9 h-9 rounded-full border border-cyan-400 object-cover">
           <div>
-            <h3 id="room-title" class="font-bold text-xs text-white">Discussion</h3>
-            <p id="room-status" class="text-[9px] text-emerald-400">En ligne</p>
+            <h3 id="room-title" class="font-bold text-xs text-white">Chat</h3>
+            <p id="room-status" class="text-[9px] text-emerald-400 font-mono">En ligne</p>
           </div>
-        </div>
-        <div class="flex items-center gap-3 text-slate-400 text-xs">
-          <i class="fa-solid fa-video cursor-pointer hover:text-cyan-400"></i>
-          <i class="fa-solid fa-phone cursor-pointer hover:text-cyan-400"></i>
         </div>
       </div>
 
-      <div id="messages-box" class="flex-1 p-3 overflow-y-auto space-y-3 chat-scroll"></div>
+      <div id="messages-box" class="flex-1 p-3 overflow-y-auto space-y-2.5 chat-scroll"></div>
 
-      <form onsubmit="sendMsg(event)" class="p-2 bg-slate-900 border-t border-slate-800 flex items-center gap-2">
-        <input type="text" id="chat-input" placeholder="Écrire un message privé..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
+      <div id="chat-img-preview-box" class="hidden px-3 py-1 bg-slate-900 border-t border-slate-800 flex items-center gap-2">
+        <img id="chat-img-preview" src="" class="w-10 h-10 object-cover rounded-lg">
+        <span class="text-[10px] text-slate-400 flex-1">Image sélectionnée</span>
+        <button onclick="clearChatImage()" class="text-xs text-rose-500">Annuler</button>
+      </div>
+
+      <form onsubmit="sendMessage(event)" class="p-2.5 bg-slate-900 border-t border-slate-800 flex items-center gap-2">
+        <label for="chat-file-input" class="text-slate-400 hover:text-cyan-400 cursor-pointer p-1">
+          <i class="fa-solid fa-paperclip text-sm"></i>
+        </label>
+        <input type="file" id="chat-file-input" accept="image/*" class="hidden" onchange="attachImageToChat(event)">
+
+        <input type="text" id="chat-input" placeholder="Écrire ou envoyer une photo/vocal..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
+
+        <button type="button" id="record-btn" onclick="toggleVoiceRecord()" class="w-9 h-9 rounded-xl bg-slate-800 text-slate-300 hover:text-rose-400 flex items-center justify-center text-xs transition">
+          <i class="fa-solid fa-microphone" id="mic-icon"></i>
+        </button>
+
         <button type="submit" class="w-9 h-9 rounded-xl meta-gradient text-white flex items-center justify-center text-xs shadow-lg shadow-cyan-500/20">
           <i class="fa-solid fa-paper-plane"></i>
         </button>
       </form>
     </div>
 
-    <nav class="bg-slate-900 border-t border-slate-800 py-2.5 px-6 flex justify-around items-center sticky bottom-0 z-30">
-      <button onclick="switchTab('feed')" id="nav-feed" class="flex flex-col items-center gap-1 text-cyan-400">
+    <nav class="bg-slate-900 border-t border-slate-800 py-2.5 px-8 flex justify-around items-center sticky bottom-0 z-30">
+      <button onclick="switchTab('feed')" id="nav-btn-feed" class="flex flex-col items-center gap-1 text-cyan-400">
         <i class="fa-solid fa-house text-base"></i>
         <span class="text-[9px] font-bold">Accueil</span>
       </button>
 
-      <button onclick="switchTab('chats')" id="nav-chats" class="flex flex-col items-center gap-1 text-slate-500 hover:text-cyan-400">
+      <button onclick="switchTab('chats')" id="nav-btn-chats" class="flex flex-col items-center gap-1 text-slate-500 hover:text-cyan-400">
         <i class="fa-solid fa-comments text-base"></i>
         <span class="text-[9px] font-bold">Messages PV</span>
       </button>
 
-      <button onclick="showInfo()" class="flex flex-col items-center gap-1 text-slate-500 hover:text-cyan-400">
-        <i class="fa-solid fa-user text-base"></i>
-        <span class="text-[9px] font-bold">Profil</span>
+      <button onclick="openProfileSettings()" class="flex flex-col items-center gap-1 text-slate-500 hover:text-cyan-400">
+        <i class="fa-solid fa-gear text-base"></i>
+        <span class="text-[9px] font-bold">Paramètres</span>
       </button>
     </nav>
 
   </div>
 
   <script>
-    let userData = {
-      name: localStorage.getItem('fb_user_name') || '',
-      role: localStorage.getItem('fb_user_role') || '',
-      avatar: localStorage.getItem('fb_user_avatar') || 'https://api.dicebear.com/7.x/bottts/svg?seed=user'
+    let user = {
+      name: localStorage.getItem('nexus_user_name') || '',
+      role: localStorage.getItem('nexus_user_role') || '',
+      avatar: localStorage.getItem('nexus_user_avatar') || 'https://api.dicebear.com/7.x/bottts/svg?seed=user'
     };
 
-    let posts = JSON.parse(localStorage.getItem('fb_posts')) || [
+    let tempPostImage = null;
+    let tempChatImage = null;
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+
+    let posts = JSON.parse(localStorage.getItem('nexus_posts')) || [
       {
-        id: 1,
+        id: 101,
         author: 'Célestin 🇨🇩',
         avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=celestin',
-        content: 'Bienvenue sur la nouvelle plateforme Nexus Social ! Vous pouvez créer vos groupes et écrire en PV ici.',
-        likes: 5,
-        time: 'Il y a 10 min'
+        content: 'Bienvenue sur la plateforme Nexus ! Vous pouvez désormais envoyer de vrais vocaux et photos !',
+        image: null,
+        likes: 12,
+        comments: ['Top !', 'Super !'],
+        time: 'Il y a 5 min'
       }
     ];
 
-    let chats = JSON.parse(localStorage.getItem('fb_chats')) || [
+    let chats = JSON.parse(localStorage.getItem('nexus_chats')) || [
       {
-        id: 'neo',
+        id: 'neo_ia',
         name: 'JPP NEO IA (PV)',
         avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=neo',
         type: 'bot',
-        messages: [{ sender: 'bot', text: 'Salut ! Je suis ton assistant virtuel en PV.', time: '10:00' }]
-      },
-      {
-        id: 'groupe_boulot',
-        name: 'Groupe Projet Nexus 🇨🇩',
-        avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=boulot',
-        type: 'group',
-        messages: [{ sender: 'other', text: 'Célestin: Tout le monde est prêt ?', time: '10:15' }]
+        messages: [{ sender: 'bot', text: 'Salut ! Je suis ton assistant virtuel. Envoie-moi un vocal ou un message !', time: '10:00' }]
       }
     ];
 
-    let currentChatId = null;
+    let activeChatId = null;
 
     document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(() => {
-        document.getElementById('splash-screen').classList.add('opacity-0', 'pointer-events-none');
-      }, 1200);
-
-      if (userData.name) {
-        initUserProfile();
+      if (user.name) {
+        applyUserProfile();
         document.getElementById('view-auth').classList.add('hidden');
       }
       renderPosts();
       renderChatsList();
     });
 
-    function previewAvatar(event) {
-      const file = event.target.files[0];
+    function loadAvatarFromGallery(e) {
+      const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = function(e) {
-          userData.avatar = e.target.result;
-          document.getElementById('avatar-preview').src = e.target.result;
-        }
+        reader.onload = function(evt) {
+          user.avatar = evt.target.result;
+          document.getElementById('avatar-preview').src = user.avatar;
+        };
         reader.readAsDataURL(file);
       }
     }
 
     function handleRegister(e) {
       e.preventDefault();
-      userData.name = document.getElementById('username-input').value.trim();
-      userData.role = document.getElementById('role-input').value.trim() || 'Membre Nexus';
+      user.name = document.getElementById('username-input').value.trim();
+      user.role = document.getElementById('role-input').value.trim() || 'Dev Google';
 
-      localStorage.setItem('fb_user_name', userData.name);
-      localStorage.setItem('fb_user_role', userData.role);
-      localStorage.setItem('fb_user_avatar', userData.avatar);
+      localStorage.setItem('nexus_user_name', user.name);
+      localStorage.setItem('nexus_user_role', user.role);
+      localStorage.setItem('nexus_user_avatar', user.avatar);
 
-      initUserProfile();
+      applyUserProfile();
       document.getElementById('view-auth').classList.add('hidden');
     }
 
-    function initUserProfile() {
-      document.getElementById('user-display-name').innerText = userData.name;
-      document.getElementById('user-display-role').innerText = userData.role;
-      
-      const avatars = [document.getElementById('user-display-avatar'), document.getElementById('feed-user-avatar')];
-      avatars.forEach(img => {
-        if(img) {
-          img.src = userData.avatar;
-          img.classList.remove('hidden');
-        }
-      });
+    function applyUserProfile() {
+      document.getElementById('header-user-name').innerText = user.name;
+      document.getElementById('header-user-role').innerText = user.role;
+      document.getElementById('header-avatar').src = user.avatar;
+      document.getElementById('post-user-avatar').src = user.avatar;
     }
 
-    // GESTION FIL D'ACTUALITÉ
-    function createPost() {
+    function openProfileSettings() {
+      document.getElementById('username-input').value = user.name;
+      document.getElementById('role-input').value = user.role;
+      document.getElementById('avatar-preview').src = user.avatar;
+      document.getElementById('view-auth').classList.remove('hidden');
+    }
+
+    // POSTS PHOTO
+    function attachImageToPost(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          tempPostImage = evt.target.result;
+          document.getElementById('post-image-preview').src = tempPostImage;
+          document.getElementById('post-image-preview-box').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function removePostImage() {
+      tempPostImage = null;
+      document.getElementById('post-image-preview-box').classList.add('hidden');
+    }
+
+    function publishPost() {
       const input = document.getElementById('post-input');
-      const content = input.value.trim();
-      if (!content) return;
+      const text = input.value.trim();
+      if (!text && !tempPostImage) return;
 
       posts.unshift({
         id: Date.now(),
-        author: userData.name,
-        avatar: userData.avatar,
-        content: content,
+        author: user.name,
+        avatar: user.avatar,
+        content: text,
+        image: tempPostImage,
         likes: 0,
+        comments: [],
         time: 'À l\'instant'
       });
 
-      localStorage.setItem('fb_posts', JSON.stringify(posts));
+      localStorage.setItem('nexus_posts', JSON.stringify(posts));
       input.value = '';
+      removePostImage();
       renderPosts();
     }
 
@@ -285,22 +304,25 @@
       const container = document.getElementById('posts-container');
       container.innerHTML = '';
 
-      posts.forEach(post => {
+      posts.forEach(p => {
         container.innerHTML += `
           <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl space-y-2.5">
             <div class="flex items-center gap-2.5">
-              <img src="${post.avatar}" class="w-9 h-9 rounded-full border border-cyan-400 object-cover">
+              <img src="${p.avatar}" class="w-9 h-9 rounded-full border border-cyan-400 object-cover bg-slate-950">
               <div>
-                <h4 class="font-bold text-xs text-white">${post.author}</h4>
-                <p class="text-[9px] text-slate-500">${post.time}</p>
+                <h4 class="font-bold text-xs text-white">${p.author}</h4>
+                <p class="text-[9px] text-slate-500">${p.time}</p>
               </div>
             </div>
-            <p class="text-xs text-slate-200 leading-relaxed">${post.content}</p>
+            
+            ${p.content ? `<p class="text-xs text-slate-200 leading-relaxed">${p.content}</p>` : ''}
+            ${p.image ? `<img src="${p.image}" class="w-full max-h-60 object-cover rounded-xl border border-slate-800">` : ''}
+
             <div class="flex justify-between items-center pt-2 border-t border-slate-800/60 text-slate-400 text-xs">
-              <button onclick="likePost(${post.id})" class="hover:text-cyan-400 flex items-center gap-1 text-[11px]">
-                <i class="fa-regular fa-thumbs-up"></i> J'aime (${post.likes})
+              <button onclick="likePost(${p.id})" class="hover:text-cyan-400 flex items-center gap-1.5 text-[11px]">
+                <i class="fa-regular fa-thumbs-up"></i> J'aime (${p.likes})
               </button>
-              <button onclick="openPVWith('${post.author}')" class="hover:text-cyan-400 flex items-center gap-1 text-[11px]">
+              <button onclick="startPVWith('${p.author}')" class="hover:text-cyan-400 flex items-center gap-1.5 text-[11px]">
                 <i class="fa-regular fa-paper-plane"></i> Écrire en PV
               </button>
             </div>
@@ -313,168 +335,242 @@
       const post = posts.find(p => p.id === id);
       if (post) {
         post.likes++;
-        localStorage.setItem('fb_posts', JSON.stringify(posts));
+        localStorage.setItem('nexus_posts', JSON.stringify(posts));
         renderPosts();
       }
     }
 
-    // GESTION MULTI-CHATS & PV
+    // IMAGE EN CHAT
+    function attachImageToChat(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          tempChatImage = evt.target.result;
+          document.getElementById('chat-img-preview').src = tempChatImage;
+          document.getElementById('chat-img-preview-box').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function clearChatImage() {
+      tempChatImage = null;
+      document.getElementById('chat-img-preview-box').classList.add('hidden');
+    }
+
+    // ENREGISTREUR VOCAL
+    async function toggleVoiceRecord() {
+      const micIcon = document.getElementById('mic-icon');
+      const recordBtn = document.getElementById('record-btn');
+
+      if (!isRecording) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+
+          mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+          mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+            const audioUrl = URL.createObjectURL(audioBlob);
+            sendAudioMessage(audioUrl);
+          };
+
+          mediaRecorder.start();
+          isRecording = true;
+          micIcon.className = "fa-solid fa-stop text-rose-500 animate-pulse";
+          recordBtn.classList.add('border', 'border-rose-500');
+        } catch (err) {
+          alert("Accès au microphone requis pour envoyer des vocaux.");
+        }
+      } else {
+        mediaRecorder.stop();
+        isRecording = false;
+        micIcon.className = "fa-solid fa-microphone";
+        recordBtn.classList.remove('border', 'border-rose-500');
+      }
+    }
+
+    function sendAudioMessage(audioUrl) {
+      if (!activeChatId) return;
+      const chat = chats.find(c => c.id === activeChatId);
+      const now = new Date();
+      const timeStr = `${now.getHours()}:${now.getMinutes() < 10 ? '0' : ''}${now.getMinutes()}`;
+
+      chat.messages.push({ sender: 'me', audio: audioUrl, time: timeStr });
+      localStorage.setItem('nexus_chats', JSON.stringify(chats));
+      renderMessages();
+
+      if (chat.type === 'bot') {
+        setTimeout(() => {
+          chat.messages.push({ sender: 'bot', text: '🎵 Vocal bien reçu par l\'IA NEO !', time: timeStr });
+          localStorage.setItem('nexus_chats', JSON.stringify(chats));
+          renderMessages();
+        }, 800);
+      }
+    }
+
+    // CHATS & MESSAGES
     function renderChatsList() {
-      const container = document.getElementById('chats-list-container');
+      const container = document.getElementById('chats-list');
       container.innerHTML = '';
 
-      chats.forEach(chat => {
-        const lastMsg = chat.messages[chat.messages.length - 1];
+      chats.forEach(c => {
+        const lastMsg = c.messages[c.messages.length - 1];
         container.innerHTML += `
-          <div onclick="openChat('${chat.id}')" class="flex items-center gap-3 p-3.5 hover:bg-slate-800/50 cursor-pointer transition">
-            <img src="${chat.avatar}" class="w-11 h-11 rounded-full border border-cyan-400 object-cover bg-slate-900">
+          <div onclick="openChatRoom('${c.id}')" class="flex items-center gap-3 p-3.5 hover:bg-slate-800/40 cursor-pointer transition">
+            <img src="${c.avatar}" class="w-11 h-11 rounded-full border border-cyan-400 object-cover bg-slate-950">
             <div class="flex-1 min-w-0">
               <div class="flex justify-between items-center mb-0.5">
-                <h2 class="font-bold text-xs text-white truncate">${chat.name}</h2>
+                <h2 class="font-bold text-xs text-white truncate">${c.name}</h2>
                 <span class="text-[9px] text-cyan-400">${lastMsg ? lastMsg.time : ''}</span>
               </div>
-              <p class="text-[11px] text-slate-400 truncate">${lastMsg ? lastMsg.text : 'Discussion démarrée'}</p>
+              <p class="text-[11px] text-slate-400 truncate">${lastMsg ? (lastMsg.text || '🎵 Vocal envoyé') : 'Démarrez la conversation'}</p>
             </div>
           </div>
         `;
       });
     }
 
-    function openChat(id) {
-      currentChatId = id;
+    function openChatRoom(id) {
+      activeChatId = id;
       const chat = chats.find(c => c.id === id);
       if (!chat) return;
 
-      document.getElementById('tab-chats-view').classList.add('hidden');
-      document.getElementById('tab-feed-view').classList.add('hidden');
-      document.getElementById('view-chat-room').classList.remove('hidden');
-      document.getElementById('view-chat-room').classList.add('flex');
-
       document.getElementById('room-title').innerText = chat.name;
       document.getElementById('room-avatar').src = chat.avatar;
+      document.getElementById('view-chat-room').classList.remove('hidden');
 
       renderMessages();
     }
 
-    function closeChat() {
+    function closeChatRoom() {
       document.getElementById('view-chat-room').classList.add('hidden');
-      document.getElementById('view-chat-room').classList.remove('flex');
-      switchTab('chats');
+      renderChatsList();
     }
 
     function renderMessages() {
-      const chat = chats.find(c => c.id === currentChatId);
+      const chat = chats.find(c => c.id === activeChatId);
       const box = document.getElementById('messages-box');
       box.innerHTML = '';
 
-      chat.messages.forEach(msg => {
-        if (msg.sender === 'me') {
-          box.innerHTML += `
-            <div class="flex items-end gap-2 justify-end">
-              <div class="flex flex-col gap-1 max-w-[75%] meta-gradient p-3 rounded-2xl text-xs text-white shadow-md">
-                <p>${msg.text}</p>
-                <span class="text-[8px] text-right text-cyan-100 font-mono">${msg.time}</span>
-              </div>
-              <img src="${userData.avatar}" class="w-6 h-6 rounded-full border border-cyan-300 object-cover">
+      chat.messages.forEach(m => {
+        const isMe = m.sender === 'me';
+        box.innerHTML += `
+          <div class="flex items-end gap-2 ${isMe ? 'justify-end' : 'justify-start'}">
+            ${!isMe ? `<img src="${chat.avatar}" class="w-6 h-6 rounded-full border border-cyan-400 object-cover">` : ''}
+            <div class="flex flex-col gap-1 max-w-[80%] ${isMe ? 'meta-gradient text-white' : 'bg-slate-900 border border-slate-800 text-slate-200'} p-2.5 rounded-2xl text-xs shadow-md">
+              
+              ${m.text ? `<p class="break-words">${m.text}</p>` : ''}
+              ${m.image ? `<img src="${m.image}" class="w-full max-h-48 object-cover rounded-xl mt-1">` : ''}
+              ${m.audio ? `
+                <div class="flex items-center gap-2 py-1">
+                  <i class="fa-solid fa-play text-cyan-300"></i>
+                  <audio controls class="h-6 w-40 rounded">
+                    <source src="${m.audio}">
+                  </audio>
+                </div>
+              ` : ''}
+
+              <span class="text-[8px] text-right font-mono ${isMe ? 'text-cyan-100' : 'text-slate-500'}">${m.time}</span>
             </div>
-          `;
-        } else {
-          box.innerHTML += `
-            <div class="flex items-end gap-2 justify-start">
-              <img src="${chat.avatar}" class="w-6 h-6 rounded-full border border-cyan-300 object-cover">
-              <div class="flex flex-col gap-1 max-w-[75%] bg-slate-900 border border-slate-800 p-3 rounded-2xl text-xs text-slate-200 shadow-md">
-                <p>${msg.text}</p>
-                <span class="text-[8px] text-right text-cyan-400 font-mono">${msg.time}</span>
-              </div>
-            </div>
-          `;
-        }
+            ${isMe ? `<img src="${user.avatar}" class="w-6 h-6 rounded-full border border-cyan-400 object-cover">` : ''}
+          </div>
+        `;
       });
 
       box.scrollTop = box.scrollHeight;
     }
 
-    function sendMsg(e) {
+    function sendMessage(e) {
       e.preventDefault();
       const input = document.getElementById('chat-input');
       const text = input.value.trim();
-      if (!text || !currentChatId) return;
 
-      const chat = chats.find(c => c.id === currentChatId);
+      if (!text && !tempChatImage) return;
+
+      const chat = chats.find(c => c.id === activeChatId);
       const now = new Date();
       const timeStr = `${now.getHours()}:${now.getMinutes() < 10 ? '0' : ''}${now.getMinutes()}`;
 
-      chat.messages.push({ sender: 'me', text: text, time: timeStr });
+      chat.messages.push({
+        sender: 'me',
+        text: text,
+        image: tempChatImage,
+        time: timeStr
+      });
+
       input.value = '';
-      localStorage.setItem('fb_chats', JSON.stringify(chats));
+      clearChatImage();
+      localStorage.setItem('nexus_chats', JSON.stringify(chats));
       renderMessages();
 
       if (chat.type === 'bot') {
         setTimeout(() => {
-          let reply = "Message reçu en PV !";
-          if (text.toLowerCase().includes("créateur")) reply = "Mon créateur est Célestin 🇨🇩";
+          let reply = "Je suis votre assistant IA NEO.";
+          if (text.toLowerCase().includes('créateur') || text.toLowerCase().includes('createur')) {
+            reply = "J'ai été créé par Célestin 🇨🇩";
+          }
           chat.messages.push({ sender: 'bot', text: reply, time: timeStr });
-          localStorage.setItem('fb_chats', JSON.stringify(chats));
+          localStorage.setItem('nexus_chats', JSON.stringify(chats));
           renderMessages();
-        }, 600);
+        }, 700);
       }
     }
 
-    function promptNewPV() {
-      const name = prompt("Nom du membre pour écrire en PV :");
-      if (name) openPVWith(name);
+    function openNewPVModal() {
+      const name = prompt("Nom du contact pour écrire en PV :");
+      if (name) startPVWith(name);
     }
 
-    function openPVWith(name) {
-      let chat = chats.find(c => c.name.toLowerCase() === name.toLowerCase());
+    function startPVWith(name) {
+      let chat = chats.find(c => c.name.toLowerCase().includes(name.toLowerCase()));
       if (!chat) {
         chat = {
           id: 'pv_' + Date.now(),
           name: name + ' (PV)',
           avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${name}`,
           type: 'pv',
-          messages: [{ sender: 'other', text: `Bonjour ! Discussion PV avec ${name}.`, time: 'Aujourd\'hui' }]
+          messages: [{ sender: 'other', text: `Message en PV avec ${name}.`, time: 'À l\'instant' }]
         };
         chats.push(chat);
-        localStorage.setItem('fb_chats', JSON.stringify(chats));
+        localStorage.setItem('nexus_chats', JSON.stringify(chats));
         renderChatsList();
       }
-      openChat(chat.id);
+      switchTab('chats');
+      openChatRoom(chat.id);
     }
 
-    function promptNewGroup() {
-      const name = prompt("Nom du nouveau groupe :");
-      if (name) {
-        chats.push({
+    function openNewGroupModal() {
+      const groupName = prompt("Nom du nouveau groupe :");
+      if (groupName) {
+        const newGroup = {
           id: 'group_' + Date.now(),
-          name: 'Groupe : ' + name,
-          avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${name}`,
+          name: 'Groupe : ' + groupName,
+          avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${groupName}`,
           type: 'group',
-          messages: [{ sender: 'other', text: 'Groupe créé ! Bienvenue à tous.', time: 'Aujourd\'hui' }]
-        });
-        localStorage.setItem('fb_chats', JSON.stringify(chats));
+          messages: [{ sender: 'other', text: `Groupe créé par ${user.name} !`, time: 'À l\'instant' }]
+        };
+        chats.push(newGroup);
+        localStorage.setItem('nexus_chats', JSON.stringify(chats));
         renderChatsList();
         switchTab('chats');
       }
     }
 
     function switchTab(tab) {
-      document.getElementById('view-chat-room').classList.add('hidden');
       if (tab === 'feed') {
-        document.getElementById('tab-feed-view').classList.remove('hidden');
-        document.getElementById('tab-chats-view').classList.add('hidden');
-        document.getElementById('nav-feed').className = "flex flex-col items-center gap-1 text-cyan-400";
-        document.getElementById('nav-chats').className = "flex flex-col items-center gap-1 text-slate-500";
-      } else if (tab === 'chats') {
-        document.getElementById('tab-feed-view').classList.add('hidden');
-        document.getElementById('tab-chats-view').classList.remove('hidden');
-        document.getElementById('nav-chats').className = "flex flex-col items-center gap-1 text-cyan-400";
-        document.getElementById('nav-feed').className = "flex flex-col items-center gap-1 text-slate-500";
+        document.getElementById('tab-feed').classList.remove('hidden');
+        document.getElementById('tab-chats').classList.add('hidden');
+        document.getElementById('nav-btn-feed').className = "flex flex-col items-center gap-1 text-cyan-400";
+        document.getElementById('nav-btn-chats').className = "flex flex-col items-center gap-1 text-slate-500 hover:text-cyan-400";
+      } else {
+        document.getElementById('tab-feed').classList.add('hidden');
+        document.getElementById('tab-chats').classList.remove('hidden');
+        document.getElementById('nav-btn-chats').className = "flex flex-col items-center gap-1 text-cyan-400";
+        document.getElementById('nav-btn-feed').className = "flex flex-col items-center gap-1 text-slate-500 hover:text-cyan-400";
       }
-    }
-
-    function showInfo() {
-      alert(`Profil : ${userData.name || 'Anonyme'}\nRôle : ${userData.role || 'Membre'}\nCréateur : Célestin 🇨🇩`);
     }
   </script>
 </body>

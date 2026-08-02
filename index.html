@@ -1,927 +1,418 @@
-<!DOCTYPE html>
-<html lang="fr" class="h-full bg-slate-950">
+// app.js
+// Application de discussion complète — TOUT est ici, dans un seul fichier :
+//   - base de données SQLite (créée automatiquement)
+//   - API REST (inscription / connexion / historique)
+//   - WebSocket temps réel (Socket.IO)
+//   - page HTML/CSS/JS servie directement par le serveur
+//
+// Lancement :
+//   npm install
+//   npm start
+// Puis ouvrez http://localhost:3000 dans plusieurs onglets.
+
+const express = require('express');
+const http = require('http');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { Server } = require('socket.io');
+const Database = require('better-sqlite3');
+
+// ---------------------------------------------------------------------------
+// Base de données
+// ---------------------------------------------------------------------------
+const db = new Database('chat.db');
+db.pragma('journal_mode = WAL');
+db.exec(`
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    phone TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE TABLE IF NOT EXISTS messages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL,
+    text TEXT NOT NULL,
+    created_at TEXT NOT NULL
+  );
+`);
+
+// ---------------------------------------------------------------------------
+// Serveur
+// ---------------------------------------------------------------------------
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+
+const JWT_SECRET = process.env.JWT_SECRET || 'change-this-secret-in-production';
+if (!process.env.JWT_SECRET) {
+  console.warn('⚠️  JWT_SECRET non défini : une clé par défaut est utilisée (à ne jamais faire en production).');
+}
+
+app.use(express.json());
+
+// ---- Inscription ----
+app.post('/api/register', (req, res) => {
+  const { phone, password } = req.body || {};
+  if (!phone || !password) {
+    return res.status(400).json({ error: 'Numéro et mot de passe requis.' });
+  }
+  if (password.length < 4) {
+    return res.status(400).json({ error: 'Mot de passe trop court (4 caractères minimum).' });
+  }
+
+  const existing = db.prepare('SELECT id FROM users WHERE phone = ?').get(phone);
+  if (existing) {
+    return res.status(409).json({ error: 'Ce numéro est déjà enregistré.' });
+  }
+
+  const hash = bcrypt.hashSync(password, 10);
+  const info = db.prepare('INSERT INTO users (phone, password_hash) VALUES (?, ?)').run(phone, hash);
+  const token = jwt.sign({ id: info.lastInsertRowid, phone }, JWT_SECRET, { expiresIn: '7d' });
+  res.json({ token, phone });
+});
+
+// ---- Connexion ----
+app.post('/api/login', (req, res) => {
+  const { phone, password } = req.body || {};
+  if (!phone || !password) {
+    return res.status(400).json({ error: 'Numéro et mot de passe requis.' });
+  }
+  const user = db.prepare('SELECT * FROM users WHERE phone = ?').get(phone);
+  if (!user || !bcrypt.compareSync(password, user.password_hash)) {
+    return res.status(401).json({ error: 'Numéro ou mot de passe incorrect.' });
+  }
+  const token = jwt.sign({ id: user.id, phone: user.phone }, JWT_SECRET, { expiresIn: '7d' });
+  res.json({ token, phone: user.phone });
+});
+
+// ---- Historique des messages ----
+function authMiddleware(req, res, next) {
+  const header = req.headers.authorization || '';
+  const token = header.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ error: 'Non authentifié.' });
+  try {
+    req.user = jwt.verify(token, JWT_SECRET);
+    next();
+  } catch {
+    res.status(401).json({ error: 'Session expirée, reconnectez-vous.' });
+  }
+}
+
+app.get('/api/messages', authMiddleware, (req, res) => {
+  const rows = db.prepare('SELECT username, text, created_at FROM messages ORDER BY id DESC LIMIT 50').all();
+  res.json(rows.reverse());
+});
+
+// ---- Page unique (HTML/CSS/JS servis directement, pas de dossier public) ----
+app.get('/', (req, res) => {
+  res.type('html').send(PAGE_HTML);
+});
+
+// ---------------------------------------------------------------------------
+// WebSocket temps réel
+// ---------------------------------------------------------------------------
+const onlineUsers = new Map(); // socket.id -> phone
+
+io.use((socket, next) => {
+  try {
+    const token = socket.handshake.auth && socket.handshake.auth.token;
+    socket.user = jwt.verify(token, JWT_SECRET);
+    next();
+  } catch {
+    next(new Error('Authentification requise.'));
+  }
+});
+
+io.on('connection', (socket) => {
+  onlineUsers.set(socket.id, socket.user.phone);
+  io.emit('presence', Array.from(new Set(onlineUsers.values())));
+
+  socket.on('chat:message', (text) => {
+    const clean = String(text || '').trim().slice(0, 2000);
+    if (!clean) return;
+    const created_at = new Date().toISOString();
+    db.prepare('INSERT INTO messages (username, text, created_at) VALUES (?, ?, ?)')
+      .run(socket.user.phone, clean, created_at);
+    io.emit('chat:message', { username: socket.user.phone, text: clean, created_at });
+  });
+
+  socket.on('disconnect', () => {
+    onlineUsers.delete(socket.id);
+    io.emit('presence', Array.from(new Set(onlineUsers.values())));
+  });
+});
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`Serveur lancé sur http://localhost:${PORT}`);
+});
+
+// ---------------------------------------------------------------------------
+// Frontend (HTML + CSS + JS) — une seule chaîne de caractères, aucun fichier
+// externe à part socket.io.js qui est déjà servi automatiquement par le
+// serveur Socket.IO sur /socket.io/socket.io.js
+// ---------------------------------------------------------------------------
+const PAGE_HTML = `<!DOCTYPE html>
+<html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Nexus Social & Marketplace</title>
-  
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-
-  <style>
-    * { font-family: 'Plus Jakarta Sans', sans-serif; }
-    .chat-scroll::-webkit-scrollbar { width: 4px; }
-    .chat-scroll::-webkit-scrollbar-thumb { background: #00d9ff; border-radius: 10px; }
-    .meta-gradient { background: linear-gradient(135deg, #0066ff, #00d9ff); }
-    .story-ring { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
-    .emoji-pop:hover { transform: scale(1.3); transition: transform 0.2s ease; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application de Discussion</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
+        body {
+            min-height: 100vh; display: flex; justify-content: center; align-items: center;
+            background: linear-gradient(135deg, #021024, #052659, #0b3d91); padding: 20px;
+        }
+        .container { width: 100%; max-width: 450px; transition: max-width 0.3s ease; }
+        .container.chat-mode { max-width: 1000px; width: 100%; height: 85vh; }
+        .form-box {
+            width: 100%; background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px; padding: 40px 30px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        .form-box h2 { text-align: center; color: #6fb7ff; margin-bottom: 25px; font-size: 28px; }
+        form { display: flex; flex-direction: column; }
+        input {
+            padding: 14px; margin-bottom: 15px; border: 1px solid transparent; border-radius: 10px;
+            background: #0a234f; color: white; font-size: 15px; outline: none; transition: all 0.3s ease;
+        }
+        input:focus { border: 1px solid #4ea1ff; box-shadow: 0 0 10px rgba(78, 161, 255, 0.5); }
+        button {
+            padding: 14px; border: none; border-radius: 10px; background: #1976ff; color: white;
+            font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s;
+        }
+        button:hover { background: #4094ff; }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
+        .hidden { display: none !important; }
+        .error-msg { color: #ff8080; font-size: 14px; text-align: center; margin-bottom: 12px; min-height: 18px; }
+        .switch-mode { text-align: center; margin-top: 18px; color: #a9c6ee; font-size: 14px; }
+        .switch-mode a { color: #6fb7ff; cursor: pointer; text-decoration: underline; }
+        .chat-box {
+            display: flex; width: 100%; height: 100%; background: rgba(10, 25, 50, 0.9);
+            border-radius: 20px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .users-sidebar {
+            width: 30%; background: rgba(5, 15, 35, 0.8); border-right: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex; flex-direction: column;
+        }
+        .sidebar-title { padding: 20px; color: #6fb7ff; font-size: 18px; font-weight: bold; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .user-item { padding: 15px 20px; color: white; display: flex; align-items: center; gap: 12px; font-size: 14px; }
+        .user-item:hover { background: rgba(255, 255, 255, 0.05); }
+        .status-dot { width: 10px; height: 10px; background: #2ec4b6; border-radius: 50%; flex-shrink: 0; }
+        .chat-main { width: 70%; display: flex; flex-direction: column; background: rgba(10, 25, 50, 0.3); }
+        .chat-header {
+            padding: 20px; background: rgba(5, 15, 35, 0.5); color: white; font-weight: bold;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05); display: flex; justify-content: space-between; align-items: center;
+        }
+        .logout-btn { background: transparent; border: 1px solid rgba(255,255,255,0.3); padding: 6px 12px; font-size: 12px; font-weight: normal; }
+        .logout-btn:hover { background: rgba(255,255,255,0.1); }
+        .messages-display { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .msg { max-width: 70%; padding: 12px 16px; border-radius: 15px; color: white; font-size: 15px; line-height: 1.4; }
+        .msg .msg-author { display: block; font-size: 11px; opacity: 0.6; margin-bottom: 4px; }
+        .msg.sent { background: #1976ff; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .msg.received { background: rgba(255, 255, 255, 0.1); align-self: flex-start; border-bottom-left-radius: 2px; }
+        .msg.system { align-self: center; background: transparent; color: #a9c6ee; font-size: 13px; opacity: 0.8; }
+        .chat-input-area { padding: 20px; display: flex; gap: 10px; background: rgba(5, 15, 35, 0.5); }
+        .chat-input-area input { flex: 1; margin-bottom: 0; background: #05152d; }
+        @media (max-width: 768px) { .users-sidebar { display: none; } .chat-main { width: 100%; } }
+    </style>
 </head>
-<body class="h-full text-slate-100 flex justify-center items-center bg-slate-950 antialiased select-none">
-
-  <div class="w-full max-w-md h-full md:h-[95vh] md:rounded-3xl bg-slate-900 border border-cyan-500/20 shadow-2xl flex flex-col overflow-hidden relative">
-
-    <div id="view-auth" class="absolute inset-0 z-50 bg-slate-950 p-6 flex flex-col justify-center items-center space-y-4">
-      <div class="text-center space-y-2">
-        <div class="w-16 h-16 meta-gradient rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-cyan-500/30">
-          <i class="fa-solid fa-share-nodes text-3xl text-white"></i>
-        </div>
-        <h2 class="text-2xl font-extrabold text-white">Nexus Social</h2>
-        <p class="text-xs text-slate-400">Réseau Multi-utilisateurs Temps Réel</p>
-      </div>
-
-      <div class="w-full space-y-3 bg-slate-900 p-4 rounded-2xl border border-slate-800">
-        <input type="text" id="auth-username" placeholder="Pseudo / Nom complet" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400">
-        <input type="text" id="auth-domain" placeholder="Domaine / Profession" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400">
-        <button onclick="loginUser()" class="w-full py-2.5 meta-gradient rounded-xl text-xs font-bold text-white shadow-lg">Entrer sur le réseau</button>
-      </div>
-    </div>
-
-    <header class="bg-slate-900/95 border-b border-slate-800 p-3.5 flex items-center justify-between sticky top-0 z-30 backdrop-blur-md">
-      <div class="flex items-center gap-3">
-        <div class="relative cursor-pointer" onclick="openProfileSettings()">
-          <img id="header-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=guest" class="w-10 h-10 rounded-full border-2 border-cyan-400 object-cover bg-slate-950">
-          <span class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-slate-900"></span>
-        </div>
-        <div>
-          <h1 class="font-bold text-xs text-white flex items-center gap-1">
-            <span id="header-user-name">Membre</span>
-            <i class="fa-solid fa-circle-check text-cyan-400 text-[10px]"></i>
-          </h1>
-          <p id="header-user-role" class="text-[10px] text-cyan-400 font-mono">Général</p>
-        </div>
-      </div>
-      <div class="flex items-center gap-2">
-        <button onclick="shareInviteLink()" class="w-8 h-8 rounded-xl bg-slate-800/80 border border-slate-700 text-cyan-400 flex items-center justify-center hover:bg-slate-700 transition">
-          <i class="fa-solid fa-share-nodes"></i>
-        </button>
-        <button onclick="openModal('modal-group')" class="text-xs bg-slate-800/80 border border-slate-700 hover:border-cyan-500 text-slate-200 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition">
-          <i class="fa-solid fa-users text-cyan-400"></i>
-          <span>+ Groupe</span>
-        </button>
-      </div>
-    </header>
-
-    <main id="tab-feed" class="flex-1 overflow-y-auto chat-scroll p-3 space-y-3">
-      <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2 items-center">
-        <div onclick="openModal('modal-story')" class="flex-shrink-0 w-20 h-28 bg-slate-950 border border-slate-800 rounded-xl relative overflow-hidden cursor-pointer flex flex-col justify-end p-2 text-center hover:border-cyan-500 transition">
-          <i class="fa-solid fa-plus text-cyan-400 text-lg mb-4 mx-auto"></i>
-          <span class="text-[9px] font-bold text-slate-300">Ajouter</span>
-        </div>
-        <div id="stories-container" class="flex gap-2"></div>
-      </div>
-
-      <div class="bg-slate-900 border border-slate-800 p-3 rounded-2xl space-y-3 shadow-lg">
-        <div class="flex items-center gap-2">
-          <img id="post-user-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=guest" class="w-8 h-8 rounded-full border border-cyan-400 object-cover">
-          <input type="text" id="post-input" placeholder="Quoi de neuf aujourd'hui ?" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
-        </div>
-
-        <div id="post-image-preview-box" class="hidden relative rounded-xl overflow-hidden border border-slate-800">
-          <img id="post-image-preview" src="" class="w-full max-h-48 object-cover">
-          <button onclick="removePostImage()" class="absolute top-2 right-2 bg-black/70 text-white w-6 h-6 rounded-full text-xs">✕</button>
-        </div>
-
-        <div class="flex justify-between items-center pt-2 border-t border-slate-800/80">
-          <label for="post-file-input" class="hover:text-cyan-400 cursor-pointer flex items-center gap-1 text-[11px] text-slate-400">
-            <i class="fa-solid fa-image text-emerald-400"></i> Photo
-          </label>
-          <input type="file" id="post-file-input" accept="image/*" class="hidden" onchange="attachImageToPost(event)">
-
-          <button onclick="publishPost()" class="px-4 py-1.5 meta-gradient rounded-xl text-xs font-bold text-white shadow-md active:scale-95 transition">
-            Publier
-          </button>
-        </div>
-      </div>
-
-      <div class="relative">
-        <input type="text" id="search-feed-input" oninput="filterFeed(this.value)" placeholder="Rechercher des posts..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400">
-        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-xs"></i>
-      </div>
-
-      <div id="posts-container" class="space-y-3"></div>
-    </main>
-
-    <main id="tab-market" class="hidden flex-1 overflow-y-auto chat-scroll p-3 space-y-3">
-      <div class="flex justify-between items-center bg-slate-900 p-3 rounded-2xl border border-slate-800">
-        <h2 class="font-bold text-xs text-white flex items-center gap-2">
-          <i class="fa-solid fa-store text-cyan-400"></i> Marché Nexus
-        </h2>
-        <button onclick="openModal('modal-market')" class="px-3 py-1.5 meta-gradient text-[10px] font-bold rounded-xl text-white">
-          + Vendre un article
-        </button>
-      </div>
-
-      <div id="market-container" class="grid grid-cols-2 gap-2.5"></div>
-    </main>
-
-    <main id="tab-chats" class="hidden flex-1 overflow-y-auto chat-scroll">
-      <div class="p-3 border-b border-slate-800/80 bg-slate-950/40 space-y-3">
-        <div>
-          <h3 class="text-[10px] font-bold text-cyan-400 uppercase tracking-wider mb-2">Membres Actifs sur le Réseau</h3>
-          <div id="online-users-list" class="flex gap-2 overflow-x-auto no-scrollbar pb-1"></div>
-        </div>
-
-        <div class="relative">
-          <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-xs"></i>
-          <input type="text" id="search-user-input" oninput="searchUsersAndChats(this.value)" placeholder="Rechercher un membre..." class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400">
-        </div>
-      </div>
-
-      <div id="search-results" class="p-2 space-y-1 hidden bg-slate-950/80 border-b border-slate-800"></div>
-      <div id="chats-list" class="divide-y divide-slate-800/40"></div>
-    </main>
-
-    <div id="view-chat-room" class="hidden absolute inset-0 z-40 bg-slate-950 flex flex-col">
-      <div class="bg-slate-900 border-b border-slate-800 p-3 flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <button onclick="closeChatRoom()" class="text-slate-400 hover:text-white p-1">
-            <i class="fa-solid fa-arrow-left"></i>
-          </button>
-          <img id="room-avatar" src="" class="w-9 h-9 rounded-full border border-cyan-400 object-cover bg-slate-950">
-          <div>
-            <h3 id="room-title" class="font-bold text-xs text-white">Discussion</h3>
-            <p class="text-[9px] text-emerald-400 font-mono">En ligne</p>
-          </div>
-        </div>
-      </div>
-
-      <div id="messages-box" class="flex-1 p-3 overflow-y-auto space-y-2.5 chat-scroll"></div>
-
-      <form onsubmit="sendMessage(event)" class="p-2.5 bg-slate-900 border-t border-slate-800 flex items-center gap-2">
-        <input type="text" id="chat-input" placeholder="Message..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
-        <button type="submit" class="w-9 h-9 rounded-xl meta-gradient text-white flex items-center justify-center text-xs shadow-lg">
-          <i class="fa-solid fa-paper-plane"></i>
-        </button>
-      </form>
-    </div>
-
-    <nav class="bg-slate-900 border-t border-slate-800 py-2.5 px-4 flex justify-around items-center sticky bottom-0 z-30">
-      <button onclick="switchTab('feed')" id="nav-btn-feed" class="flex flex-col items-center gap-1 text-cyan-400">
-        <i class="fa-solid fa-newspaper text-base"></i>
-        <span class="text-[9px] font-bold">Accueil</span>
-      </button>
-
-      <button onclick="switchTab('market')" id="nav-btn-market" class="flex flex-col items-center gap-1 text-slate-500 hover:text-cyan-400">
-        <i class="fa-solid fa-store text-base"></i>
-        <span class="text-[9px] font-bold">Marché</span>
-      </button>
-
-      <button onclick="switchTab('chats')" id="nav-btn-chats" class="flex flex-col items-center gap-1 text-slate-500 hover:text-cyan-400">
-        <i class="fa-solid fa-comments text-base"></i>
-        <span class="text-[9px] font-bold">Messages</span>
-      </button>
-
-      <button onclick="openProfileSettings()" class="flex flex-col items-center gap-1 text-slate-500 hover:text-cyan-400">
-        <i class="fa-solid fa-gear text-base"></i>
-        <span class="text-[9px] font-bold">Profil</span>
-      </button>
-    </nav>
-
-    <div id="modal-story" class="hidden absolute inset-0 z-50 bg-slate-950/95 p-6 flex flex-col justify-center items-center backdrop-blur-md">
-      <div class="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-2xl">
-        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-          <h3 class="font-bold text-sm text-white">Créer une Story (24h)</h3>
-          <button onclick="closeModal('modal-story')" class="text-slate-400">✕</button>
-        </div>
-
-        <div class="flex gap-2">
-          <button onclick="toggleStoryType('photo')" id="btn-story-type-photo" class="flex-1 py-1.5 bg-cyan-500 text-white rounded-xl text-xs font-bold">Image</button>
-          <button onclick="toggleStoryType('text')" id="btn-story-type-text" class="flex-1 py-1.5 bg-slate-800 text-slate-400 rounded-xl text-xs font-bold">Texte</button>
-        </div>
-
-        <div id="story-photo-section" class="space-y-3">
-          <div id="story-preview-box" class="hidden relative h-40 rounded-xl overflow-hidden border border-slate-800">
-            <img id="story-preview-img" src="" class="w-full h-full object-cover">
-          </div>
-          <label for="story-file-input" class="w-full py-3 border-2 border-dashed border-slate-700 rounded-xl flex justify-center items-center text-xs text-slate-400 cursor-pointer hover:border-cyan-400">
-            <i class="fa-solid fa-image text-cyan-400 mr-2"></i> Choisir une photo
-          </label>
-          <input type="file" id="story-file-input" accept="image/*" class="hidden" onchange="previewStoryImage(event)">
-        </div>
-
-        <div id="story-text-section" class="hidden space-y-3">
-          <textarea id="story-text-input" placeholder="Écrivez votre story..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white h-24 focus:outline-none focus:border-cyan-400"></textarea>
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] text-slate-400">Couleur de fond :</span>
-            <input type="color" id="story-bg-color" value="#0066ff" class="w-8 h-8 rounded-lg bg-transparent border-0 cursor-pointer">
-          </div>
-        </div>
-
-        <button onclick="submitStory()" class="w-full py-2.5 meta-gradient rounded-xl text-xs font-bold text-white shadow-lg">Publier la Story</button>
-      </div>
-    </div>
-
-    <div id="modal-view-story" class="hidden absolute inset-0 z-50 bg-black/95 p-4 flex flex-col justify-between items-center">
-      <div class="w-full flex justify-between items-center pt-2">
-        <div class="flex items-center gap-2">
-          <img id="view-story-avatar" src="" class="w-8 h-8 rounded-full border border-cyan-400 object-cover">
-          <div>
-            <span id="view-story-user" class="text-xs font-bold text-white block"></span>
-            <span id="view-story-time" class="text-[9px] text-slate-400"></span>
-          </div>
-        </div>
-        <button onclick="closeModal('modal-view-story')" class="text-white text-lg">✕</button>
-      </div>
-      <div id="view-story-content" class="my-auto w-full max-h-[75vh] flex items-center justify-center p-4"></div>
-    </div>
-
-    <div id="modal-settings" class="hidden absolute inset-0 z-50 bg-slate-950/95 p-6 flex flex-col justify-center items-center backdrop-blur-md">
-      <div class="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-2xl">
-        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-          <h3 class="font-bold text-sm text-white">Éditer le profil</h3>
-          <button onclick="closeModal('modal-settings')" class="text-slate-400">✕</button>
-        </div>
-        <div class="flex flex-col items-center gap-2">
-          <img id="avatar-preview" src="" class="w-20 h-20 rounded-full border-2 border-cyan-400 object-cover bg-slate-950">
-          <label for="avatar-file-input" class="text-[10px] text-cyan-400 font-semibold cursor-pointer hover:underline">Changer la photo</label>
-          <input type="file" id="avatar-file-input" accept="image/*" class="hidden" onchange="loadAvatarFromGallery(event)">
-        </div>
-        <div class="space-y-3">
-          <input type="text" id="username-input" placeholder="Pseudo" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
-          <input type="text" id="domain-input" placeholder="Domaine" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
-        </div>
-        <button onclick="saveUserProfile()" class="w-full py-2.5 meta-gradient rounded-xl text-xs font-bold text-white shadow-lg">Enregistrer</button>
-      </div>
-    </div>
-
-    <div id="modal-market" class="hidden absolute inset-0 z-50 bg-slate-950/95 p-6 flex flex-col justify-center items-center backdrop-blur-md">
-      <div class="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-3">
-        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-          <h3 class="font-bold text-sm text-white">Vendre un article</h3>
-          <button onclick="closeModal('modal-market')" class="text-slate-400">✕</button>
-        </div>
-        <input type="text" id="market-title" placeholder="Titre de l'article" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
-        <input type="text" id="market-price" placeholder="Prix (ex: 50$)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
-        <input type="text" id="market-img" placeholder="URL de l'image du produit" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
-        <button onclick="publishMarketItem()" class="w-full py-2.5 meta-gradient rounded-xl text-xs font-bold text-white">Publier l'annonce</button>
-      </div>
-    </div>
-
-    <div id="modal-group" class="hidden absolute inset-0 z-50 bg-slate-950/95 p-6 flex flex-col justify-center items-center backdrop-blur-md">
-      <div class="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4">
-        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-          <h3 class="font-bold text-sm text-white">Nouveau Groupe</h3>
-          <button onclick="closeModal('modal-group')" class="text-slate-400">✕</button>
-        </div>
-        <input type="text" id="group-name-input" placeholder="Nom du groupe..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
-        <button onclick="createGroupSubmit()" class="w-full py-2.5 meta-gradient rounded-xl text-xs font-bold text-white">Créer le Groupe</button>
-      </div>
-    </div>
-
-  </div>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDemoKeyNexusSocialApp2026",
-      authDomain: "nexus-app-live.firebaseapp.com",
-      projectId: "nexus-app-live",
-      storageBucket: "nexus-app-live.appspot.com",
-      messagingSenderId: "123456789",
-      appId: "1:123456789:web:abcdef"
-    };
-
-    let db = null;
-    try {
-      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-      db = firebase.firestore();
-    } catch(e) {}
-
-    const syncChannel = new BroadcastChannel('nexus_social_channel');
-    syncChannel.onmessage = (event) => {
-      if (event.data && event.data.type === 'SYNC') {
-        loadDataFromStorage();
-      }
-    };
-
-    let currentUser = JSON.parse(localStorage.getItem('nexus_user')) || null;
-    let posts = [];
-    let marketItems = [];
-    let stories = [];
-    let chats = [];
-    let allRegisteredUsers = [];
-
-    let tempPostImage = null;
-    let tempStoryImage = null;
-    let storyType = 'photo';
-    let activeChatId = null;
-
-    document.addEventListener('DOMContentLoaded', () => {
-      loadDataFromStorage();
-      if (currentUser) {
-        document.getElementById('view-auth').classList.add('hidden');
-        applyUserProfile();
-        registerPresence();
-        initRealtimeSync();
-      }
-    });
-
-    function broadcastChange() {
-      localStorage.setItem('nexus_posts', JSON.stringify(posts));
-      localStorage.setItem('nexus_stories', JSON.stringify(stories));
-      localStorage.setItem('nexus_market', JSON.stringify(marketItems));
-      localStorage.setItem('nexus_chats', JSON.stringify(chats));
-      localStorage.setItem('nexus_all_users', JSON.stringify(allRegisteredUsers));
-      syncChannel.postMessage({ type: 'SYNC' });
-    }
-
-    function registerPresence() {
-      if (!currentUser) return;
-      currentUser.lastSeen = Date.now();
-      
-      const idx = allRegisteredUsers.findIndex(u => u.username === currentUser.username);
-      if (idx !== -1) {
-        allRegisteredUsers[idx] = currentUser;
-      } else {
-        allRegisteredUsers.push(currentUser);
-      }
-      
-      if (db) db.collection('users').doc(currentUser.id).set(currentUser).catch(() => {});
-      broadcastChange();
-      renderOnlineUsers();
-    }
-
-    setInterval(() => {
-      if (currentUser) registerPresence();
-    }, 10000);
-
-    function loadDataFromStorage() {
-      posts = JSON.parse(localStorage.getItem('nexus_posts')) || [];
-      stories = JSON.parse(localStorage.getItem('nexus_stories')) || [];
-      marketItems = JSON.parse(localStorage.getItem('nexus_market')) || [];
-      chats = JSON.parse(localStorage.getItem('nexus_chats')) || [];
-      allRegisteredUsers = JSON.parse(localStorage.getItem('nexus_all_users')) || [];
-
-      const now = Date.now();
-      stories = stories.filter(s => (now - s.timestamp) < 24 * 60 * 60 * 1000);
-
-      renderPosts();
-      renderStories();
-      renderMarket();
-      renderChatsList();
-      renderOnlineUsers();
-      if (activeChatId) renderMessages();
-    }
-
-    function initRealtimeSync() {
-      if (!db) return;
-      try {
-        db.collection('users').onSnapshot(snapshot => {
-          if (snapshot && !snapshot.empty) {
-            allRegisteredUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderOnlineUsers();
-          }
-        });
-        db.collection('posts').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
-          if (snapshot && !snapshot.empty) {
-            posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderPosts();
-          }
-        });
-        db.collection('stories').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
-          if (snapshot && !snapshot.empty) {
-            const now = Date.now();
-            stories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-                              .filter(s => (now - s.timestamp) < 24 * 60 * 60 * 1000);
-            renderStories();
-          }
-        });
-        db.collection('market').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
-          if (snapshot && !snapshot.empty) {
-            marketItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderMarket();
-          }
-        });
-        db.collection('chats').onSnapshot(snapshot => {
-          if (snapshot && !snapshot.empty) {
-            chats = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderChatsList();
-            if (activeChatId) renderMessages();
-          }
-        });
-      } catch(e) {}
-    }
-
-    function renderOnlineUsers() {
-      const container = document.getElementById('online-users-list');
-      if (!container) return;
-      container.innerHTML = '';
-
-      const now = Date.now();
-      const onlineUsers = allRegisteredUsers.filter(u => u.username !== (currentUser ? currentUser.username : ''));
-
-      if (onlineUsers.length === 0) {
-        container.innerHTML = `<span class="text-[10px] text-slate-500 italic">Aucun autre utilisateur visible</span>`;
-        return;
-      }
-
-      onlineUsers.forEach(u => {
-        const isOnline = u.lastSeen && (now - u.lastSeen < 30000);
-        container.innerHTML += `
-          <div onclick="startPV('${u.username}', '${u.avatar}')" class="flex flex-col items-center flex-shrink-0 cursor-pointer w-14 group">
-            <div class="relative">
-              <img src="${u.avatar}" class="w-10 h-10 rounded-full border border-slate-700 group-hover:border-cyan-400 object-cover bg-slate-950">
-              <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-slate-900 ${isOnline ? 'bg-emerald-500' : 'bg-slate-600'}"></span>
+<body>
+    <div class="container" id="mainContainer">
+        <div class="form-box" id="loginBox">
+            <h2 id="formTitle">Connexion</h2>
+            <div class="error-msg" id="errorMsg"></div>
+            <form id="authForm">
+                <input type="tel" id="phone" placeholder="Numéro de téléphone" required>
+                <input type="password" id="password" placeholder="Mot de passe" required minlength="4">
+                <button type="submit" id="submitBtn">Se connecter &amp; Parler</button>
+            </form>
+            <div class="switch-mode">
+                <span id="switchText">Pas encore de compte ?</span>
+                <a id="switchLink">Créer un compte</a>
             </div>
-            <span class="text-[9px] font-semibold text-slate-300 truncate w-full text-center mt-1">${u.username}</span>
-          </div>
-        `;
-      });
-    }
+        </div>
 
-    function loginUser() {
-      const username = document.getElementById('auth-username').value.trim() || 'Membre';
-      const domain = document.getElementById('auth-domain').value.trim() || 'Général';
-
-      currentUser = {
-        id: 'usr_' + Date.now(),
-        username: username,
-        domain: domain,
-        avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(username)}`,
-        lastSeen: Date.now()
-      };
-
-      localStorage.setItem('nexus_user', JSON.stringify(currentUser));
-      registerPresence();
-
-      document.getElementById('view-auth').classList.add('hidden');
-      applyUserProfile();
-      initRealtimeSync();
-    }
-
-    function applyUserProfile() {
-      if (!currentUser) return;
-      document.getElementById('header-user-name').innerText = currentUser.username;
-      document.getElementById('header-user-role').innerText = currentUser.domain;
-      document.getElementById('header-avatar').src = currentUser.avatar;
-      document.getElementById('post-user-avatar').src = currentUser.avatar;
-    }
-
-    function toggleStoryType(type) {
-      storyType = type;
-      if (type === 'photo') {
-        document.getElementById('story-photo-section').classList.remove('hidden');
-        document.getElementById('story-text-section').classList.add('hidden');
-        document.getElementById('btn-story-type-photo').className = "flex-1 py-1.5 bg-cyan-500 text-white rounded-xl text-xs font-bold";
-        document.getElementById('btn-story-type-text').className = "flex-1 py-1.5 bg-slate-800 text-slate-400 rounded-xl text-xs font-bold";
-      } else {
-        document.getElementById('story-photo-section').classList.add('hidden');
-        document.getElementById('story-text-section').classList.remove('hidden');
-        document.getElementById('btn-story-type-photo').className = "flex-1 py-1.5 bg-slate-800 text-slate-400 rounded-xl text-xs font-bold";
-        document.getElementById('btn-story-type-text').className = "flex-1 py-1.5 bg-cyan-500 text-white rounded-xl text-xs font-bold";
-      }
-    }
-
-    function previewStoryImage(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          tempStoryImage = evt.target.result;
-          document.getElementById('story-preview-img').src = tempStoryImage;
-          document.getElementById('story-preview-box').classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    function submitStory() {
-      const newStory = {
-        id: 'st_' + Date.now(),
-        user: currentUser.username,
-        avatar: currentUser.avatar,
-        type: storyType,
-        img: storyType === 'photo' ? tempStoryImage : null,
-        text: storyType === 'text' ? document.getElementById('story-text-input').value.trim() : null,
-        bgColor: storyType === 'text' ? document.getElementById('story-bg-color').value : null,
-        timestamp: Date.now()
-      };
-
-      if (storyType === 'photo' && !tempStoryImage) return alert("Choisis une image pour la story");
-      if (storyType === 'text' && !newStory.text) return alert("Écris un texte pour la story");
-
-      stories.unshift(newStory);
-      if (db) db.collection('stories').add(newStory).catch(() => {});
-
-      broadcastChange();
-      tempStoryImage = null;
-      document.getElementById('story-text-input').value = '';
-      document.getElementById('story-preview-box').classList.add('hidden');
-      closeModal('modal-story');
-      renderStories();
-    }
-
-    function renderStories() {
-      const container = document.getElementById('stories-container');
-      container.innerHTML = '';
-
-      const now = Date.now();
-      stories = stories.filter(s => (now - s.timestamp) < 24 * 60 * 60 * 1000);
-
-      stories.forEach(s => {
-        const isText = s.type === 'text';
-        container.innerHTML += `
-          <div onclick="viewStory('${s.id}')" class="flex-shrink-0 w-20 h-28 story-ring p-0.5 rounded-xl cursor-pointer">
-            <div class="w-full h-full rounded-[10px] overflow-hidden relative flex flex-col justify-end p-1.5" style="background: ${isText ? s.bgColor : '#020617'}">
-              ${!isText ? `<img src="${s.img}" class="absolute inset-0 w-full h-full object-cover opacity-80">` : `<div class="absolute inset-0 flex items-center justify-center p-1 text-[8px] text-white font-bold text-center overflow-hidden">${s.text}</div>`}
-              <img src="${s.avatar}" class="w-6 h-6 rounded-full border border-cyan-400 absolute top-1.5 left-1.5 object-cover z-10">
-              <span class="text-[9px] font-bold text-white truncate w-full block text-center z-10 drop-shadow-md">${s.user}</span>
+        <div class="chat-box hidden" id="chatBox">
+            <div class="users-sidebar">
+                <div class="sidebar-title">En ligne</div>
+                <div id="usersList"></div>
             </div>
-          </div>
-        `;
-      });
-    }
-
-    function viewStory(id) {
-      const s = stories.find(item => item.id === id);
-      if (!s) return;
-
-      document.getElementById('view-story-user').innerText = s.user;
-      document.getElementById('view-story-avatar').src = s.avatar;
-
-      const hoursAgo = Math.floor((Date.now() - s.timestamp) / (1000 * 60 * 60));
-      document.getElementById('view-story-time').innerText = `Il y a ${hoursAgo === 0 ? 'quelques minutes' : hoursAgo + 'h'}`;
-
-      const contentBox = document.getElementById('view-story-content');
-      if (s.type === 'text') {
-        contentBox.innerHTML = `
-          <div class="w-full h-96 rounded-2xl p-6 flex items-center justify-center text-center text-lg font-bold text-white shadow-2xl" style="background: ${s.bgColor}">
-            ${s.text}
-          </div>
-        `;
-      } else {
-        contentBox.innerHTML = `<img src="${s.img}" class="max-h-[70vh] rounded-2xl object-contain">`;
-      }
-
-      openModal('modal-view-story');
-    }
-
-    function attachImageToPost(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          tempPostImage = evt.target.result;
-          document.getElementById('post-image-preview').src = tempPostImage;
-          document.getElementById('post-image-preview-box').classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    function removePostImage() {
-      tempPostImage = null;
-      document.getElementById('post-image-preview-box').classList.add('hidden');
-    }
-
-    function publishPost() {
-      const text = document.getElementById('post-input').value.trim();
-      if (!text && !tempPostImage) return;
-
-      const newPost = {
-        id: 'pst_' + Date.now(),
-        author: currentUser.username,
-        domain: currentUser.domain,
-        avatar: currentUser.avatar,
-        content: text,
-        image: tempPostImage,
-        totalReactions: 0,
-        shares: 0,
-        comments: [],
-        timestamp: Date.now()
-      };
-
-      posts.unshift(newPost);
-      if (db) db.collection('posts').add(newPost).catch(() => {});
-
-      broadcastChange();
-      document.getElementById('post-input').value = '';
-      removePostImage();
-      renderPosts();
-    }
-
-    function renderPosts(filteredPosts = null) {
-      const container = document.getElementById('posts-container');
-      container.innerHTML = '';
-      const list = filteredPosts || posts;
-
-      list.forEach(p => {
-        container.innerHTML += `
-          <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl space-y-3">
-            <div class="flex items-center gap-2.5">
-              <img src="${p.avatar}" class="w-9 h-9 rounded-full border border-cyan-400 object-cover bg-slate-950">
-              <div>
-                <h4 class="font-bold text-xs text-white">${p.author}</h4>
-                <p class="text-[9px] text-cyan-400">${p.domain}</p>
-              </div>
-            </div>
-
-            ${p.content ? `<p class="text-xs text-slate-200">${p.content}</p>` : ''}
-            ${p.image ? `<img src="${p.image}" class="w-full max-h-60 object-cover rounded-xl border border-slate-800">` : ''}
-
-            <div class="flex justify-between items-center pt-2 border-t border-slate-800/60 text-xs text-slate-400">
-              <div class="flex gap-2 text-base">
-                <span onclick="reactToPost('${p.id}')" class="cursor-pointer emoji-pop">👍</span>
-                <span onclick="reactToPost('${p.id}')" class="cursor-pointer emoji-pop">❤️</span>
-                <span onclick="reactToPost('${p.id}')" class="cursor-pointer emoji-pop">😂</span>
-              </div>
-              <div class="flex gap-2 text-[10px]">
-                <span>${p.totalReactions || 0} Réactions</span>
-                <span>•</span>
-                <button onclick="sharePost('${p.id}')" class="hover:text-cyan-400"><i class="fa-solid fa-share"></i> Partager (${p.shares || 0})</button>
-              </div>
-            </div>
-
-            <div class="space-y-1">
-              ${(p.comments || []).map(c => `
-                <div class="bg-slate-950 p-1.5 rounded-lg text-[10px]">
-                  <span class="font-bold text-cyan-400">${c.author}:</span> ${c.text}
+            <div class="chat-main">
+                <div class="chat-header">
+                    <span>Salon Public</span>
+                    <button class="logout-btn" id="logoutBtn">Déconnexion</button>
                 </div>
-              `).join('')}
-              <div class="flex gap-1.5 pt-1">
-                <input type="text" id="comment-input-${p.id}" placeholder="Écrire un commentaire..." class="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-[10px] text-white focus:outline-none">
-                <button onclick="addComment('${p.id}')" class="px-2 py-1 meta-gradient text-[9px] font-bold rounded-lg text-white">Envoyer</button>
-              </div>
+                <div class="messages-display" id="msgDisplay"></div>
+                <div class="chat-input-area">
+                    <input type="text" id="chatInput" placeholder="Tapez votre message ici..." autocomplete="off">
+                    <button id="sendBtn">Envoyer</button>
+                </div>
             </div>
-          </div>
-        `;
-      });
-    }
+        </div>
+    </div>
 
-    function filterFeed(query) {
-      if (!query.trim()) return renderPosts();
-      const filtered = posts.filter(p => 
-        (p.content && p.content.toLowerCase().includes(query.toLowerCase())) || 
-        (p.author && p.author.toLowerCase().includes(query.toLowerCase()))
-      );
-      renderPosts(filtered);
-    }
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        let mode = 'login';
+        let token = localStorage.getItem('chat_token') || null;
+        let myPhone = localStorage.getItem('chat_phone') || null;
+        let socket = null;
 
-    function reactToPost(id) {
-      const p = posts.find(item => item.id === id);
-      if (p) {
-        p.totalReactions = (p.totalReactions || 0) + 1;
-        broadcastChange();
-        renderPosts();
-      }
-    }
+        const authForm = document.getElementById('authForm');
+        const errorMsg = document.getElementById('errorMsg');
+        const formTitle = document.getElementById('formTitle');
+        const submitBtn = document.getElementById('submitBtn');
+        const switchText = document.getElementById('switchText');
+        const switchLink = document.getElementById('switchLink');
 
-    function addComment(id) {
-      const input = document.getElementById(`comment-input-${id}`);
-      const text = input.value.trim();
-      if (!text) return;
-
-      const p = posts.find(item => item.id === id);
-      if (p) {
-        if (!p.comments) p.comments = [];
-        p.comments.push({ author: currentUser.username, text: text });
-        broadcastChange();
-        renderPosts();
-      }
-      input.value = '';
-    }
-
-    function sharePost(id) {
-      const post = posts.find(p => p.id === id);
-      if (post) {
-        post.shares = (post.shares || 0) + 1;
-        posts.unshift({
-          id: 'pst_' + Date.now(),
-          author: currentUser.username,
-          domain: currentUser.domain,
-          avatar: currentUser.avatar,
-          content: `🔄 Partagé de @${post.author} : "${post.content || ''}"`,
-          image: post.image || null,
-          totalReactions: 0,
-          shares: 0,
-          comments: [],
-          timestamp: Date.now()
+        switchLink.addEventListener('click', () => {
+            mode = mode === 'login' ? 'register' : 'login';
+            document.getElementById('password').value = '';
+            errorMsg.textContent = '';
+            if (mode === 'register') {
+                formTitle.textContent = 'Créer un compte';
+                submitBtn.textContent = 'Créer mon compte';
+                switchText.textContent = 'Déjà inscrit ?';
+                switchLink.textContent = 'Se connecter';
+            } else {
+                formTitle.textContent = 'Connexion';
+                submitBtn.textContent = 'Se connecter & Parler';
+                switchText.textContent = 'Pas encore de compte ?';
+                switchLink.textContent = 'Créer un compte';
+            }
         });
-        broadcastChange();
-        renderPosts();
-      }
-    }
 
-    function publishMarketItem() {
-      const title = document.getElementById('market-title').value.trim();
-      const price = document.getElementById('market-price').value.trim();
-      const img = document.getElementById('market-img').value.trim() || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300';
+        authForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            errorMsg.textContent = '';
+            submitBtn.disabled = true;
 
-      if (!title || !price) return;
-      const newItem = { id: 'mkt_' + Date.now(), title, price, img, seller: currentUser.username, timestamp: Date.now() };
+            const phone = document.getElementById('phone').value.trim();
+            const password = document.getElementById('password').value;
+            const endpoint = mode === 'login' ? '/api/login' : '/api/register';
 
-      marketItems.unshift(newItem);
-      broadcastChange();
-      closeModal('modal-market');
-      renderMarket();
-    }
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone, password })
+                });
+                const data = await res.json();
 
-    function renderMarket() {
-      const container = document.getElementById('market-container');
-      container.innerHTML = '';
-      marketItems.forEach(m => {
-        container.innerHTML += `
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden flex flex-col justify-between">
-            <img src="${m.img}" class="w-full h-28 object-cover">
-            <div class="p-2 space-y-1">
-              <h4 class="font-bold text-xs text-white truncate">${m.title}</h4>
-              <p class="text-cyan-400 font-bold text-xs">${m.price}</p>
-              <p class="text-[9px] text-slate-400">Vendeur: ${m.seller}</p>
-              <button onclick="startPV('${m.seller}', 'https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(m.seller)}')" class="w-full py-1 meta-gradient rounded-lg text-[9px] font-bold text-white mt-1">Contacter</button>
-            </div>
-          </div>
-        `;
-      });
-    }
+                if (!res.ok) {
+                    errorMsg.textContent = data.error || 'Une erreur est survenue.';
+                    return;
+                }
 
-    function searchUsersAndChats(query) {
-      const container = document.getElementById('search-results');
-      if (!query.trim()) return container.classList.add('hidden');
-      container.classList.remove('hidden');
-      container.innerHTML = '';
+                token = data.token;
+                myPhone = data.phone;
+                localStorage.setItem('chat_token', token);
+                localStorage.setItem('chat_phone', myPhone);
+                enterChat();
+            } catch (err) {
+                errorMsg.textContent = 'Impossible de joindre le serveur.';
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
 
-      const matchedUsers = allRegisteredUsers.filter(u => u.username.toLowerCase().includes(query.toLowerCase()) && u.username !== currentUser.username);
-      
-      if (matchedUsers.length === 0) {
-        container.innerHTML = `<div class="p-2 text-xs text-slate-400 text-center">Aucun membre trouvé</div>`;
-        return;
-      }
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            logout();
+        });
 
-      matchedUsers.forEach(u => {
-        container.innerHTML += `
-          <div class="flex justify-between items-center p-2 bg-slate-900 rounded-xl">
-            <div class="flex items-center gap-2">
-              <img src="${u.avatar}" class="w-7 h-7 rounded-full object-cover">
-              <div>
-                <span class="text-xs font-bold text-white block">${u.username}</span>
-                <span class="text-[9px] text-cyan-400">${u.domain}</span>
-              </div>
-            </div>
-            <button onclick="startPV('${u.username}', '${u.avatar}')" class="px-2.5 py-1 meta-gradient text-[10px] rounded-lg font-bold text-white">Message PV</button>
-          </div>
-        `;
-      });
-    }
+        function logout() {
+            localStorage.removeItem('chat_token');
+            localStorage.removeItem('chat_phone');
+            if (socket) socket.disconnect();
+            location.reload();
+        }
 
-    function startPV(name, avatar) {
-      let existingChat = chats.find(c => c.name === `PV : ${name}`);
-      if (!existingChat) {
-        existingChat = { id: 'chat_' + Date.now(), name: `PV : ${name}`, avatar: avatar, messages: [] };
-        chats.unshift(existingChat);
-        broadcastChange();
-      }
-      openChatRoom(existingChat.id, existingChat.name, existingChat.avatar);
-      document.getElementById('search-results').classList.add('hidden');
-      switchTab('chats');
-    }
+        async function enterChat() {
+            document.getElementById('loginBox').classList.add('hidden');
+            document.getElementById('chatBox').classList.remove('hidden');
+            document.getElementById('mainContainer').classList.add('chat-mode');
 
-    function renderChatsList() {
-      const container = document.getElementById('chats-list');
-      container.innerHTML = '';
-      chats.forEach(c => {
-        container.innerHTML += `
-          <div onclick="openChatRoom('${c.id}', '${c.name}', '${c.avatar}')" class="flex items-center gap-3 p-3.5 hover:bg-slate-800/40 cursor-pointer transition">
-            <img src="${c.avatar}" class="w-10 h-10 rounded-full border border-cyan-400 object-cover bg-slate-950">
-            <div class="flex-1">
-              <h2 class="font-bold text-xs text-white">${c.name}</h2>
-              <p class="text-[10px] text-slate-400 truncate">${c.messages && c.messages.length ? c.messages[c.messages.length - 1].text : 'Discussion active'}</p>
-            </div>
-          </div>
-        `;
-      });
-    }
+            try {
+                const res = await fetch('/api/messages', {
+                    headers: { Authorization: 'Bearer ' + token }
+                });
+                if (res.status === 401) {
+                    // Jeton expiré ou invalide : on renvoie l'utilisateur se reconnecter.
+                    return logout();
+                }
+                if (res.ok) {
+                    const history = await res.json();
+                    history.forEach(renderMessage);
+                }
+            } catch (err) {
+                addSystemMessage('Impossible de charger l\\'historique des messages.');
+            }
 
-    function openChatRoom(id, name, avatar) {
-      activeChatId = id;
-      document.getElementById('room-title').innerText = name;
-      document.getElementById('room-avatar').src = avatar;
-      document.getElementById('view-chat-room').classList.remove('hidden');
-      renderMessages();
-    }
+            socket = io({ auth: { token } });
 
-    function closeChatRoom() {
-      document.getElementById('view-chat-room').classList.add('hidden');
-      activeChatId = null;
-    }
+            socket.on('connect_error', () => {
+                addSystemMessage('Connexion au serveur temps réel impossible.');
+            });
 
-    function renderMessages() {
-      const chat = chats.find(c => c.id === activeChatId);
-      if (!chat) return;
+            socket.on('chat:message', renderMessage);
 
-      const box = document.getElementById('messages-box');
-      box.innerHTML = '';
-      (chat.messages || []).forEach(m => {
-        const isMe = m.sender === currentUser.username;
-        box.innerHTML += `
-          <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
-            <div class="max-w-[80%] ${isMe ? 'meta-gradient text-white' : 'bg-slate-900 text-slate-200 border border-slate-800'} p-2.5 rounded-2xl text-xs">
-              ${!isMe ? `<span class="text-[9px] font-bold text-cyan-300 block mb-0.5">${m.sender}</span>` : ''}
-              <p class="break-words">${m.text}</p>
-            </div>
-          </div>
-        `;
-      });
-      box.scrollTop = box.scrollHeight;
-    }
+            socket.on('presence', (users) => {
+                const list = document.getElementById('usersList');
+                list.innerHTML = '';
+                users.forEach((phone) => {
+                    const item = document.createElement('div');
+                    item.className = 'user-item';
+                    item.innerHTML = '<div class="status-dot"></div><span>' + escapeHtml(phone) + (phone === myPhone ? ' (vous)' : '') + '</span>';
+                    list.appendChild(item);
+                });
+            });
+        }
 
-    function sendMessage(e) {
-      e.preventDefault();
-      const input = document.getElementById('chat-input');
-      const text = input.value.trim();
-      if (!text || !activeChatId) return;
+        function renderMessage(msg) {
+            const display = document.getElementById('msgDisplay');
+            const el = document.createElement('div');
+            el.classList.add('msg', msg.username === myPhone ? 'sent' : 'received');
+            el.innerHTML = '<span class="msg-author">' + escapeHtml(msg.username) + '</span>' + escapeHtml(msg.text);
+            display.appendChild(el);
+            display.scrollTop = display.scrollHeight;
+        }
 
-      const chat = chats.find(c => c.id === activeChatId);
-      if (chat) {
-        if (!chat.messages) chat.messages = [];
-        chat.messages.push({ sender: currentUser.username, text: text, timestamp: Date.now() });
-        broadcastChange();
-        renderMessages();
-        renderChatsList();
-      }
-      input.value = '';
-    }
+        function addSystemMessage(text) {
+            const display = document.getElementById('msgDisplay');
+            const el = document.createElement('div');
+            el.classList.add('msg', 'system');
+            el.textContent = text;
+            display.appendChild(el);
+            display.scrollTop = display.scrollHeight;
+        }
 
-    function createGroupSubmit() {
-      const name = document.getElementById('group-name-input').value.trim();
-      if (!name) return;
-      const newGroup = { 
-        id: 'grp_' + Date.now(), 
-        name: 'Groupe : ' + name, 
-        avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(name)}`, 
-        messages: [] 
-      };
-      chats.unshift(newGroup);
-      broadcastChange();
-      closeModal('modal-group');
-      renderChatsList();
-    }
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
 
-    function openProfileSettings() {
-      if (!currentUser) return;
-      document.getElementById('username-input').value = currentUser.username;
-      document.getElementById('domain-input').value = currentUser.domain;
-      document.getElementById('avatar-preview').src = currentUser.avatar;
-      openModal('modal-settings');
-    }
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (text !== '' && socket) {
+                socket.emit('chat:message', text);
+                input.value = '';
+            }
+        }
 
-    function saveUserProfile() {
-      currentUser.username = document.getElementById('username-input').value;
-      currentUser.domain = document.getElementById('domain-input').value;
-      localStorage.setItem('nexus_user', JSON.stringify(currentUser));
-      registerPresence();
-      applyUserProfile();
-      closeModal('modal-settings');
-    }
+        document.getElementById('sendBtn').addEventListener('click', sendMessage);
+        document.getElementById('chatInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') sendMessage();
+        });
 
-    function loadAvatarFromGallery(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          currentUser.avatar = evt.target.result;
-          document.getElementById('avatar-preview').src = currentUser.avatar;
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    function shareInviteLink() {
-      navigator.clipboard.writeText(window.location.href).then(() => alert("Lien d'invitation copié !"));
-    }
-
-    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-
-    function switchTab(tab) {
-      document.getElementById('tab-feed').classList.add('hidden');
-      document.getElementById('tab-market').classList.add('hidden');
-      document.getElementById('tab-chats').classList.add('hidden');
-
-      document.getElementById('nav-btn-feed').className = "flex flex-col items-center gap-1 text-slate-500 hover:text-cyan-400";
-      document.getElementById('nav-btn-market').className = "flex flex-col items-center gap-1 text-slate-500 hover:text-cyan-400";
-      document.getElementById('nav-btn-chats').className = "flex flex-col items-center gap-1 text-slate-500 hover:text-cyan-400";
-
-      if (tab === 'feed') {
-        document.getElementById('tab-feed').classList.remove('hidden');
-        document.getElementById('nav-btn-feed').className = "flex flex-col items-center gap-1 text-cyan-400";
-      } else if (tab === 'market') {
-        document.getElementById('tab-market').classList.remove('hidden');
-        document.getElementById('nav-btn-market').className = "flex flex-col items-center gap-1 text-cyan-400";
-      } else if (tab === 'chats') {
-        document.getElementById('tab-chats').classList.remove('hidden');
-        document.getElementById('nav-btn-chats').className = "flex flex-col items-center gap-1 text-cyan-400";
-      }
-    }
-  </script>
+        if (token && myPhone) {
+            enterChat();
+        }
+    </script>
 </body>
-</html>
+</html>`;

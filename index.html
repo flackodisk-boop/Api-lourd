@@ -1,1486 +1,337 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Application Sociale</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, Helvetica, sans-serif;
-        }
-
-        body {
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #021024, #052659, #0b3d91);
-            padding: 20px;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 450px;
-            transition: max-width 0.3s ease;
-        }
-
-        .container.app-mode {
-            max-width: 1100px;
-            width: 100%;
-            height: 88vh;
-        }
-
-        .form-box {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 40px 30px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-        }
-
-        .form-box h2 {
-            text-align: center;
-            color: #6fb7ff;
-            margin-bottom: 25px;
-            font-size: 28px;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .visually-hidden {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
-        }
-
-        input, textarea {
-            padding: 14px;
-            margin-bottom: 15px;
-            border: 1px solid transparent;
-            border-radius: 10px;
-            background: #0a234f;
-            color: white;
-            font-size: 15px;
-            outline: none;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-
-        input:focus, textarea:focus {
-            border: 1px solid #4ea1ff;
-            box-shadow: 0 0 10px rgba(78, 161, 255, 0.5);
-        }
-
-        .error-text {
-            color: #ff6b6b;
-            font-size: 13px;
-            margin: -10px 0 12px 4px;
-            min-height: 16px;
-        }
-
-        button {
-            border: none;
-            border-radius: 10px;
-            background: #1976ff;
-            color: white;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        form > button {
-            padding: 14px;
-            font-size: 16px;
-        }
-
-        button:hover {
-            background: #4094ff;
-        }
-
-        button:focus-visible, input:focus-visible, textarea:focus-visible, .user-item:focus-visible {
-            outline: 2px solid #6fb7ff;
-            outline-offset: 2px;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* --- APPLICATION PRINCIPALE --- */
-        .app-box {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            height: 100%;
-            background: rgba(10, 25, 50, 0.9);
-            border-radius: 20px;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .app-topbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 20px;
-            background: rgba(5, 15, 35, 0.6);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            flex-shrink: 0;
-        }
-
-        .app-tabs {
-            display: flex;
-            gap: 6px;
-        }
-
-        .tab-btn {
-            background: transparent;
-            color: #9db8de;
-            padding: 10px 16px;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .tab-btn:hover {
-            background: rgba(255, 255, 255, 0.06);
-        }
-
-        .tab-btn.active {
-            background: #1976ff;
-            color: white;
-        }
-
-        .badge {
-            display: inline-block;
-            background: #ff5c7a;
-            color: white;
-            font-size: 11px;
-            font-weight: bold;
-            border-radius: 999px;
-            padding: 1px 6px;
-            margin-left: 4px;
-            vertical-align: middle;
-        }
-
-        .logout-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #cfe3ff;
-            font-size: 13px;
-            font-weight: normal;
-            padding: 8px 14px;
-        }
-
-        .logout-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .app-body {
-            flex: 1;
-            display: flex;
-            overflow: hidden;
-        }
-
-        /* --- FIL D'ACTUALITÉ --- */
-        .feed-view {
-            width: 100%;
-            overflow-y: auto;
-            padding: 24px 16px 60px;
-        }
-
-        .feed-inner {
-            max-width: 560px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 14px;
-            padding: 16px;
-        }
-
-        .composer textarea {
-            width: 100%;
-            resize: vertical;
-            min-height: 60px;
-            margin-bottom: 10px;
-        }
-
-        .composer-actions {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .photo-label {
-            color: #6fb7ff;
-            cursor: pointer;
-            font-size: 14px;
-            padding: 8px 10px;
-            border-radius: 8px;
-            transition: 0.2s;
-        }
-
-        .photo-label:hover {
-            background: rgba(255, 255, 255, 0.06);
-        }
-
-        #publishBtn {
-            padding: 10px 20px;
-        }
-
-        #publishBtn:disabled {
-            background: #2a4a7a;
-            cursor: not-allowed;
-        }
-
-        .photo-preview {
-            position: relative;
-            margin: 10px 0;
-            display: inline-block;
-        }
-
-        .photo-preview img {
-            max-width: 100%;
-            max-height: 220px;
-            border-radius: 10px;
-            display: block;
-        }
-
-        .photo-preview button {
-            position: absolute;
-            top: 6px;
-            right: 6px;
-            width: 26px;
-            height: 26px;
-            padding: 0;
-            border-radius: 50%;
-            background: rgba(0,0,0,0.6);
-            line-height: 1;
-        }
-
-        .post-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 10px;
-        }
-
-        .avatar {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: white;
-            font-size: 15px;
-            flex-shrink: 0;
-        }
-
-        .post-author {
-            color: white;
-            font-weight: bold;
-            font-size: 15px;
-        }
-
-        .post-time {
-            color: rgba(255,255,255,0.45);
-            font-size: 12.5px;
-        }
-
-        .post-text {
-            color: #e6eefc;
-            font-size: 15px;
-            line-height: 1.5;
-            margin-bottom: 10px;
-            white-space: pre-wrap;
-        }
-
-        .post-image {
-            width: 100%;
-            max-height: 400px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        .post-stats {
-            display: flex;
-            justify-content: space-between;
-            color: rgba(255,255,255,0.45);
-            font-size: 13px;
-            padding: 6px 2px 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.07);
-        }
-
-        .post-actions {
-            display: flex;
-            gap: 8px;
-            padding-top: 8px;
-        }
-
-        .post-actions button {
-            flex: 1;
-            background: transparent;
-            color: #9db8de;
-            padding: 9px;
-            font-size: 14px;
-            font-weight: normal;
-        }
-
-        .post-actions button:hover {
-            background: rgba(255, 255, 255, 0.06);
-        }
-
-        .like-btn.liked {
-            color: #ff5c7a;
-            font-weight: bold;
-        }
-
-        .comments-section {
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid rgba(255,255,255,0.07);
-        }
-
-        .comment-row {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .comment-bubble {
-            background: rgba(255,255,255,0.07);
-            border-radius: 10px;
-            padding: 8px 12px;
-            color: #e6eefc;
-        }
-
-        .comment-bubble b {
-            color: #6fb7ff;
-        }
-
-        .comment-input-row {
-            display: flex;
-            gap: 8px;
-            margin-top: 6px;
-        }
-
-        .comment-input-row input {
-            flex: 1;
-            margin-bottom: 0;
-            padding: 10px;
-            font-size: 14px;
-        }
-
-        .comment-input-row button {
-            padding: 0 16px;
-        }
-
-        /* --- AMIS --- */
-        .friends-view {
-            width: 100%;
-            overflow-y: auto;
-            padding: 24px 16px 60px;
-        }
-
-        .friends-inner {
-            max-width: 560px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 22px;
-        }
-
-        #friendSearch {
-            margin-bottom: 0;
-        }
-
-        .search-wrap {
-            position: relative;
-        }
-
-        .search-results {
-            margin-top: 10px;
-        }
-
-        .invite-card h3 {
-            color: #6fb7ff;
-            font-size: 15px;
-            margin-bottom: 6px;
-        }
-
-        .invite-hint {
-            color: rgba(255,255,255,0.5);
-            font-size: 13px;
-            margin-bottom: 12px;
-        }
-
-        .invite-row {
-            display: flex;
-            gap: 10px;
-        }
-
-        .invite-row input {
-            flex: 1;
-            margin-bottom: 0;
-        }
-
-        .invite-row button {
-            padding: 0 18px;
-            white-space: nowrap;
-        }
-
-        .invite-row button:disabled {
-            background: #2a4a7a;
-            cursor: not-allowed;
-        }
-
-        .friends-section h3 {
-            color: #6fb7ff;
-            font-size: 15px;
-            margin-bottom: 10px;
-        }
-
-        .friends-section.empty {
-            display: none;
-        }
-
-        .friends-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .friend-card {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 12px 14px;
-        }
-
-        .friend-card .avatar {
-            width: 42px;
-            height: 42px;
-            font-size: 15px;
-        }
-
-        .friend-name {
-            color: white;
-            font-weight: bold;
-            font-size: 15px;
-        }
-
-        .friend-meta {
-            color: rgba(255,255,255,0.45);
-            font-size: 12.5px;
-        }
-
-        .friend-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .friend-actions {
-            display: flex;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        .friend-actions button {
-            padding: 8px 12px;
-            font-size: 13px;
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.08);
-            color: #cfe3ff;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .btn-danger {
-            background: rgba(255, 92, 122, 0.15);
-            color: #ff8fa3;
-        }
-
-        .btn-danger:hover {
-            background: rgba(255, 92, 122, 0.3);
-        }
-
-        .btn-disabled, .btn-disabled:hover {
-            background: #2a4a7a;
-            color: rgba(255,255,255,0.6);
-            cursor: default;
-        }
-
-        .friends-empty-text {
-            color: rgba(255,255,255,0.4);
-            font-size: 13.5px;
-            padding: 4px 2px;
-        }
-
-        /* --- CHAT (repris de l'existant) --- */
-        .chat-box {
-            display: flex;
-            width: 100%;
-            height: 100%;
-        }
-
-        .users-sidebar {
-            width: 30%;
-            background: rgba(5, 15, 35, 0.8);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sidebar-title {
-            padding: 20px;
-            color: #6fb7ff;
-            font-size: 18px;
-            font-weight: bold;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .close-sidebar-btn {
-            display: none;
-            background: none;
-            color: #6fb7ff;
-            font-size: 20px;
-            padding: 0 4px;
-        }
-
-        .user-item {
-            padding: 15px 20px;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: 0.2s;
-            background: none;
-            width: 100%;
-            text-align: left;
-            font-size: 15px;
-            border-radius: 0;
-        }
-
-        .user-item:hover, .user-item.active {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            background: #2ec4b6;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .chat-main {
-            width: 70%;
-            display: flex;
-            flex-direction: column;
-            background: rgba(10, 25, 50, 0.3);
-        }
-
-        .chat-header {
-            padding: 16px 20px;
-            background: rgba(5, 15, 35, 0.5);
-            color: white;
-            font-weight: bold;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .open-sidebar-btn {
-            display: none;
-            background: none;
-            color: #6fb7ff;
-            font-size: 20px;
-        }
-
-        .messages-display {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .msg-row {
-            display: flex;
-            flex-direction: column;
-            max-width: 70%;
-        }
-
-        .msg-row.sent {
-            align-self: flex-end;
-            align-items: flex-end;
-        }
-
-        .msg-row.received {
-            align-self: flex-start;
-            align-items: flex-start;
-        }
-
-        .msg {
-            padding: 12px 16px;
-            border-radius: 15px;
-            color: white;
-            font-size: 15px;
-            line-height: 1.4;
-            word-wrap: break-word;
-        }
-
-        .msg.sent {
-            background: #1976ff;
-            border-bottom-right-radius: 2px;
-        }
-
-        .msg.received {
-            background: rgba(255, 255, 255, 0.1);
-            border-bottom-left-radius: 2px;
-        }
-
-        .msg-time {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.4);
-            margin-top: 4px;
-            padding: 0 4px;
-        }
-
-        .chat-input-area {
-            padding: 16px 20px;
-            display: flex;
-            gap: 10px;
-            background: rgba(5, 15, 35, 0.5);
-            flex-shrink: 0;
-        }
-
-        .chat-input-area input {
-            flex: 1;
-            margin-bottom: 0;
-            background: #05152d;
-        }
-
-        .chat-input-area button {
-            padding: 14px 22px;
-        }
-
-        .chat-input-area button:disabled {
-            background: #2a4a7a;
-            cursor: not-allowed;
-        }
-
-        .feed-view::-webkit-scrollbar,
-        .messages-display::-webkit-scrollbar {
-            width: 6px;
-        }
-        .feed-view::-webkit-scrollbar-thumb,
-        .messages-display::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 6px;
-        }
-
-        @media (max-width: 768px) {
-            .container.app-mode {
-                height: 94vh;
-            }
-
-            .app-topbar {
-                padding: 10px 12px;
-            }
-
-            .tab-btn {
-                padding: 9px 12px;
-                font-size: 13px;
-            }
-
-            .users-sidebar {
-                position: absolute;
-                inset: 0;
-                width: 100%;
-                z-index: 5;
-            }
-
-            .users-sidebar.hidden {
-                display: none !important;
-            }
-
-            .chat-main {
-                width: 100%;
-            }
-
-            .close-sidebar-btn, .open-sidebar-btn {
-                display: inline-block;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            * { transition: none !important; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VP Dev App</title>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <style>
+    :root {
+      --bg-dark: #0a0a0c;
+      --card-bg: #121318;
+      --accent-blue: #0070f3;
+      --accent-blue-hover: #0051a8;
+      --text-color: #ffffff;
+      --text-muted: #a0a0a0;
+      --border-color: #1f222e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* En-tête / Logo VP */
+    header {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--text-color);
+      letter-spacing: 2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo span {
+      background-color: var(--accent-blue);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0, 112, 243, 0.4);
+    }
+
+    /* Cartes */
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 500px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    h2 {
+      font-size: 16px;
+      margin-bottom: 15px;
+      color: var(--accent-blue);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Formulaires */
+    .form-group {
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      background-color: #060608;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--accent-blue);
+    }
+
+    /* Photo de profil galerie */
+    .profile-upload {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .avatar-preview {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 2px solid var(--accent-blue);
+      object-fit: cover;
+      background-color: #000;
+    }
+
+    .file-btn {
+      background-color: #1a1c23;
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    input[type="file"] { display: none; }
+
+    /* Boutons */
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background-color: var(--accent-blue);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn:hover { background-color: var(--accent-blue-hover); }
+
+    /* Zone de Chat */
+    .chat-box {
+      height: 250px;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      background-color: #060608;
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .msg {
+      background-color: #1f222e;
+      padding: 8px 12px;
+      border-radius: 8px;
+      max-width: 80%;
+      font-size: 13px;
+      align-self: flex-start;
+    }
+
+    .msg.me {
+      align-self: flex-end;
+      background-color: var(--accent-blue);
+    }
+
+    .msg-author {
+      font-size: 10px;
+      color: #aaa;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .chat-input-group {
+      display: flex;
+      gap: 8px;
+    }
+  </style>
 </head>
 <body>
 
-    <div class="container" id="mainContainer">
+  <header>
+    <div class="logo">
+      <span>VP</span> DEV
+    </div>
+  </header>
 
-        <div class="form-box" id="loginBox">
-            <h2>Connexion</h2>
-            <form id="loginForm" novalidate>
-                <label class="visually-hidden" for="phone">Numéro de téléphone</label>
-                <input type="tel" id="phone" name="phone" placeholder="Numéro de téléphone"
-                       autocomplete="tel" inputmode="tel" required>
+  <div class="card" id="authSection">
+    <h2>Connexion / Inscription</h2>
+    <form id="authForm">
+      <div class="profile-upload">
+        <img src="https://via.placeholder.com/80/121318/a0a0a0?text=Avatar" id="avatarPreview" class="avatar-preview">
+        <label for="galleryInput" class="file-btn">Choisir photo depuis la galerie</label>
+        <input type="file" id="galleryInput" accept="image/*">
+      </div>
 
-                <label class="visually-hidden" for="password">Mot de passe</label>
-                <input type="password" id="password" name="password" placeholder="Mot de passe"
-                       autocomplete="current-password" minlength="4" required>
+      <div class="form-group">
+        <label>Pseudo Développeur</label>
+        <input type="text" id="username" placeholder="ex: Dev_Master" required>
+      </div>
 
-                <div class="error-text" id="loginError" role="alert"></div>
+      <div class="form-group">
+        <label>Adresse E-mail</label>
+        <input type="email" placeholder="dev@exemple.com" required>
+      </div>
 
-                <button type="submit">Se connecter &amp; Parler</button>
-            </form>
-        </div>
+      <button type="submit" class="btn">Rejoindre l'application</button>
+    </form>
+  </div>
 
-        <div class="app-box hidden" id="appBox">
-
-            <div class="app-topbar">
-                <div class="app-tabs">
-                    <button class="tab-btn active" id="feedTabBtn" data-tab="feed">Fil d'actualité</button>
-                    <button class="tab-btn" id="friendsTabBtn" data-tab="friends">Amis <span class="badge hidden" id="friendsBadge">0</span></button>
-                    <button class="tab-btn" id="chatTabBtn" data-tab="chat">Messages</button>
-                </div>
-                <button class="logout-btn" id="logoutBtn" type="button">Déconnexion</button>
-            </div>
-
-            <div class="app-body">
-
-                <!-- FIL D'ACTUALITÉ -->
-                <div class="feed-view" id="feedView">
-                    <div class="feed-inner">
-
-                        <div class="card composer">
-                            <textarea id="postText" placeholder="Quoi de neuf ?" maxlength="1000"></textarea>
-                            <div class="photo-preview hidden" id="photoPreview">
-                                <img id="photoPreviewImg" alt="Aperçu de la photo">
-                                <button id="removePhotoBtn" type="button" aria-label="Retirer la photo">&times;</button>
-                            </div>
-                            <div class="composer-actions">
-                                <label class="photo-label" for="postPhoto">&#128247; Photo</label>
-                                <input type="file" id="postPhoto" accept="image/*" class="visually-hidden">
-                                <button id="publishBtn" type="button" disabled>Publier</button>
-                            </div>
-                        </div>
-
-                        <div id="postsList"></div>
-
-                    </div>
-                </div>
-
-                <!-- AMIS -->
-                <div class="friends-view hidden" id="friendsView">
-                    <div class="friends-inner">
-
-                        <div class="search-wrap">
-                            <label class="visually-hidden" for="friendSearch">Rechercher un utilisateur par nom</label>
-                            <input type="text" id="friendSearch" placeholder="Rechercher une personne par son nom...">
-                            <div id="searchResultsList" class="friends-list search-results hidden"></div>
-                            <div class="friends-empty-text hidden" id="noSearchResults">
-                                Aucun utilisateur trouvé avec ce nom.
-                            </div>
-                        </div>
-
-                        <div class="card invite-card">
-                            <h3>Inviter par numéro de téléphone</h3>
-                            <p class="invite-hint">Cette personne n'est pas encore sur l'application ? Envoie-lui une invitation directement.</p>
-                            <div class="invite-row">
-                                <label class="visually-hidden" for="invitePhone">Numéro de téléphone à inviter</label>
-                                <input type="tel" id="invitePhone" placeholder="Numéro de téléphone" inputmode="tel">
-                                <button id="inviteBtn" type="button" disabled>Envoyer une invitation</button>
-                            </div>
-                            <div class="error-text" id="inviteError" role="alert"></div>
-                        </div>
-
-                        <div class="friends-section" id="receivedSection">
-                            <h3>Demandes reçues</h3>
-                            <div id="receivedList" class="friends-list"></div>
-                        </div>
-
-                        <div class="friends-section" id="sentSection">
-                            <h3>Demandes envoyées</h3>
-                            <div id="sentList" class="friends-list"></div>
-                        </div>
-
-                        <div class="friends-section" id="suggestionsSection">
-                            <h3>Suggestions</h3>
-                            <div id="suggestionsList" class="friends-list"></div>
-                        </div>
-
-                        <div class="friends-section">
-                            <h3>Mes amis (<span id="friendsCount">0</span>)</h3>
-                            <div id="friendsList" class="friends-list"></div>
-                        </div>
-
-                    </div>
-                </div>
-
-                <!-- CHAT -->
-                <div class="chat-box hidden" id="chatBox">
-
-                    <div class="users-sidebar" id="usersSidebar">
-                        <div class="sidebar-title">
-                            <span>Discussions</span>
-                            <button class="close-sidebar-btn" id="closeSidebarBtn" aria-label="Fermer la liste">&times;</button>
-                        </div>
-                        <button class="user-item active" data-name="Groupe Général">
-                            <div class="status-dot"></div>
-                            <span>Groupe Général</span>
-                        </button>
-                        <button class="user-item" data-name="Utilisateur_23">
-                            <div class="status-dot" style="background: #a0a0a0;"></div>
-                            <span>Utilisateur_23</span>
-                        </button>
-                    </div>
-
-                    <div class="chat-main">
-                        <div class="chat-header">
-                            <button class="open-sidebar-btn" id="openSidebarBtn" aria-label="Afficher les discussions">&#9776;</button>
-                            <span id="chatHeader">Groupe Général</span>
-                        </div>
-
-                        <div class="messages-display" id="msgDisplay" aria-live="polite">
-                            <div class="msg-row received">
-                                <div class="msg received">Bienvenue dans l'espace de discussion ! Écrivez votre message ci-dessous.</div>
-                            </div>
-                        </div>
-
-                        <div class="chat-input-area">
-                            <label class="visually-hidden" for="chatInput">Votre message</label>
-                            <input type="text" id="chatInput" placeholder="Tapez votre message ici..."
-                                   autocomplete="off" maxlength="500">
-                            <button id="sendBtn" type="button">Envoyer</button>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-        </div>
-
+  <div id="appSection" class="hidden">
+    
+    <div class="card">
+      <h2>Créer ou Rejoindre un Groupe</h2>
+      <div class="form-group">
+        <input type="text" id="groupNameInput" placeholder="Nom du groupe (ex: React Devs)">
+      </div>
+      <button onclick="joinGroup()" class="btn">Rejoindre le Groupe</button>
     </div>
 
-    <script>
-        // ---------- CONNEXION ----------
-        const loginForm = document.getElementById('loginForm');
-        const loginError = document.getElementById('loginError');
-        const phoneInput = document.getElementById('phone');
-        const passwordInput = document.getElementById('password');
-        const mainContainer = document.getElementById('mainContainer');
-        const loginBox = document.getElementById('loginBox');
-        const appBox = document.getElementById('appBox');
-        const logoutBtn = document.getElementById('logoutBtn');
-
-        loginForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-            loginError.textContent = '';
-
-            const phone = phoneInput.value.trim();
-            const password = passwordInput.value;
-
-            if (phone.length < 6) {
-                loginError.textContent = 'Veuillez entrer un numéro de téléphone valide.';
-                phoneInput.focus();
-                return;
-            }
-            if (password.length < 4) {
-                loginError.textContent = 'Le mot de passe doit contenir au moins 4 caractères.';
-                passwordInput.focus();
-                return;
-            }
-
-            loginBox.classList.add('hidden');
-            appBox.classList.remove('hidden');
-            mainContainer.classList.add('app-mode');
-        });
-
-        logoutBtn.addEventListener('click', function () {
-            appBox.classList.add('hidden');
-            loginBox.classList.remove('hidden');
-            mainContainer.classList.remove('app-mode');
-            passwordInput.value = '';
-            loginError.textContent = '';
-            phoneInput.focus();
-        });
-
-        // ---------- ONGLETS ----------
-        const feedTabBtn = document.getElementById('feedTabBtn');
-        const friendsTabBtn = document.getElementById('friendsTabBtn');
-        const chatTabBtn = document.getElementById('chatTabBtn');
-        const feedView = document.getElementById('feedView');
-        const friendsView = document.getElementById('friendsView');
-        const chatBox = document.getElementById('chatBox');
-
-        function switchTab(tab) {
-            feedTabBtn.classList.toggle('active', tab === 'feed');
-            friendsTabBtn.classList.toggle('active', tab === 'friends');
-            chatTabBtn.classList.toggle('active', tab === 'chat');
-            feedView.classList.toggle('hidden', tab !== 'feed');
-            friendsView.classList.toggle('hidden', tab !== 'friends');
-            chatBox.classList.toggle('hidden', tab !== 'chat');
-        }
-
-        feedTabBtn.addEventListener('click', () => switchTab('feed'));
-        friendsTabBtn.addEventListener('click', () => switchTab('friends'));
-        chatTabBtn.addEventListener('click', () => switchTab('chat'));
-
-        // ---------- CHAT ----------
-        const chatInput = document.getElementById('chatInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const msgDisplay = document.getElementById('msgDisplay');
-        const chatHeader = document.getElementById('chatHeader');
-        const usersSidebar = document.getElementById('usersSidebar');
-        const openSidebarBtn = document.getElementById('openSidebarBtn');
-        const closeSidebarBtn = document.getElementById('closeSidebarBtn');
-        const userItems = document.querySelectorAll('.user-item');
-
-        function heureActuelle() {
-            const d = new Date();
-            return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
-        }
-
-        function ajouterMessage(texte, type) {
-            const row = document.createElement('div');
-            row.classList.add('msg-row', type);
-            const bulle = document.createElement('div');
-            bulle.classList.add('msg', type);
-            bulle.textContent = texte;
-            const heure = document.createElement('div');
-            heure.classList.add('msg-time');
-            heure.textContent = heureActuelle();
-            row.appendChild(bulle);
-            row.appendChild(heure);
-            msgDisplay.appendChild(row);
-            msgDisplay.scrollTop = msgDisplay.scrollHeight;
-        }
-
-        function sendMessage() {
-            const text = chatInput.value.trim();
-            if (text === '') return;
-            ajouterMessage(text, 'sent');
-            chatInput.value = '';
-            chatInput.focus();
-            sendBtn.disabled = true;
-            setTimeout(() => {
-                ajouterMessage('Message reçu sur le réseau ! (Simulation de réponse)', 'received');
-                sendBtn.disabled = false;
-            }, 1000);
-        }
-
-        sendBtn.addEventListener('click', sendMessage);
-        chatInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
-
-        userItems.forEach(item => {
-            item.addEventListener('click', function () {
-                userItems.forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
-                chatHeader.textContent = item.dataset.name;
-                if (window.innerWidth <= 768) usersSidebar.classList.add('hidden');
-            });
-        });
-
-        openSidebarBtn.addEventListener('click', () => usersSidebar.classList.remove('hidden'));
-        closeSidebarBtn.addEventListener('click', () => usersSidebar.classList.add('hidden'));
-
-        // ---------- FIL D'ACTUALITÉ ----------
-        const postText = document.getElementById('postText');
-        const postPhoto = document.getElementById('postPhoto');
-        const photoPreview = document.getElementById('photoPreview');
-        const photoPreviewImg = document.getElementById('photoPreviewImg');
-        const removePhotoBtn = document.getElementById('removePhotoBtn');
-        const publishBtn = document.getElementById('publishBtn');
-        const postsList = document.getElementById('postsList');
-
-        let pendingPhoto = null;
-        let postIdCounter = 0;
-
-        const avatarColors = ['#1976ff', '#2ec4b6', '#ff5c7a', '#a06bff', '#ff9f43'];
-
-        function initiales(nom) {
-            return nom.split(' ').map(p => p[0]).join('').substring(0, 2).toUpperCase();
-        }
-
-        function couleurPour(nom) {
-            let somme = 0;
-            for (let i = 0; i < nom.length; i++) somme += nom.charCodeAt(i);
-            return avatarColors[somme % avatarColors.length];
-        }
-
-        // Publications de démonstration
-        let posts = [
-            {
-                id: postIdCounter++,
-                author: 'Utilisateur_23',
-                time: 'Il y a 2 h',
-                text: 'Belle randonnée ce matin, l\'air était parfait !',
-                image: null,
-                likes: 4,
-                liked: false,
-                comments: [
-                    { author: 'Léa Martin', text: 'Superbe, tu étais où exactement ?' }
-                ]
-            },
-            {
-                id: postIdCounter++,
-                author: 'Léa Martin',
-                time: 'Il y a 5 h',
-                text: 'Nouvelle recette testée ce soir, un vrai succès !',
-                image: null,
-                likes: 9,
-                liked: false,
-                comments: []
-            }
-        ];
-
-        function mettreAJourBoutonPublier() {
-            publishBtn.disabled = postText.value.trim() === '' && !pendingPhoto;
-        }
-
-        postText.addEventListener('input', mettreAJourBoutonPublier);
-
-        postPhoto.addEventListener('change', function () {
-            const fichier = postPhoto.files[0];
-            if (!fichier) return;
-            const lecteur = new FileReader();
-            lecteur.onload = function (e) {
-                pendingPhoto = e.target.result;
-                photoPreviewImg.src = pendingPhoto;
-                photoPreview.classList.remove('hidden');
-                mettreAJourBoutonPublier();
-            };
-            lecteur.readAsDataURL(fichier);
-        });
-
-        removePhotoBtn.addEventListener('click', function () {
-            pendingPhoto = null;
-            postPhoto.value = '';
-            photoPreview.classList.add('hidden');
-            mettreAJourBoutonPublier();
-        });
-
-        publishBtn.addEventListener('click', function () {
-            const texte = postText.value.trim();
-            if (texte === '' && !pendingPhoto) return;
-
-            posts.unshift({
-                id: postIdCounter++,
-                author: 'Vous',
-                time: 'À l\'instant',
-                text: texte,
-                image: pendingPhoto,
-                likes: 0,
-                liked: false,
-                comments: []
-            });
-
-            postText.value = '';
-            pendingPhoto = null;
-            postPhoto.value = '';
-            photoPreview.classList.add('hidden');
-            mettreAJourBoutonPublier();
-            afficherPublications();
-        });
-
-        function basculerLike(id) {
-            const post = posts.find(p => p.id === id);
-            if (!post) return;
-            post.liked = !post.liked;
-            post.likes += post.liked ? 1 : -1;
-            afficherPublications();
-        }
-
-        function ajouterCommentaire(id, texte) {
-            const post = posts.find(p => p.id === id);
-            if (!post || texte.trim() === '') return;
-            post.comments.push({ author: 'Vous', text: texte.trim() });
-            afficherPublications();
-        }
-
-        function afficherPublications() {
-            postsList.innerHTML = '';
-
-            posts.forEach(post => {
-                const card = document.createElement('div');
-                card.classList.add('card');
-
-                const header = document.createElement('div');
-                header.classList.add('post-header');
-                header.innerHTML = `
-                    <div class="avatar" style="background:${couleurPour(post.author)}">${initiales(post.author)}</div>
-                    <div>
-                        <div class="post-author"></div>
-                        <div class="post-time"></div>
-                    </div>
-                `;
-                header.querySelector('.post-author').textContent = post.author;
-                header.querySelector('.post-time').textContent = post.time;
-                card.appendChild(header);
-
-                if (post.text) {
-                    const texte = document.createElement('div');
-                    texte.classList.add('post-text');
-                    texte.textContent = post.text;
-                    card.appendChild(texte);
-                }
-
-                if (post.image) {
-                    const img = document.createElement('img');
-                    img.classList.add('post-image');
-                    img.src = post.image;
-                    img.alt = 'Photo publiée par ' + post.author;
-                    card.appendChild(img);
-                }
-
-                const stats = document.createElement('div');
-                stats.classList.add('post-stats');
-                stats.innerHTML = `<span>&#10084; ${post.likes}</span><span>${post.comments.length} commentaire(s)</span>`;
-                card.appendChild(stats);
-
-                const actions = document.createElement('div');
-                actions.classList.add('post-actions');
-
-                const likeBtn = document.createElement('button');
-                likeBtn.type = 'button';
-                likeBtn.classList.add('like-btn');
-                if (post.liked) likeBtn.classList.add('liked');
-                likeBtn.textContent = (post.liked ? '❤ Aimé' : '♡ J\'aime');
-                likeBtn.addEventListener('click', () => basculerLike(post.id));
-
-                const commentToggleBtn = document.createElement('button');
-                commentToggleBtn.type = 'button';
-                commentToggleBtn.textContent = '💬 Commenter';
-
-                actions.appendChild(likeBtn);
-                actions.appendChild(commentToggleBtn);
-                card.appendChild(actions);
-
-                const commentsSection = document.createElement('div');
-                commentsSection.classList.add('comments-section', 'hidden');
-
-                const commentsListEl = document.createElement('div');
-                commentsListEl.classList.add('comments-list');
-                post.comments.forEach(c => {
-                    const row = document.createElement('div');
-                    row.classList.add('comment-row');
-                    const bubble = document.createElement('div');
-                    bubble.classList.add('comment-bubble');
-                    const b = document.createElement('b');
-                    b.textContent = c.author + ': ';
-                    bubble.appendChild(b);
-                    bubble.appendChild(document.createTextNode(c.text));
-                    row.appendChild(bubble);
-                    commentsListEl.appendChild(row);
-                });
-                commentsSection.appendChild(commentsListEl);
-
-                const inputRow = document.createElement('div');
-                inputRow.classList.add('comment-input-row');
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.placeholder = 'Écrire un commentaire...';
-                input.maxLength = 300;
-                const sendCommentBtn = document.createElement('button');
-                sendCommentBtn.type = 'button';
-                sendCommentBtn.textContent = 'Envoyer';
-
-                function envoyerCommentaire() {
-                    ajouterCommentaire(post.id, input.value);
-                }
-                sendCommentBtn.addEventListener('click', envoyerCommentaire);
-                input.addEventListener('keypress', e => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        envoyerCommentaire();
-                    }
-                });
-
-                inputRow.appendChild(input);
-                inputRow.appendChild(sendCommentBtn);
-                commentsSection.appendChild(inputRow);
-
-                commentToggleBtn.addEventListener('click', () => {
-                    commentsSection.classList.toggle('hidden');
-                    if (!commentsSection.classList.contains('hidden')) input.focus();
-                });
-
-                card.appendChild(commentsSection);
-                postsList.appendChild(card);
-            });
-        }
-
-        afficherPublications();
-
-        // ---------- AMIS ----------
-        // status possibles : 'none', 'sent' (demande envoyée par vous),
-        // 'received' (demande reçue, en attente de votre réponse), 'friends'
-        let people = [
-            { id: 1, name: 'Utilisateur_23', status: 'friends', meta: 'Amis depuis 3 mois' },
-            { id: 2, name: 'Léa Martin', status: 'friends', meta: 'Amis depuis 1 an' },
-            { id: 3, name: 'Marc Petit', status: 'received', meta: 'Vous a envoyé une demande' },
-            { id: 4, name: 'Sofia Nkunda', status: 'sent', meta: 'Demande en attente' },
-            { id: 5, name: 'Camille Dubois', status: 'none', meta: '4 amis en commun' },
-            { id: 6, name: 'Yanis Belkacem', status: 'none', meta: '1 ami en commun' },
-            { id: 7, name: 'Amina Traoré', status: 'none', meta: '2 amis en commun' },
-            { id: 8, name: 'Thomas Lefebvre', status: 'none', meta: 'Aucun ami en commun' },
-            { id: 9, name: 'Julie Rousseau', status: 'none', meta: '3 amis en commun' },
-            { id: 10, name: 'Karim Haddad', status: 'none', meta: '1 ami en commun' },
-            { id: 11, name: 'Nadia Benali', status: 'none', meta: '5 amis en commun' },
-            { id: 12, name: 'Paul Girard', status: 'none', meta: 'Aucun ami en commun' },
-            { id: 13, name: 'Chloé Fontaine', status: 'none', meta: '2 amis en commun' },
-            { id: 14, name: 'Ibrahim Diallo', status: 'none', meta: '1 ami en commun' },
-            { id: 15, name: 'Manon Lefevre', status: 'none', meta: '6 amis en commun' },
-            { id: 16, name: 'Hugo Moreau', status: 'none', meta: 'Aucun ami en commun' },
-            { id: 17, name: 'Sarah Cohen', status: 'none', meta: '3 amis en commun' },
-            { id: 18, name: 'Adama Koné', status: 'none', meta: '2 amis en commun' },
-            { id: 19, name: 'Emma Bernard', status: 'none', meta: '1 ami en commun' },
-            { id: 20, name: 'Yassine El Idrissi', status: 'none', meta: 'Aucun ami en commun' }
-        ];
-        let inviteIdCounter = 1000;
-
-        const friendSearch = document.getElementById('friendSearch');
-        const searchResultsList = document.getElementById('searchResultsList');
-        const noSearchResults = document.getElementById('noSearchResults');
-        const invitePhone = document.getElementById('invitePhone');
-        const inviteBtn = document.getElementById('inviteBtn');
-        const inviteError = document.getElementById('inviteError');
-        const receivedSection = document.getElementById('receivedSection');
-        const receivedList = document.getElementById('receivedList');
-        const sentSection = document.getElementById('sentSection');
-        const sentList = document.getElementById('sentList');
-        const suggestionsSection = document.getElementById('suggestionsSection');
-        const suggestionsList = document.getElementById('suggestionsList');
-        const friendsList = document.getElementById('friendsList');
-        const friendsCount = document.getElementById('friendsCount');
-        const friendsBadge = document.getElementById('friendsBadge');
-
-        function actionsPour(p) {
-            if (p.status === 'received') {
-                return [
-                    { label: 'Accepter', cls: 'btn-secondary', onClick: () => accepterDemande(p.id) },
-                    { label: 'Refuser', cls: 'btn-danger', onClick: () => refuserDemande(p.id) }
-                ];
-            }
-            if (p.status === 'sent') {
-                return [{ label: 'Annuler', cls: 'btn-danger', onClick: () => annulerDemande(p.id) }];
-            }
-            if (p.status === 'friends') {
-                return [{ label: 'Amis ✓', cls: 'btn-disabled' }];
-            }
-            return [{ label: 'Ajouter', cls: 'btn-secondary', onClick: () => envoyerDemande(p.id) }];
-        }
-
-        function creerCarteAmi(p) {
-            const card = document.createElement('div');
-            card.classList.add('friend-card');
-            card.innerHTML = `
-                <div class="avatar" style="background:${couleurPour(p.name)}">${initiales(p.name)}</div>
-                <div class="friend-info">
-                    <div class="friend-name"></div>
-                    <div class="friend-meta"></div>
-                </div>
-                <div class="friend-actions"></div>
-            `;
-            card.querySelector('.friend-name').textContent = p.name;
-            card.querySelector('.friend-meta').textContent = p.meta;
-            const actionsEl = card.querySelector('.friend-actions');
-
-            actionsPour(p).forEach(({ label, cls, onClick }) => {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.textContent = label;
-                if (cls) btn.classList.add(cls);
-                if (onClick) btn.addEventListener('click', onClick);
-                else btn.classList.add('btn-disabled');
-                actionsEl.appendChild(btn);
-            });
-
-            return card;
-        }
-
-        function envoyerDemande(id) {
-            const p = people.find(x => x.id === id);
-            if (!p) return;
-            p.status = 'sent';
-            p.meta = 'Demande en attente';
-            afficherAmis();
-        }
-
-        function annulerDemande(id) {
-            const p = people.find(x => x.id === id);
-            if (!p) return;
-            p.status = 'none';
-            p.meta = '';
-            afficherAmis();
-        }
-
-        function accepterDemande(id) {
-            const p = people.find(x => x.id === id);
-            if (!p) return;
-            p.status = 'friends';
-            p.meta = 'Amis depuis aujourd\'hui';
-            afficherAmis();
-        }
-
-        function refuserDemande(id) {
-            const p = people.find(x => x.id === id);
-            if (!p) return;
-            p.status = 'none';
-            p.meta = '';
-            afficherAmis();
-        }
-
-        function retirerAmi(id) {
-            const p = people.find(x => x.id === id);
-            if (!p) return;
-            p.status = 'none';
-            p.meta = '';
-            afficherAmis();
-        }
-
-        function afficherAmis() {
-            const q = friendSearch.value.trim().toLowerCase();
-            const enRecherche = q.length > 0;
-
-            // Recherche réelle dans tout l'annuaire, tous statuts confondus
-            searchResultsList.classList.toggle('hidden', !enRecherche);
-            noSearchResults.classList.toggle('hidden', !enRecherche);
-            suggestionsSection.classList.toggle('hidden', enRecherche);
-
-            if (enRecherche) {
-                const resultats = people.filter(p => p.name.toLowerCase().includes(q));
-                searchResultsList.innerHTML = '';
-                noSearchResults.classList.toggle('hidden', resultats.length > 0);
-                resultats.forEach(p => searchResultsList.appendChild(creerCarteAmi(p)));
-            }
-
-            // Demandes reçues
-            const recus = people.filter(p => p.status === 'received');
-            receivedList.innerHTML = '';
-            receivedSection.classList.toggle('empty', recus.length === 0);
-            recus.forEach(p => receivedList.appendChild(creerCarteAmi(p)));
-
-            // Demandes envoyées (inclut les invitations par téléphone)
-            const envoyes = people.filter(p => p.status === 'sent');
-            sentList.innerHTML = '';
-            sentSection.classList.toggle('empty', envoyes.length === 0);
-            envoyes.forEach(p => sentList.appendChild(creerCarteAmi(p)));
-
-            // Suggestions par défaut (hors recherche)
-            const suggestions = people.filter(p => p.status === 'none').slice(0, 6);
-            suggestionsList.innerHTML = '';
-            suggestions.forEach(p => suggestionsList.appendChild(creerCarteAmi(p)));
-
-            // Amis confirmés
-            const amis = people.filter(p => p.status === 'friends');
-            friendsList.innerHTML = '';
-            friendsCount.textContent = amis.length;
-            if (amis.length === 0) {
-                const vide = document.createElement('div');
-                vide.classList.add('friends-empty-text');
-                vide.textContent = 'Aucun ami pour le moment.';
-                friendsList.appendChild(vide);
-            }
-            amis.forEach(p => friendsList.appendChild(creerCarteAmi(p)));
-
-            // Badge de notification sur l'onglet (demandes reçues en attente)
-            const enAttente = recus.length;
-            friendsBadge.textContent = enAttente;
-            friendsBadge.classList.toggle('hidden', enAttente === 0);
-        }
-
-        friendSearch.addEventListener('input', afficherAmis);
-
-        // Invitation par numéro de téléphone (personne hors annuaire)
-        function numeroValide(valeur) {
-            return valeur.replace(/[^0-9]/g, '').length >= 8;
-        }
-
-        invitePhone.addEventListener('input', function () {
-            inviteBtn.disabled = !numeroValide(invitePhone.value);
-            inviteError.textContent = '';
-        });
-
-        inviteBtn.addEventListener('click', function () {
-            const numero = invitePhone.value.trim();
-            if (!numeroValide(numero)) {
-                inviteError.textContent = 'Entre un numéro de téléphone valide (8 chiffres minimum).';
-                return;
-            }
-
-            const dejaInvite = people.some(p => p.name === numero);
-            if (dejaInvite) {
-                inviteError.textContent = 'Une invitation a déjà été envoyée à ce numéro.';
-                return;
-            }
-
-            people.push({
-                id: inviteIdCounter++,
-                name: numero,
-                status: 'sent',
-                meta: 'Invitation SMS envoyée · pas encore sur l\'application'
-            });
-
-            invitePhone.value = '';
-            inviteBtn.disabled = true;
-            inviteError.textContent = '';
-            afficherAmis();
-        });
-
-        afficherAmis();
-    </script>
+    <div class="card">
+      <h2>Discussion en temps réel (<span id="currentGroup">Général</span>)</h2>
+      <div class="chat-box" id="chatBox"></div>
+      
+      <form id="chatForm" class="chat-input-group">
+        <input type="text" id="messageInput" placeholder="Écris un message..." required>
+        <button type="submit" class="btn" style="width: auto; padding: 0 20px;">Envoyer</button>
+      </form>
+    </div>
+
+  </div>
+
+  <script>
+    // Connexion au serveur WebSocket (Remplace l'adresse si ton serveur est en ligne)
+    const socket = io('http://localhost:3000'); 
+
+    let currentUser = { name: '', avatar: '' };
+    let activeGroup = 'Général';
+
+    // 1. Gestion de la Photo issue de la Galerie
+    const galleryInput = document.getElementById('galleryInput');
+    const avatarPreview = document.getElementById('avatarPreview');
+
+    galleryInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          avatarPreview.src = event.target.result;
+          currentUser.avatar = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // 2. Soumission du Profil / Connexion
+    document.getElementById('authForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      currentUser.name = document.getElementById('username').value;
+      
+      // Masquer la connexion et afficher l'application
+      document.getElementById('authSection').classList.add('hidden');
+      document.getElementById('appSection').classList.remove('hidden');
+
+      // Rejoindre le canal par défaut
+      socket.emit('join_group', activeGroup);
+    });
+
+    // 3. Changement/Création de groupe
+    function joinGroup() {
+      const input = document.getElementById('groupNameInput');
+      if (input.value.trim() !== '') {
+        activeGroup = input.value.trim();
+        document.getElementById('currentGroup').textContent = activeGroup;
+        document.getElementById('chatBox').innerHTML = ''; // Réinitialiser le tchat
+        socket.emit('join_group', activeGroup);
+        input.value = '';
+      }
+    }
+
+    // 4. Envoi de Message Réel
+    document.getElementById('chatForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const input = document.getElementById('messageInput');
+      
+      if (input.value.trim() !== '') {
+        const msgData = {
+          user: currentUser.name,
+          text: input.value,
+          group: activeGroup
+        };
+
+        socket.emit('send_message', msgData);
+        input.value = '';
+      }
+    });
+
+    // 5. Réception des Messages Instantanés
+    socket.on('receive_message', function(data) {
+      const chatBox = document.getElementById('chatBox');
+      const msgDiv = document.createElement('div');
+      msgDiv.classList.add('msg');
+
+      if (data.user === currentUser.name) {
+        msgDiv.classList.add('me');
+      }
+
+      msgDiv.innerHTML = `<span class="msg-author">${data.user}</span>${data.text}`;
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    });
+  </script>
 
 </body>
-  </html>
+</html>

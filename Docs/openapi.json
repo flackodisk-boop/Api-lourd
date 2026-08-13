@@ -1,0 +1,50 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "VP Dev App API",
+    "description": "API REST pour la gestion des utilisateurs, des salons de discussion et des ressources.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api",
+      "description": "Serveur local de développement"
+    }
+  ],
+  "paths": {
+    "/users/login": {
+      "post": {
+        "summary": "Connexion d'un développeur",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string", "example": "Dev_Master" },
+                  "email": { "type": "string", "example": "dev@example.com" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Connexion réussie"
+          }
+        }
+      }
+    },
+    "/groups": {
+      "get": {
+        "summary": "Liste des groupes disponibles",
+        "responses": {
+          "200": {
+            "description": "Liste récupérée avec succès"
+          }
+        }
+      }
+    }
+  }
+}

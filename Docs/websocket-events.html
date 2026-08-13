@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Événements WebSocket - VP Dev</title>
+  <style>
+    body {
+      background-color: #0a0a0c;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      line-height: 1.6;
+    }
+    h1, h2 { color: #0070f3; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      background-color: #121318;
+    }
+    th, td {
+      border: 1px solid #1f222e;
+      padding: 12px;
+      text-align: left;
+    }
+    th { background-color: #1f222e; color: #0070f3; }
+    code {
+      background-color: #060608;
+      color: #0070f3;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Documentation WebSocket (Socket.IO)</h1>
+  <p>Adresse de connexion : <code>ws://localhost:3000</code></p>
+
+  <h2>Événements Émis (Client ➔ Serveur)</h2>
+  <table>
+    <tr>
+      <th>Événement</th>
+      <th>Payload</th>
+      <th>Description</th>
+    </tr>
+    <tr>
+      <td><code>join_group</code></td>
+      <td><code>"NomDuGroupe"</code> (String)</td>
+      <td>Rejoint un canal de discussion spécifique.</td>
+    </tr>
+    <tr>
+      <td><code>send_message</code></td>
+      <td><code>{ user, text, group }</code> (Object)</td>
+      <td>Envoie un message instantané dans un groupe.</td>
+    </tr>
+  </table>
+
+  <h2>Événements Reçus (Serveur ➔ Client)</h2>
+  <table>
+    <tr>
+      <th>Événement</th>
+      <th>Payload</th>
+      <th>Description</th>
+    </tr>
+    <tr>
+      <td><code>receive_message</code></td>
+      <td><code>{ user, text, group }</code> (Object)</td>
+      <td>Diffusion d'un nouveau message aux membres du groupe.</td>
+    </tr>
+  </table>
+
+</body>
+</ht
+ml>

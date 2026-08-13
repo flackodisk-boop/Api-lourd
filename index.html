@@ -85,6 +85,43 @@
       letter-spacing: 1px;
     }
 
+    /* Index Documentation & Fichiers API */
+    .doc-index {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .doc-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      background-color: #060608;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+    }
+
+    .doc-item a {
+      color: var(--accent-blue);
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .doc-item a:hover {
+      text-decoration: underline;
+    }
+
+    .doc-badge {
+      font-size: 11px;
+      background-color: #1f222e;
+      color: var(--text-muted);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
     /* Formulaires */
     .form-group {
       margin-bottom: 15px;
@@ -233,6 +270,33 @@
   <div id="appSection" class="hidden">
     
     <div class="card">
+      <h2>Index - Documentation API</h2>
+      <ul class="doc-index">
+        <li class="doc-item">
+          <div>
+            <a href="/docs/api-reference.html" target="_blank">Spécification Swagger / OpenAPI</a>
+            <div style="font-size: 11px; color: var(--text-muted);">Points d'accès JSON et schéma complet</div>
+          </div>
+          <span class="doc-badge">v1.0</span>
+        </li>
+        <li class="doc-item">
+          <div>
+            <a href="/docs/websocket-events.html" target="_blank">Événements Socket.IO</a>
+            <div style="font-size: 11px; color: var(--text-muted);">Guide d'intégration du chat temps réel</div>
+          </div>
+          <span class="doc-badge">WS</span>
+        </li>
+        <li class="doc-item">
+          <div>
+            <a href="/docs/files-index.json" target="_blank">Répertoire des fichiers API</a>
+            <div style="font-size: 11px; color: var(--text-muted);">Téléchargement des SDK et dépendances</div>
+          </div>
+          <span class="doc-badge">JSON</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card">
       <h2>Créer ou Rejoindre un Groupe</h2>
       <div class="form-group">
         <input type="text" id="groupNameInput" placeholder="Nom du groupe (ex: React Devs)">
@@ -334,4 +398,5 @@
   </script>
 
 </body>
-</html>
+        </html>
+        

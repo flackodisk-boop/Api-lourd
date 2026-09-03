@@ -323,7 +323,6 @@
           <div class="progress-bar" id="progressBar"></div>
         </div>
         <span id="timeDisplay" class="time-display">0:00 / 0:00</span>
-        <!-- Remplacez le lien src par le lien de votre fichier MP3 -->
         <audio id="audioElement" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
       </div>
 
@@ -348,7 +347,7 @@
     const progressContainer = document.getElementById('progressContainer');
     const timeDisplay = document.getElementById('timeDisplay');
 
-    // Fonction de Recherche
+    // Navigation
     searchBtn.addEventListener('click', () => {
       if (searchInput.value.trim() !== "") {
         heroSection.classList.add('hidden');
@@ -371,7 +370,7 @@
       return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
     }
 
-    // 1. Gestion Lecture / Pause
+    // Controls Audio
     playPauseBtn.addEventListener('click', () => {
       if (audioElement.paused) {
         audioElement.play();
@@ -382,7 +381,6 @@
       }
     });
 
-    // 2. Affichage en temps réel du temps écoulé et de la durée totale
     audioElement.addEventListener('timeupdate', () => {
       const currentTime = audioElement.currentTime;
       const duration = audioElement.duration;
@@ -396,12 +394,10 @@
       }
     });
 
-    // 3. Charger la durée dès le chargement du fichier
     audioElement.addEventListener('loadedmetadata', () => {
       timeDisplay.textContent = `0:00 / ${formatTime(audioElement.duration)}`;
     });
 
-    // 4. Se déplacer dans la musique au clic sur la barre de progression
     progressContainer.addEventListener('click', (e) => {
       const width = progressContainer.clientWidth;
       const clickX = e.offsetX;
@@ -412,7 +408,6 @@
       }
     });
 
-    // 5. Réinitialiser le lecteur à la fin de la musique
     audioElement.addEventListener('ended', () => {
       playPauseBtn.textContent = '▶';
       progressBar.style.width = '0%';

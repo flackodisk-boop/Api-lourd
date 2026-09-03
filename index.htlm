@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Célestin Lyrics — Experience Musique Premium</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #080c14;
+      --card-bg: rgba(15, 23, 42, 0.65);
+      --card-border: rgba(56, 189, 248, 0.2);
+      --primary-blue: #0088ff;
+      --accent-cyan: #00d2ff;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient Blue Glow Backgrounds */
+    .ambient-glow {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      z-index: -1;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    .bg-glow-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #0055ff; }
+    .bg-glow-2 { top: 40%; right: -10%; width: 600px; height: 600px; background: #00d2ff; }
+    .bg-glow-3 { bottom: -10%; left: 20%; width: 450px; height: 450px; background: #002244; }
+
+    /* Navbar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 2rem;
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--card-border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+    }
+
+    .sl-logo-svg {
+      width: 45px;
+      height: 45px;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 1.2rem;
+      letter-spacing: 2px;
+      color: var(--text-main);
+    }
+
+    .brand-subtitle {
+      font-size: 0.65rem;
+      letter-spacing: 3px;
+      color: var(--accent-cyan);
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    /* Glass Card Style */
+    .glass-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(16px);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+
+    /* Hero Section */
+    .hero-section {
+      text-align: center;
+      padding: 3rem 1rem;
+    }
+
+    .hero-title {
+      font-size: 3rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-title span {
+      color: var(--accent-cyan);
+      text-shadow: 0 0 20px rgba(0, 210, 255, 0.5);
+    }
+
+    .hero-subtitle {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      font-size: 1.1rem;
+    }
+
+    /* Search Box */
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--card-border);
+      border-radius: 50px;
+      padding: 0.5rem 1rem;
+      max-width: 600px;
+      margin: 0 auto;
+      transition: all 0.3s ease;
+    }
+
+    .search-box:focus-within {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+    }
+
+    .search-box input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+    }
+
+    .search-box button {
+      background: var(--primary-blue);
+      border: none;
+      color: white;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease;
+    }
+
+    .search-box button:hover {
+      background: var(--accent-cyan);
+    }
+
+    /* Player & Utility */
+    .hidden { display: none; }
+
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-action:hover {
+      background: var(--primary-blue);
+      border-color: var(--primary-blue);
+    }
+
+    /* Audio Player Custom */
+    .player-card {
+      margin: 1.5rem 0;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .progress-bar-container {
+      flex: 1;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary-blue), var(--accent-cyan));
+      border-radius: 4px;
+      transition: width 0.1s linear;
+    }
+
+    .time-display {
+      font-size: 0.85rem;
+      color: var(--accent-cyan);
+      font-weight: 600;
+      min-width: 85px;
+      text-align: right;
+    }
+
+    pre {
+      white-space: pre-wrap;
+      font-family: inherit;
+      line-height: 1.8;
+      color: #cbd5e1;
+      font-size: 1.05rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Glows (Bleu & Noir) -->
+  <div class="ambient-glow bg-glow-1"></div>
+  <div class="ambient-glow bg-glow-2"></div>
+  <div class="ambient-glow bg-glow-3"></div>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="logo-brand" id="homeBtn" role="button" tabindex="0">
+      <div class="logo-svg-wrapper">
+        <svg viewBox="0 0 500 500" class="sl-logo-svg">
+          <defs>
+            <filter id="nav-glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="10" result="blur" />
+              <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+            <linearGradient id="celestin-blue" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00d2ff" />
+              <stop offset="100%" stop-color="#0055ff" />
+            </linearGradient>
+          </defs>
+          <circle cx="250" cy="250" r="210" fill="none" stroke="url(#celestin-blue)" stroke-width="10" filter="url(#nav-glow)" opacity="0.8" />
+          <path d="M 320 160 C 290 130 240 120 180 140 C 120 160 90 220 90 290 C 90 370 140 400 210 400 C 280 400 320 360 340 320" 
+                fill="none" stroke="url(#celestin-blue)" stroke-width="28" stroke-linecap="round" />
+          <circle cx="340" cy="160" r="16" fill="#00d2ff" filter="url(#nav-glow)" />
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-title">CÉLESTIN</span>
+        <span class="brand-subtitle">LYRICS</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Hero / Search Section -->
+    <section class="hero-section" id="heroSection">
+      <h1 class="hero-title">CÉLESTIN <span>LYRICS</span></h1>
+      <p class="hero-subtitle">Recherchez. Écoutez. Explorez les paroles.</p>
+      
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Rechercher une chanson, un artiste..." autocomplete="off">
+        <button id="searchBtn" aria-label="Rechercher">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- Lyrics View Section -->
+    <section class="lyrics-section hidden" id="lyricsSection">
+      <button class="btn-action" id="backBtn" style="margin-bottom: 1rem;">
+        ← Retour à la recherche
+      </button>
+      
+      <div class="lyrics-header glass-card">
+        <div class="song-details">
+          <h2 id="songTitle" class="song-title">Exemple de chanson</h2>
+          <p id="songArtist" class="song-artist" style="color: var(--accent-cyan);">Artiste Célestin</p>
+          <p id="songAlbum" class="song-album" style="color: var(--text-muted); font-size: 0.9rem;">Album Céleste</p>
+          
+          <div class="action-buttons">
+            <button class="btn-action" id="focusBtn">Mode Focus</button>
+            <button class="btn-action" id="copyBtn">Copier</button>
+            <button class="btn-action" id="shareBtn">Partager</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Player Section avec Durée de l'Audio -->
+      <div id="playerContainer" class="player-card glass-card">
+        <button id="playPauseBtn" class="btn-action" aria-label="Jouer ou Mettre en pause">▶</button>
+        <div class="progress-bar-container" id="progressContainer">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <span id="timeDisplay" class="time-display">0:00 / 0:00</span>
+        <!-- Remplacez le lien src par le lien de votre fichier MP3 -->
+        <audio id="audioElement" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+      </div>
+
+      <!-- Paroles -->
+      <div class="lyrics-body glass-card" id="lyricsBody">
+        <pre id="lyricsText">Les paroles s'afficheront ici...</pre>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const heroSection = document.getElementById('heroSection');
+    const lyricsSection = document.getElementById('lyricsSection');
+    const backBtn = document.getElementById('backBtn');
+
+    // Éléments Lecteur Audio
+    const audioElement = document.getElementById('audioElement');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const progressBar = document.getElementById('progressBar');
+    const progressContainer = document.getElementById('progressContainer');
+    const timeDisplay = document.getElementById('timeDisplay');
+
+    // Fonction de Recherche
+    searchBtn.addEventListener('click', () => {
+      if (searchInput.value.trim() !== "") {
+        heroSection.classList.add('hidden');
+        lyricsSection.classList.remove('hidden');
+      }
+    });
+
+    backBtn.addEventListener('click', () => {
+      audioElement.pause();
+      playPauseBtn.textContent = '▶';
+      lyricsSection.classList.add('hidden');
+      heroSection.classList.remove('hidden');
+    });
+
+    // Formater le temps en MM:SS
+    function formatTime(seconds) {
+      if (isNaN(seconds)) return "0:00";
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    // 1. Gestion Lecture / Pause
+    playPauseBtn.addEventListener('click', () => {
+      if (audioElement.paused) {
+        audioElement.play();
+        playPauseBtn.textContent = '❚❚';
+      } else {
+        audioElement.pause();
+        playPauseBtn.textContent = '▶';
+      }
+    });
+
+    // 2. Affichage en temps réel du temps écoulé et de la durée totale
+    audioElement.addEventListener('timeupdate', () => {
+      const currentTime = audioElement.currentTime;
+      const duration = audioElement.duration;
+      
+      if (duration) {
+        const progressPercent = (currentTime / duration) * 100;
+        progressBar.style.width = `${progressPercent}%`;
+        timeDisplay.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+      } else {
+        timeDisplay.textContent = `${formatTime(currentTime)} / 0:00`;
+      }
+    });
+
+    // 3. Charger la durée dès le chargement du fichier
+    audioElement.addEventListener('loadedmetadata', () => {
+      timeDisplay.textContent = `0:00 / ${formatTime(audioElement.duration)}`;
+    });
+
+    // 4. Se déplacer dans la musique au clic sur la barre de progression
+    progressContainer.addEventListener('click', (e) => {
+      const width = progressContainer.clientWidth;
+      const clickX = e.offsetX;
+      const duration = audioElement.duration;
+
+      if (duration) {
+        audioElement.currentTime = (clickX / width) * duration;
+      }
+    });
+
+    // 5. Réinitialiser le lecteur à la fin de la musique
+    audioElement.addEventListener('ended', () => {
+      playPauseBtn.textContent = '▶';
+      progressBar.style.width = '0%';
+    });
+  </script>
+</body>
+</html>
